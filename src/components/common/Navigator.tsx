@@ -23,7 +23,7 @@ export const Navigator = () => {
     <S.NavBar>
       <S.NavItem to="/Home" aria-label="Home">
         <S.Icon src={isHome ? homeActive : homeInactive} alt="home" />
-        <S.Label $active={isHome}>홈</S.Label>
+        <S.Label className='l500' $active={isHome}>홈</S.Label>
       </S.NavItem>
 
       <S.NavItem to="/Project" aria-label="Project">

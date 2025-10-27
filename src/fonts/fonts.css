@@ -1,0 +1,112 @@
+/* Pretendard Font-Face */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('./Pretendard-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('./Pretendard-Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('./Pretendard-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('./Pretendard-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Headings */
+.h1 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+.h2 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 150%;
+}
+.h3 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 150%;
+}
+
+/* Body - XL400, XL500 */
+.xl400 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.xl500 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+/* Body - L400, L500, L600 */
+.l400 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.l500 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 150%;
+}
+.l600 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 150%;
+}
+
+/* Body - M400, M500, M600 */
+.m400 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.m500 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 150%;
+}
+.m600 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 150%;
+}
+
+/* Body - S400, S500 */
+.s400 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.s500 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 150%;
+}
