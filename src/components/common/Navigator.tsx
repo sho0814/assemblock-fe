@@ -28,17 +28,17 @@ export const Navigator = () => {
 
       <S.NavItem to="/Project" aria-label="Project">
         <S.Icon src={isProject ? projectActive : projectInactive} alt="project" />
-        <S.Label $active={isProject}>내 프로젝트</S.Label>
+        <S.Label className='l500' $active={isProject}>내 프로젝트</S.Label>
       </S.NavItem>
 
       <S.NavItem to="/Board" aria-label="Board">
         <S.Icon src={isBoard ? boardActive : boardInactive} alt="board" />
-        <S.Label $active={isBoard}>내 보드</S.Label>
+        <S.Label className='l500' $active={isBoard}>내 보드</S.Label>
       </S.NavItem>
 
       <S.NavItem to="/My" aria-label="Profile">
         <S.Icon src={isMy ? profileActive : profileInactive} alt="profile" />
-        <S.Label $active={isMy}>마이페이지</S.Label>
+        <S.Label className='l500' $active={isMy}>마이페이지</S.Label>
       </S.NavItem>
       
     </S.NavBar>
