@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 
+import { OverlayProvider } from '@components/common/OverlayContext';
 import { Layout } from '@components/common/Layout'
 import { Navigator} from '@components/common/Navigator'
 
@@ -10,7 +11,7 @@ import { MyPage } from '@pages/my/MyPage'
 
 function App() {
   return (
-    <>
+    <OverlayProvider>
       <Layout>
         <Routes>
           <Route path="/Home" element={<HomePage />} />
@@ -20,8 +21,7 @@ function App() {
         </Routes>
       </Layout>
       <Navigator />
-    </>
-
+    </OverlayProvider>
   )
 }
 
