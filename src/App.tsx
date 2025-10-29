@@ -8,7 +8,9 @@ import { HomePage } from '@pages/home/HomePage'
 import { BoardPage } from '@pages/board/BoardPage'
 import { ProjectPage } from '@pages/project/ProjectPage'
 import { MyPage } from '@pages/my/MyPage'
-import { BlockRegisterPage } from '@pages/BlockRegister/BlockRegisterPage'
+import { BlockDetailPage } from '@pages/block/BlockDetailPage'
+import { BlockEditPage } from '@pages/block/BlockEditPage'
+import { BlockRegisterPage } from '@pages/block/BlockRegisterPage'
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
+          <Route path="Block/detail" element={<BlockDetailPage />} />
+          <Route path="Block/edit" element={<BlockEditPage />} />
           <Route path="Block/register" element={<BlockRegisterPage />} />
         </Route>
       </Routes>
