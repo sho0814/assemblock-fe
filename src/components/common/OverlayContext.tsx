@@ -1,10 +1,11 @@
-import React, { useState, createContext, useContext } from 'react';
+import type { ReactNode, CSSProperties } from "react"
+import { useState, createContext, useContext } from 'react';
 import Overlay from './Overlay';
 
 interface OverlayContextType {
   showOverlay: (
-    content: React.ReactNode,
-    options?: { overlayStyle?: React.CSSProperties; contentStyle?: React.CSSProperties }
+    content: ReactNode,
+    options?: { overlayStyle?: CSSProperties; contentStyle?: CSSProperties }
   ) => void;
   closeOverlay: () => void;
 }
@@ -12,19 +13,19 @@ interface OverlayContextType {
 const OverlayContext = createContext<OverlayContextType | null>(null);
 
 interface OverlayProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function OverlayProvider({ children }: OverlayProviderProps) {
-  const [content, setContent] = useState<React.ReactNode | null>(null);
+  const [content, setContent] = useState<ReactNode | null>(null);
   const [styleOptions, setStyleOptions] = useState<{
-    overlayStyle?: React.CSSProperties;
-    contentStyle?: React.CSSProperties;
+    overlayStyle?: CSSProperties;
+    contentStyle?: CSSProperties;
   }>({});
 
   const showOverlay = (
     jsx: React.ReactNode,
-    options?: { overlayStyle?: React.CSSProperties; contentStyle?: React.CSSProperties }
+    options?: { overlayStyle?: CSSProperties; contentStyle?: CSSProperties }
   ) => {
     setContent(jsx);
     setStyleOptions(options || {});

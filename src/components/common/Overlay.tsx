@@ -1,12 +1,13 @@
+import type { ReactNode, CSSProperties } from "react"
 import ReactDOM from "react-dom";
 import * as S from './Overlay.styled'
 
 interface OverlayProps {
   open: boolean;
   onClose: () => void;
-  children: React.ReactNode;
-  overlayStyle?: React.CSSProperties;
-  contentStyle?: React.CSSProperties;
+  children: ReactNode;
+  overlayStyle?: CSSProperties;
+  contentStyle?: CSSProperties;
 }
 
 export default function Overlay({
