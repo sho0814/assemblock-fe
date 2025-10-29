@@ -17,6 +17,6 @@ export const LayoutContainer = styled.div`
 
 export const Content = styled.div`
   flex: 1;              // 남은 공간 모두 차지
-  overflow-y: auto;     // 세로 스크롤 가능하도록
-  padding-bottom: 99px; // GNB 높이만큼 패딩 줘서 가리지 않게 함
+  overflow-y: auto;
+  padding-bottom: 99px;
 `;
