@@ -7,9 +7,11 @@ export const LayoutContainer = styled.div`
   height: 100vh;
   background: #F2F2F2;
   padding-top: 48px;
-  padding-bottom: 99px;
-  margin: 0 auto;
-  overflow: auto;
+  padding-bottom: 20px;
   padding-left: 20px;
   padding-right: 20px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 `;
