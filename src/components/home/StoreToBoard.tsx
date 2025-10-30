@@ -1,6 +1,6 @@
 import { useOverlay } from '@components/common/OverlayContext'
 
-export function StoreToBoard() {
+export default function StoreToBoard() {
     const { showOverlay, closeOverlay } = useOverlay();
 
     return (

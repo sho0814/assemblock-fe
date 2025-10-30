@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom"
-export function BlockRegisterBtn() {
+
+export default function BlockRegisterBtn() {
     const navigate = useNavigate();
 
     return (
         <div>
-            <div onClick={() => navigate('/')}></div>
+            <button onClick={() => navigate('/block/register')}>블록 등록하기</button>
         </div>
     )
 }
