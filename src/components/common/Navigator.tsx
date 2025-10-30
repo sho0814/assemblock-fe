@@ -12,14 +12,14 @@ import profileInactive from '@assets/common/Nav/profile-inactive.svg'
 
 
 export const Navigator = () => {
-    const { pathname } = useLocation();
-    
-    const isHome = pathname === "/Home";
-    const isProject = pathname === "/Project";
-    const isBoard = pathname === "/Board";
-    const isMy = pathname === "/My";
-    
-    return (
+  const { pathname } = useLocation();
+
+  const isHome = pathname === "/Home";
+  const isProject = pathname === "/Project";
+  const isBoard = pathname === "/Board";
+  const isMy = pathname === "/My";
+
+  return (
     <S.NavBar>
       <S.NavItem to="/Home" aria-label="Home">
         <S.Icon src={isHome ? homeActive : homeInactive} alt="home" />
@@ -40,7 +40,7 @@ export const Navigator = () => {
         <S.Icon src={isMy ? profileActive : profileInactive} alt="profile" />
         <S.Label className='l500' $active={isMy}>마이페이지</S.Label>
       </S.NavItem>
-      
+
     </S.NavBar>
-    );
+  );
 }

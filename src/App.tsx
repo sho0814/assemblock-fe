@@ -8,6 +8,9 @@ import { HomePage } from '@pages/home/HomePage'
 import { BoardPage } from '@pages/board/BoardPage'
 import { ProjectPage } from '@pages/project/ProjectPage'
 import { MyPage } from '@pages/my/MyPage'
+import { CategoryPage } from '@pages/home/category/CategoryPage';
+import { NotificationPage } from '@pages/home/notification/NotificationPage';
+import { SearchPage } from '@pages/home/search/SearchPage';
 import { BlockDetailPage } from '@pages/block/BlockDetailPage'
 import { BlockEditPage } from '@pages/block/BlockEditPage'
 import { BlockRegisterPage } from '@pages/block/BlockRegisterPage'
@@ -23,9 +26,12 @@ function App() {
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
-          <Route path="Block/detail" element={<BlockDetailPage />} />
-          <Route path="Block/edit" element={<BlockEditPage />} />
-          <Route path="Block/register" element={<BlockRegisterPage />} />
+          <Route path="/Home/category" element={<CategoryPage />} />
+          <Route path="/Home/notification" element={<NotificationPage />} />
+          <Route path="/Home/search" element={<SearchPage />} />
+          <Route path="/Block/detail" element={<BlockDetailPage />} />
+          <Route path="/Block/edit" element={<BlockEditPage />} />
+          <Route path="/Block/register" element={<BlockRegisterPage />} />
         </Route>
       </Routes>
     </OverlayProvider>
