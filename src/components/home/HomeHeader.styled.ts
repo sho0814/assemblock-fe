@@ -1,3 +1,4 @@
+// src/components/home/HomeHeader.styled.ts
 import styled from 'styled-components';
 
 export const Header = styled.div`
@@ -34,11 +35,6 @@ export const IconWrapper = styled.div`
     justify-content: flex-end;
     width: 144px;
     gap: 16px;
-
-    .img{
-        width: 24px;
-        height: 24px;
-    }
 `
 
 export const Icon = styled.img`

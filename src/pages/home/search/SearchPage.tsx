@@ -1,6 +1,10 @@
 // src/pages/home/category/SearchPage.tsx
+import SimpleHeader from "@components/shared/SimpleHeader"
+
 export function SearchPage() {
     return(
-        <div>This is Search page.</div>
+        <>
+        <SimpleHeader title={"검색"} />
+        </>
     )
 }

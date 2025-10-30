@@ -1,5 +1,4 @@
-// src/components/block/Header.tsx
-import React, { useState } from 'react';
+// src/components/home/HomeHeader.tsx
 import { useNavigate } from 'react-router-dom';
 
 import * as S from './HomeHeader.styled'
