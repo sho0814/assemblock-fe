@@ -19,19 +19,19 @@ export function HomePage() {
         <>
             <HomeHeader isSkill={isSkill} setIsSkill={setIsSkill} />
 
-            <div>
-            <Swipe />
-            <StoreToBoard />
-            </div>
+            <S.SwipeContainer>
+                <Swipe />
+                <StoreToBoard />
+            </S.SwipeContainer>
 
             <S.RegisterButtonContainer>
-            <CommonButton
-                width="60px"
-                height="60px"
-                borderRadius='100px'
-                onClick={() => navigate('/block/register')}
-                imgSrc={RegisterIcon}
-            />
+                <CommonButton
+                    width="60px"
+                    height="60px"
+                    borderRadius='100px'
+                    onClick={() => navigate('/block/register')}
+                    imgSrc={RegisterIcon}
+                />
             </S.RegisterButtonContainer>
         </>
     )
