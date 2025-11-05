@@ -7,15 +7,24 @@ import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   title: string;
+  onBackClick?: () => void;
 }
 
-export default function SimpleHeader({title}: HeaderProps): React.JSX.Element {
+export default function SimpleHeader({ title, onBackClick }: HeaderProps): React.JSX.Element {
   const navigate = useNavigate();
+
+  const handleBackClick = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      navigate(-1);
+    }
+  };
 
   return (
     <S.Header>
       
-      <S.IconWrapper  onClick={() => navigate(-1)}>
+      <S.IconWrapper  onClick={handleBackClick}>
         <S.Icon src={backArrow}/>
       </S.IconWrapper>
 

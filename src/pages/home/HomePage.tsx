@@ -14,7 +14,7 @@ import * as S from './HomePage.styled'
 export function HomePage() {
     const navigate = useNavigate();
     const [isSkill, setIsSkill] = useState(true);
-
+    console.log(isSkill);
     return (
         <>
             <HomeHeader isSkill={isSkill} setIsSkill={setIsSkill} />
@@ -29,7 +29,7 @@ export function HomePage() {
                     width="60px"
                     height="60px"
                     borderRadius='100px'
-                    onClick={() => navigate('/block/register')}
+                    onClick={() => navigate('/block/register', { state: { isSkill }})}
                     imgSrc={RegisterIcon}
                 />
             </S.RegisterButtonContainer>
