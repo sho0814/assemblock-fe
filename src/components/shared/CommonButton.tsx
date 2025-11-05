@@ -8,16 +8,20 @@ interface CommonButtonProps {
     onClick?: () => void;
     content?: string;
     imgSrc?: string;
+    type?: "button" | "submit";
+    disabled?: boolean;
 }
 
-export default function CommonButton({ width, height, borderRadius, onClick, content, imgSrc }: CommonButtonProps): React.JSX.Element {
+export default function CommonButton({ width, height, borderRadius, onClick, content, imgSrc, type, disabled }: CommonButtonProps): React.JSX.Element {
     return (
         <>
             <S.Button
                 width={width}
                 height={height}
                 $borderRadius={borderRadius}
-                onClick={onClick}>
+                onClick={onClick}
+                type={type}
+                disabled={disabled}>
 
                 {imgSrc && <S.ButtonImage src={imgSrc} alt="button image" />}
                 {content && content}

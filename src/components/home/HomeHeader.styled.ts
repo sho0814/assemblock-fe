@@ -27,6 +27,8 @@ export const Title = styled.strong<{ $active?: boolean }>`
     font-size: 24px;
     font-weight: 700;
     color: ${({ $active }) => ($active ? "#49444A" : "#C2C1C3")};
+
+    transition: color 0.2s;
 `
 
 export const IconWrapper = styled.div`

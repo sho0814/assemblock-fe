@@ -10,7 +10,7 @@ export default function StoreToBoard() {
                 <button onClick={closeOverlay}>close</button>
             </div>,
             {
-                overlayStyle: { background: "rgba(100,0,0,0.7)" },
+                overlayStyle: { background: "rgba(72, 70, 70, 0.7)" },
                 contentStyle: { borderRadius: "24px", padding: "48px" }
             })}>
             보드에 저장
