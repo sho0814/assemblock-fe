@@ -1,7 +1,12 @@
-// src/pages/project/Project.tsx
+// src/pages/project/ProjectPage.tsx
+
+import ProjectHeader from "@components/project/ProjectHeader";
 
 export function ProjectPage() {
-    return (
-        <div>This is Project Page.</div>
-    )
+  return (
+    <>
+      <ProjectHeader />
+      <div>This is Project Page.</div>
+    </>
+  );
 }
