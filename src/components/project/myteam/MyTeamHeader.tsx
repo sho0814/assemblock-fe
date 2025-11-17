@@ -15,7 +15,7 @@ const HEADER_COPY: Record<ProjectStatus, { title: string; subtitle: string }> =
     },
     done: {
       title: "우리 팀의 여정이 마무리됐어요.\n멋진 협업이었네요!",
-      subtitle: "아래 팀원들에게 리뷰 블록을 남겨주세요.",
+      subtitle: "",
     },
   };
 

@@ -129,7 +129,7 @@ export default function ProposalItem({
   const title = kind === "SENT" ? "보낸 제안" : "받은 제안";
 
   const handleClickTeam = () => {
-    navigate(`/Project/team/${projectId}`);
+    navigate(`/Project/team/${proposalId}`);
   };
 
   const handleClickProposalDetail = () => {

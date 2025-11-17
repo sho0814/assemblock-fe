@@ -28,7 +28,7 @@ function App() {
           <Route path="/Board" element={<BoardPage />} />
           <Route path="/Project" element={<ProjectPage />} />
           <Route
-            path="/Project/team/:projectId/review/:targetUserId"
+            path="/Project/team/:proposalId/review"
             element={<ReviewPage />}
           />
           <Route path="/My" element={<MyPage />} />
@@ -40,7 +40,7 @@ function App() {
           <Route path="/Block/detail" element={<BlockDetailPage />} />
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
-          <Route path="/Project/team/:projectId" element={<MyTeamPage />} />
+          <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
           <Route
             path="/Project/proposal/:proposalId"
             element={<ProposalDetailPage />}

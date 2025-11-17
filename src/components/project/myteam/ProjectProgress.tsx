@@ -2,12 +2,6 @@
 import styled from "styled-components";
 import type { ProjectStatus } from "./MyTeamTypes";
 
-const PROGRESS_LABEL: Record<ProjectStatus, string> = {
-  recruiting: "마감까지 D-6",
-  ongoing: "프로젝트 진행 중",
-  done: "프로젝트 완료",
-};
-
 const Wrapper = styled.section`
   margin-bottom: 16px;
   padding: 14px 16px;
@@ -23,12 +17,11 @@ const BarOuter = styled.div`
   overflow: hidden;
 `;
 
-const BarInner = styled.div<{ status: ProjectStatus }>`
+const BarInner = styled.div<{ widthPercent: number }>`
   height: 100%;
   border-radius: 999px;
   background: #333;
-  width: ${({ status }) =>
-    status === "recruiting" ? "30%" : status === "ongoing" ? "70%" : "100%"};
+  width: ${({ widthPercent }) => `${widthPercent}%`};
 `;
 
 const DateText = styled.div`
@@ -43,18 +36,57 @@ type Props = {
   endDate: string;
 };
 
+const diffDays = (from: Date, to: Date) => {
+  const DAY = 1000 * 60 * 60 * 24;
+  const fromMidnight = new Date(
+    from.getFullYear(),
+    from.getMonth(),
+    from.getDate()
+  );
+  const toMidnight = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.floor((toMidnight.getTime() - fromMidnight.getTime()) / DAY);
+};
+
 export const ProjectProgress = ({ status, startDate, endDate }: Props) => {
-  const label = PROGRESS_LABEL[status];
+  const today = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  let label = "";
+  let widthPercent = 0;
+
+  if (status === "recruiting") {
+    const totalDays = diffDays(start, end) + 1;
+    const passedDays = diffDays(start, today) + 1;
+
+    const clampedPassed = Math.min(Math.max(passedDays, 0), totalDays);
+    widthPercent = (clampedPassed / totalDays) * 100;
+
+    const dday = diffDays(today, end);
+
+    if (dday < 0) label = "모집 마감";
+    else if (dday === 0) label = "오늘 마감";
+    else label = `마감까지 D-${dday}`;
+  } else if (status === "ongoing") {
+    label = "프로젝트 진행 중";
+    widthPercent = 100;
+  } else {
+    label = "프로젝트 완료됨";
+    widthPercent = 100;
+  }
 
   return (
     <Wrapper>
       <div style={{ fontSize: 13 }}>{label}</div>
       <BarOuter>
-        <BarInner status={status} />
+        <BarInner widthPercent={widthPercent} />
       </BarOuter>
-      <DateText>
-        {startDate} ~ {endDate}
-      </DateText>
+
+      {status === "recruiting" && (
+        <DateText>
+          {startDate} ~ {endDate}
+        </DateText>
+      )}
     </Wrapper>
   );
 };

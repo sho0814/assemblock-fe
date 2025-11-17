@@ -36,15 +36,6 @@ const Chip = styled.span`
   background: #eee;
 `;
 
-const ReviewButton = styled.button`
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  border: none;
-  background: #333;
-  color: #fff;
-`;
-
 type Props = {
   status: ProjectStatus;
   member: Member;
@@ -53,15 +44,8 @@ type Props = {
 export const MemberItem = ({ status, member }: Props) => {
   let right: React.ReactNode = null;
 
-  if (status === "done") {
-    // 완료 상태 → 리뷰 버튼 / 완료 라벨
-    if (member.responseStatus === "accepted") {
-      right = <ReviewButton>리뷰 남기기</ReviewButton>;
-    } else {
-      right = <Chip>작성 완료</Chip>;
-    }
-  } else {
-    // recruiting / ongoing
+  if (status === "recruiting") {
+    // 모집 중: 기존 로직 유지
     if (member.isLeader) {
       right = <Chip>팀장</Chip>;
     } else if (member.responseStatus === "pending") {
@@ -70,6 +54,10 @@ export const MemberItem = ({ status, member }: Props) => {
       right = <Chip>거절됨</Chip>;
     } else if (member.responseStatus === "accepted") {
       right = <Chip>수락 완료</Chip>;
+    }
+  } else if (status === "ongoing") {
+    if (member.isLeader) {
+      right = <Chip>팀장</Chip>;
     }
   }
 
