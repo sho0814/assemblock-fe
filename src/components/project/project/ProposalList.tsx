@@ -1,21 +1,19 @@
-import React, { useMemo } from "react";
+import React from "react";
 import styled from "styled-components";
 import ProposalItem from "./ProposalItem";
 
-type Kind = "SENT" | "RECEIVED";
 export type ProposalListItem = {
+  projectId: number | string;
   proposalId: number | string;
-  kind: Kind; // '보낸 제안' | '받은 제안'
-  topNickname: string; // 가나다 순 가장 상단 사용자 닉네임
-  othersCount: number; // topNickname 외 인원 수
-  topProfileUrl?: string; // 프로필 이미지 URL
-  onClickTeam: () => void; // "내 팀 보기"
-  state?: "ONGOING" | "DONE";
+  kind: "SENT" | "RECEIVED";
+  topNickname: string;
+  othersCount: number;
+  topProfileUrl?: string;
+  state: "ONGOING" | "DONE";
 };
 
 type Props = {
-  sentItems?: ProposalListItem[];
-  receivedItems?: ProposalListItem[];
+  items: ProposalListItem[];
   sortByNicknameClient?: boolean;
 };
 
@@ -27,7 +25,7 @@ const Card = styled.ul`
   border: 1.2px solid var(--GrayScale-GR10, #efedef);
   border-radius: 20px;
   margin: 0 auto;
-  /* 아이템 간격 8px */
+
   & > li + li {
     margin-top: 8px;
   }
@@ -41,32 +39,33 @@ const Divider = styled.hr`
 `;
 
 export default function ProposalList({
-  sentItems = [],
-  receivedItems = [],
+  items,
   sortByNicknameClient = false,
 }: Props) {
-  const items = useMemo(() => {
-    const merged = [...sentItems, ...receivedItems];
+  // 정렬 옵션 (선택)
+  const sortedItems = React.useMemo(() => {
+    const clone = [...items];
     if (sortByNicknameClient) {
-      merged.sort((a, b) => a.topNickname.localeCompare(b.topNickname, "ko"));
+      clone.sort((a, b) => a.topNickname.localeCompare(b.topNickname, "ko"));
     }
-    return merged;
-  }, [sentItems, receivedItems, sortByNicknameClient]);
+    return clone;
+  }, [items, sortByNicknameClient]);
 
-  if (items.length === 0) return null;
+  if (sortedItems.length === 0) return null;
 
   return (
     <Card>
-      {items.map((it, idx) => (
+      {sortedItems.map((it, idx) => (
         <React.Fragment key={it.proposalId}>
           <ProposalItem
             kind={it.kind}
             topNickname={it.topNickname}
             othersCount={it.othersCount}
             topProfileUrl={it.topProfileUrl}
-            onClickTeam={it.onClickTeam}
+            projectId={it.projectId}
+            proposalId={it.proposalId}
           />
-          {idx !== items.length - 1 && <Divider />}
+          {idx !== sortedItems.length - 1 && <Divider />}
         </React.Fragment>
       ))}
     </Card>

@@ -5,22 +5,31 @@ import { useNavigate } from "react-router-dom";
 type Kind = "SENT" | "RECEIVED";
 
 type Props = {
-  kind: Kind; // '보낸 제안' | '받은 제안'
-  topNickname: string; // 가나다 순 가장 상단 사용자 닉네임
-  othersCount: number; // topNickname 외 인원 수
-  topProfileUrl?: string; // 프로필 이미지 URL (없으면 컬러 원형)
-  onClickTeam: () => void; // "내 팀 보기"
+  kind: Kind;
+  topNickname: string;
+  othersCount: number;
+  topProfileUrl?: string;
+  projectId: number | string;
+  proposalId: number | string;
 };
 
 const Item = styled.li`
   list-style: none;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
 
-  padding: 14px 16px;
+  padding: 16px;
   border-radius: 16px;
-  background: #fafafa;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+`;
+
+const TopRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 `;
 
 const Left = styled.div`
@@ -39,7 +48,7 @@ const Avatar = styled.div<{ src?: string }>`
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: ${({ src }) => (src ? `url(${src}) center/cover` : "#D9D9D9")};
+  background: ${({ src }) => (src ? `url(${src}) center/cover` : "#d9d9d9")};
 `;
 
 const Badge = styled.div`
@@ -49,7 +58,7 @@ const Badge = styled.div`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #352f36; /* 어두운 원형 배경 */
+  background: #352f36;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,6 +71,11 @@ const BadgeIcon = styled.img`
   height: 11px;
   user-select: none;
   pointer-events: none;
+`;
+
+const TextWrap = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 const Title = styled.div`
@@ -77,15 +91,30 @@ const Sub = styled.div`
   color: #5d595e;
 `;
 
-const CTA = styled.button`
-  padding: 8px 16px;
-  border: none;
+// 버튼 그룹
+const CTAGroup = styled.div`
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
   border-radius: 16px;
-  background: #352f36;
-  color: #fff;
+  border: 1px solid #d0ced1;
+  overflow: hidden;
+`;
+
+const CTAButton = styled.button`
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: #ffffff;
+  font-size: 14px;
   font-weight: 500;
-  font-size: 12px;
+  color: #352f36;
   cursor: pointer;
+`;
+
+const Divider = styled.div`
+  width: 1px;
+  background: #d0ced1;
 `;
 
 export default function ProposalItem({
@@ -93,36 +122,47 @@ export default function ProposalItem({
   topNickname,
   othersCount,
   topProfileUrl,
+  projectId,
+  proposalId,
 }: Props) {
   const navigate = useNavigate();
   const title = kind === "SENT" ? "보낸 제안" : "받은 제안";
 
-  // 임시로 projectId
-  const projectId = 123;
-
-  const handleClick = () => {
+  const handleClickTeam = () => {
     navigate(`/Project/team/${projectId}`);
+  };
+
+  const handleClickProposalDetail = () => {
+    navigate(`/Project/proposal/${proposalId}`);
   };
 
   return (
     <Item>
-      <Left>
-        <AvatarWrap>
-          <Avatar src={topProfileUrl} />
-          <Badge>
-            <BadgeIcon src={arrowIcon} alt="" />
-          </Badge>
-        </AvatarWrap>
+      <TopRow>
+        <Left>
+          <AvatarWrap>
+            <Avatar src={topProfileUrl} />
+            <Badge>
+              <BadgeIcon src={arrowIcon} alt="" />
+            </Badge>
+          </AvatarWrap>
 
-        <div>
-          <Title>{title}</Title>
-          <Sub>
-            {topNickname} 님 외 {othersCount}인
-          </Sub>
-        </div>
-      </Left>
+          <TextWrap>
+            <Title>{title}</Title>
+            <Sub>
+              {topNickname} 님 외 {othersCount}인
+            </Sub>
+          </TextWrap>
+        </Left>
+      </TopRow>
 
-      <CTA onClick={handleClick}>내 팀 보기</CTA>
+      <CTAGroup>
+        <CTAButton onClick={handleClickTeam}>내 팀 보기</CTAButton>
+        <Divider />
+        <CTAButton onClick={handleClickProposalDetail}>
+          제안 상세 보기
+        </CTAButton>
+      </CTAGroup>
     </Item>
   );
 }

@@ -9,6 +9,7 @@ import { BoardPage } from "@pages/board/BoardPage";
 import { ProjectPage } from "@pages/project/ProjectPage";
 import { MyTeamPage } from "@pages/project/MyTeamPage";
 import { ReviewPage } from "@pages/project/ReviewPage";
+import { ProposalDetailPage } from "@pages/project/ProposalDetailPage";
 import { MyPage } from "@pages/my/MyPage";
 import { CategoryPage } from "@pages/home/category/CategoryPage";
 import { NotificationPage } from "@pages/home/notification/NotificationPage";
@@ -40,6 +41,10 @@ function App() {
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
           <Route path="/Project/team/:projectId" element={<MyTeamPage />} />
+          <Route
+            path="/Project/proposal/:proposalId"
+            element={<ProposalDetailPage />}
+          />
         </Route>
       </Routes>
     </OverlayProvider>
