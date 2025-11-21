@@ -7,19 +7,19 @@ import searchIcon from '@assets/home/search.svg'
 import menuIcon from '@assets/home/menu.svg'
 
 interface HomeHeaderProps {
-  isSkill: boolean;
-  setIsSkill: React.Dispatch<React.SetStateAction<boolean>>;
+  isTech: boolean;
+  setIsTech: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function HomeHeader({isSkill, setIsSkill}: HomeHeaderProps): React.JSX.Element {
+export default function HomeHeader({isTech: isTech, setIsTech: setIsSkill}: HomeHeaderProps): React.JSX.Element {
   const navigate = useNavigate();
 
   return (
     <S.Header>
       
       <S.TitleWrapper>
-        <S.Title $active={isSkill} onClick={() => setIsSkill(true)}>기술</S.Title>
-        <S.Title $active={!isSkill} onClick={() => setIsSkill(false)}>아이디어</S.Title>
+        <S.Title $active={isTech} onClick={() => setIsSkill(true)}>기술</S.Title>
+        <S.Title $active={!isTech} onClick={() => setIsSkill(false)}>아이디어</S.Title>
       </ S.TitleWrapper>
 
       <S.IconWrapper>
