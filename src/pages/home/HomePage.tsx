@@ -1,38 +1,57 @@
 // src/pages/home/HomePage.tsx
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom"
 
+import Card from '@components/home/Card'
 import HomeHeader from '@components/home/HomeHeader'
-import Swipe from '@components/home/Swipe'
-import StoreToBoard from '@components/home/StoreToBoard'
+import useCardList from '@components/home/useCardList.ts'
+import EmblaCarousel from '@components/home/EmblaCarousel'
+import type { EmblaOptionsType } from 'embla-carousel'
 import CommonButton from '@components/shared/CommonButton'
 import RegisterIcon from '@assets/home/register.svg'
 
 import * as S from './HomePage.styled'
 
+const OPTIONS: EmblaOptionsType = { loop: true }
 
 export function HomePage() {
     const navigate = useNavigate();
-    const [isSkill, setIsSkill] = useState(true);
-    console.log(isSkill);
+    const [isTech, setIsTech] = useState(true);
+    const [isRegisterBlockVisible, setIsRegisterBlockVisible] = useState(true);
+    const cards = useCardList(isTech);
+
+    if (!cards.length) return <p>Loading cards...</p>
+    // Card 컴포넌트 배열 생성
+    const slides = cards.map((card) => (
+        <Card key={card.block_id}
+            isRegisterBlockVisible={isRegisterBlockVisible}
+            setIsRegisterBlockVisible={setIsRegisterBlockVisible}
+            {...card} />
+    ))
+
+
     return (
-        <>
-            <HomeHeader isSkill={isSkill} setIsSkill={setIsSkill} />
+        <S.PageContainer>
 
-            <S.SwipeContainer>
-                <Swipe />
-                <StoreToBoard />
-            </S.SwipeContainer>
+            <S.HeaderWrapper>
+                <HomeHeader isTech={isTech} setIsTech={setIsTech} />
+            </S.HeaderWrapper>
 
-            <S.RegisterButtonContainer>
-                <CommonButton
-                    width="60px"
-                    height="60px"
-                    borderRadius='100px'
-                    onClick={() => navigate('/block/register', { state: { isSkill }})}
-                    imgSrc={RegisterIcon}
-                />
-            </S.RegisterButtonContainer>
-        </>
+            <S.EmblaWrapper>
+                <EmblaCarousel slides={slides} options={OPTIONS} />
+            </S.EmblaWrapper>
+
+            <S.RegisterButtonWrapper>
+                {isRegisterBlockVisible &&
+                    <CommonButton
+                        width="60px"
+                        height="60px"
+                        borderRadius='100px'
+                        onClick={() => navigate('/block/register', { state: { isTech: isTech } })}
+                        imgSrc={RegisterIcon}
+                    />}
+
+            </S.RegisterButtonWrapper>
+        </ S.PageContainer>
     )
 }

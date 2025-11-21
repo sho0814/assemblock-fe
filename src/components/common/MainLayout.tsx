@@ -1,11 +1,14 @@
 // src/components/common/MainLayout.tsx
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 import { Navigator } from "@components/common/Navigator"
 import * as S from './MainLayout.styled';
 
 export const MainLayout = () => {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+
   return (
-    <S.LayoutContainer>
+    <S.LayoutContainer noPadding={isHome}>
       <S.Content>
         <Outlet />
       </S.Content>
