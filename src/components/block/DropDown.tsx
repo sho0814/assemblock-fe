@@ -5,13 +5,12 @@ import  downArrow  from '@assets/common/down-md.svg';
 
 export interface DropDownOption {
   value: string;
-  label: string;
 }
 
 export interface DropdownProps {
-  content: string;
-  selected: string[];
-  onChange: (selected: string[]) => void;
+  content: string | string[];
+  selected: string;
+  onChange: (selected: string) => void;
   options: DropDownOption[];
 }
 
@@ -19,11 +18,13 @@ export default function Dropdown({ content, selected, onChange, options }: Dropd
   const [open, setOpen] = useState(false);
 
   const handleToggle = () => setOpen(o => !o);
+
   const handleSelect = (value: string) => {
-    if (selected.includes(value)) {
-      onChange(selected.filter(v => v !== value));
+    if (selected === value) {
+      return; 
     } else {
-      onChange([...selected, value]);
+      onChange(value);
+      setOpen(false);
     }
   };
 
@@ -37,11 +38,11 @@ export default function Dropdown({ content, selected, onChange, options }: Dropd
         {options.map(opt => (
           <S.DropdownOption
             key={opt.value}
-            selected={selected.includes(opt.value)}
+            selected={selected === opt.value}
             onClick={() => handleSelect(opt.value)}
           >
-            {opt.label}
-            {selected.includes(opt.value) && <S.CheckIcon />}
+            {opt.value}
+            {selected === opt.value && <S.CheckIcon />}
           </S.DropdownOption>
         ))}
       </S.DropdownList>

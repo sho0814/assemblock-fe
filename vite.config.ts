@@ -11,9 +11,12 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: "@assets", replacement: resolve(__dirname, "src/assets") },
-      { find: "@components",replacement: resolve(__dirname, "src/components") },
-      { find: "@pages",replacement: resolve(__dirname, "src/pages") },
+      { find: "@components", replacement: resolve(__dirname, "src/components") },
+      { find: "@pages", replacement: resolve(__dirname, "src/pages") },
       { find: "@utils", replacement: resolve(__dirname, "src/utils") }
     ],
   },
+  server: {
+    host: true
+  }
 })

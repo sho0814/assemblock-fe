@@ -23,8 +23,7 @@ function App() {
     <OverlayProvider>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route index element={<Navigate to="/Home" replace />} />
-          <Route path="/Home" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/Board" element={<BoardPage />} />
           <Route path="/Project" element={<ProjectPage />} />
           <Route

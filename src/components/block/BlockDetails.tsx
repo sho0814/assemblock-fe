@@ -4,7 +4,10 @@ import { useOverlay } from '@components/common/OverlayContext';
 import CancelGuide from './CancleGuide.tsx';
 
 import Dropdown from './DropDown';
-import { CATEGORY_OPTIONS, TOOLS_OPTIONS } from './DropdownOptions.tsx';
+import {
+    CATEGORY_IDEA_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_BACK_OPTIONS,
+    TOOLS_DESIGN_OPTIONS, TOOLS_FRONT_OPTIONS, TOOLS_BACK_OPTIONS
+} from './DropdownOptions.tsx';
 import { logFormData, submitFormData } from '@utils/formSubmit';
 import CommonButton from '@components/shared/CommonButton'
 import { Dot } from './InformText.styled'
@@ -18,15 +21,14 @@ interface BlockDetailsProps {
 type BlockPart = 'design' | 'frontend' | 'backend';
 
 export default function BlockDetails({ isSkill }: BlockDetailsProps) {
-
-    const [isSkillState, setIsSkillState] = useState(isSkill);
-    const [blockTitle, setBlockTitle] = useState('');
-    const [selectedParts, setSelectedParts] = useState<BlockPart[]>([]);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [selectedTools, setSelectedTools] = useState<string[]>([]);
-    const [onelineSummary, setOnelineSummary] = useState('');
-    const [contributionRate, setContributionRate] = useState<number>(0);
-    const [fileName, setFileName] = useState<string | null>(null);
+    const [isSkillState, setIsSkillState] = useState(isSkill);                          // 타입
+    const [blockTitle, setBlockTitle] = useState('');                                   // 제목
+    const [selectedTechPart, setSelectedTechPart] = useState<BlockPart | null>(null);   // 기술 파트
+    const [selectedCategory, setSelectedCategory] = useState<string>('');               // 카테고리
+    const [selectedTools, setSelectedTools] = useState<string>('');                   // 사용 툴 및 언어
+    const [onelineSummary, setOnelineSummary] = useState('');                           // 기존 프로젝트 한 줄 소개
+    const [contributionRate, setContributionRate] = useState<number>(0);                // 기존 프로젝트 기여도
+    const [fileName, setFileName] = useState<string | null>(null);                      // 기존 프로젝트 결과물 PDF
     const [isFormValid, setIsFormValid] = useState(false);
 
     const { showOverlay, closeOverlay } = useOverlay();
@@ -35,17 +37,21 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
     const formRef = useRef<HTMLFormElement>(null);
 
 
+
+
     // 필수 조건 검사
     useEffect(() => {
         const isBlockTitleValid = blockTitle.trim() !== '';
-        const isPartsValid = isSkillState ? selectedParts.length > 0 : true;
-        const isCategoriesValid = selectedCategories.length > 0;
+        const isPartsValid = isSkillState ? selectedTechPart !== null : false;
+        const isCategoriesValid = selectedCategory.length > 0;
         const isToolsValid = isSkillState ? selectedTools.length > 0 : true;
         const isOnelineSummaryValid = onelineSummary.trim() !== '';
 
         setIsFormValid(isBlockTitleValid && isPartsValid && isCategoriesValid && isToolsValid && isOnelineSummaryValid);
 
-    }, [isSkillState, blockTitle, selectedParts, selectedCategories, selectedTools, onelineSummary]);
+    }, [isSkillState, blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary]);
+
+
 
 
     // 블록 타입 변경 이벤트 핸들러
@@ -53,9 +59,11 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
     const confirmSetIsSkillState = (newValue: boolean) => {
 
         setIsSkillState(newValue);
-        setSelectedParts([]);
-        setSelectedCategories([]);
-        setSelectedTools([]);
+        setBlockTitle('');
+        setSelectedTechPart(null);
+        setSelectedCategory('');
+        setOnelineSummary('');
+        setSelectedTools('');
         setContributionRate(0);
         setFileName(null);
 
@@ -85,6 +93,31 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
     };
 
 
+
+    // 블록 타입, 블록 기술파트에 따라 카테고리 선택지 변경
+    let categoryOptions = CATEGORY_IDEA_OPTIONS;
+    let toolsOptions = TOOLS_DESIGN_OPTIONS;
+    if (isSkill) {
+        if (selectedTechPart === 'design') categoryOptions = CATEGORY_TECH_DESIGN_OPTIONS;
+        else if (selectedTechPart === 'frontend') {
+            categoryOptions = CATEGORY_TECH_FRONT_OPTIONS;
+            toolsOptions = TOOLS_FRONT_OPTIONS;
+        }
+        else if (selectedTechPart === 'backend') {
+            categoryOptions = CATEGORY_TECH_BACK_OPTIONS;
+            toolsOptions = TOOLS_BACK_OPTIONS;
+        }
+
+        // selectedTechPart가 변경되면 selectedCategories 초기화
+        useEffect(() => {
+            setSelectedCategory('');
+            setSelectedTools('');
+        }, [selectedTechPart]);
+    }
+
+
+
+
     // 폼 제출 관리 함수
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -97,7 +130,7 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
 
         logFormData(formRef.current);
 
-        const response = await submitFormData(formRef.current, 'https://your-backend-url.com/submit');
+        const response = await submitFormData(formRef.current);
         if (response.ok) {
             console.log('전송 성공');
         } else {
@@ -105,14 +138,8 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
         }
     };
 
-    const togglePart = (part: BlockPart) => {
-        setSelectedParts(prev => {
-            if (prev.includes(part)) {
-                return prev.filter(p => p !== part);
-            } else {
-                return [...prev, part];
-            }
-        });
+    const toggleTechPart = (part: BlockPart) => {
+        setSelectedTechPart(prev => (prev === part ? null : part));
     };
 
     // 기여도 변경 함수
@@ -138,13 +165,11 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
         inputRef.current?.click();
     };
 
-    console.log({ isSkillState });
-
     return (
         <S.Form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data">
             <S.Row>
                 <S.Label>블록 타입<Dot /> </S.Label>
-                <input name="block_type" type="hidden" value={isSkillState ? "TECHNOLOGY" : "IDEA"} />
+                <input name="block_type" type="hidden" value={isSkillState ? "technology" : "idea"} />
                 <div>
                     <S.BlockTypeButton type="button" $selected={!isSkillState} onClick={() => handleShowCancelGuide(false)}>아이디어</S.BlockTypeButton>
                     <S.BlockTypeButton type="button" $selected={isSkillState} onClick={() => handleShowCancelGuide(true)}>기술</S.BlockTypeButton>
@@ -161,39 +186,43 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
             {isSkillState && (
                 <S.Row>
                     <S.Label>기술 파트<Dot /> </S.Label>
-                    <input name="part" type="hidden" value={selectedParts.join(',')} />
+                    <input name="tech_part" type="hidden" value={selectedTechPart ?? ''} />
                     <div>
-                        <S.BlockTypeButton type="button" $selected={selectedParts.includes('design')} onClick={() => togglePart('design')}>디자인</S.BlockTypeButton>
-                        <S.BlockTypeButton type="button" $selected={selectedParts.includes('frontend')} onClick={() => togglePart('frontend')}>프론트엔드</S.BlockTypeButton>
-                        <S.BlockTypeButton type="button" $selected={selectedParts.includes('backend')} onClick={() => togglePart('backend')}>백엔드</S.BlockTypeButton>
+                        <S.BlockTypeButton type="button" $selected={selectedTechPart === 'design'} onClick={() => toggleTechPart('design')}>디자인</S.BlockTypeButton>
+                        <S.BlockTypeButton type="button" $selected={selectedTechPart === 'frontend'} onClick={() => toggleTechPart('frontend')}>프론트엔드</S.BlockTypeButton>
+                        <S.BlockTypeButton type="button" $selected={selectedTechPart === 'backend'} onClick={() => toggleTechPart('backend')}>백엔드</S.BlockTypeButton>
                     </div>
-                    <S.Desc>기술 파트는 중복 선택할 수 있어요</S.Desc>
+                    <S.Desc>기술 파트는 중복 선택할 수 없어요</S.Desc>
                 </S.Row>
             )}
 
             <S.Row>
                 <S.Label>블록 카테고리<Dot /></S.Label>
-                <input name="category" type="hidden" value={selectedCategories} />
+                <input name="category_name" type="hidden" value={selectedCategory} />
                 <Dropdown
-                    content="카테고리를 선택해 주세요"
-                    options={CATEGORY_OPTIONS}
-                    selected={selectedCategories}
-                    onChange={setSelectedCategories}
-                />
-                <S.Desc>블록 카테고리는 중복 선택할 수 있어요</S.Desc>
+                    content={
+                        selectedCategory && selectedCategory.length > 0 ?
+                            selectedCategory : "카테고리를 선택해 주세요"
+                    }
+                    options={categoryOptions}
+                    selected={selectedCategory}
+                    onChange={(value: string) => setSelectedCategory(value)} />
+                <S.Desc>블록 카테고리는 중복 선택할 수 없어요</S.Desc>
             </S.Row>
 
             {isSkillState && (
                 <S.Row>
                     <S.Label>사용 툴 및 언어<Dot /></S.Label>
-                    <input name="tools" type="hidden" value={selectedTools} />
+                    <input name="tools_text" type="hidden" value={selectedTools} />
                     <Dropdown
-                        content="사용 툴 및 언어를 선택해 주세요"
-                        options={TOOLS_OPTIONS}
+                        content={
+                            selectedTools && selectedTools.length > 0 ?
+                                selectedTools : "사용 툴 및 언어를 선택해 주세요"}
+                        options={toolsOptions}
                         selected={selectedTools}
                         onChange={setSelectedTools}
                     />
-                    <S.Desc>사용 툴 및 언어는 중복 선택할 수 있어요</S.Desc>
+                    <S.Desc>사용 툴 및 언어는 중복 선택할 수 없어요</S.Desc>
                 </S.Row>
             )}
 
@@ -209,10 +238,9 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
                     <S.ChangeButton type="button" onClick={() => changeRate(-10)}>-</S.ChangeButton>
                     <S.ValueBox
                         type="number"
-                        name="contributionRate"
+                        name="contribution_score"
                         value={contributionRate}
                         readOnly
-                        style={{ width: '60px', textAlign: 'center' }}
                     />
                     <S.ChangeButton type="button" onClick={() => changeRate(10)}>+</S.ChangeButton>
                 </S.NumberInputWrapper>
