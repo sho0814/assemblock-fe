@@ -14,9 +14,9 @@ import { MyPage } from "@pages/my/MyPage";
 import { CategoryPage } from "@pages/home/category/CategoryPage";
 import { NotificationPage } from "@pages/home/notification/NotificationPage";
 import { SearchPage } from "@pages/home/search/SearchPage";
-import { BlockDetailPage } from "@pages/Block/BlockDetailPage";
-import { BlockEditPage } from "@pages/Block/BlockEditPage";
-import { BlockRegisterPage } from "@pages/Block/BlockRegisterPage";
+import { BlockDetailPage } from "@pages/block/BlockDetailPage";
+import { BlockEditPage } from "@pages/block/BlockEditPage";
+import { BlockRegisterPage } from "@pages/block/BlockRegisterPage";
 
 function App() {
   return (
