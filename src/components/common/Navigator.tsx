@@ -14,7 +14,7 @@ import profileInactive from '@assets/common/Nav/profile-inactive.svg'
 export const Navigator = () => {
   const { pathname } = useLocation();
 
-  const isHome = pathname === "/Home";
+  const isHome = pathname === "/";
   const isProject = pathname === "/Project";
   const isBoard = pathname === "/Board";
   const isMy = pathname === "/My";
