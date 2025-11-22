@@ -5,24 +5,32 @@ import cancelButton from '@assets/common/cancel-btn.svg'
 import * as S from './SelectBoard.styled'
 
 interface SelectBoardProps {
-    block_id: number;
+  block_id: number;
+  setIsRegisterBlockActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function SelectBoard({ block_id }: SelectBoardProps) {
-    const { closeOverlay } = useOverlay();
-    const boards = useBoardList();
-    const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null);  // 선택된 보드ID
-    const [newBoardName, setNewBoardName] = useState('');                         // 새 보드 입력상태
+export default function SelectBoard({ block_id, setIsRegisterBlockActive }: SelectBoardProps) {
+  const { closeOverlay } = useOverlay();
+  const boards = useBoardList();
+  const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null);  // 선택된 보드ID
+  const [newBoardName, setNewBoardName] = useState('');                         // 새 보드 입력상태
 
-    if (!boards.length) return <p>No Boards yet...</p>
+  if (!boards.length) return <p>No Boards yet...</p>
 
-    return (
+  const handleClick = () => {
+    closeOverlay();
+    setIsRegisterBlockActive(true);
+  };
+
+  return (
     <S.Wrapper>
       <S.TopRow>
         <S.CloseBtn />
         <S.Title>보드 선택</S.Title>
-        <S.CloseBtn src={cancelButton} onClick={closeOverlay} aria-label="닫기" />
+        <S.CloseBtn src={cancelButton} onClick={handleClick} aria-label="닫기" />
       </S.TopRow>
+
+      <S.Divider />
 
       <S.BoardList>
         {boards.map((board: any) => (
@@ -47,7 +55,7 @@ export default function SelectBoard({ block_id }: SelectBoardProps) {
         <S.AddBoardBtn onClick={() => setNewBoardName('')}>＋</S.AddBoardBtn>
       </S.AddBoardBox>
 
-      <S.BottomBtn>보드에 담기</S.BottomBtn>
+      <S.BottomBtn onClick={handleClick}>보드에 담기</S.BottomBtn>
     </S.Wrapper>
   );
 }

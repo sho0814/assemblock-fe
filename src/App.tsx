@@ -14,6 +14,7 @@ import { SearchPage } from '@pages/home/search/SearchPage';
 import { BlockDetailPage } from '@pages/block/BlockDetailPage'
 import { BlockEditPage } from '@pages/block/BlockEditPage'
 import { BlockRegisterPage } from '@pages/block/BlockRegisterPage'
+import { ViewPerCategoryPage } from '@pages/home/category/ViewPerCategoryPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         </Route>
         <Route element={<SubLayout />}>
           <Route path="/Home/category" element={<CategoryPage />} />
+          <Route path="/Home/Category/:techpart" element={<ViewPerCategoryPage />} />
           <Route path="/Home/notification" element={<NotificationPage />} />
           <Route path="/Home/search" element={<SearchPage />} />
           <Route path="/Block/detail" element={<BlockDetailPage />} />

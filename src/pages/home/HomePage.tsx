@@ -17,18 +17,17 @@ const OPTIONS: EmblaOptionsType = { loop: true }
 export function HomePage() {
     const navigate = useNavigate();
     const [isTech, setIsTech] = useState(true);
-    const [isRegisterBlockVisible, setIsRegisterBlockVisible] = useState(true);
+    const [isRegisterBlockActive, setIsRegisterBlockActive] = useState(true);
     const cards = useCardList(isTech);
 
     if (!cards.length) return <p>Loading cards...</p>
     // Card 컴포넌트 배열 생성
     const slides = cards.map((card) => (
         <Card key={card.block_id}
-            isRegisterBlockVisible={isRegisterBlockVisible}
-            setIsRegisterBlockVisible={setIsRegisterBlockVisible}
+            isRegisterBlockActive={isRegisterBlockActive}
+            setIsRegisterBlockActive={setIsRegisterBlockActive}
             {...card} />
     ))
-
 
     return (
         <S.PageContainer>
@@ -38,11 +37,11 @@ export function HomePage() {
             </S.HeaderWrapper>
 
             <S.EmblaWrapper>
-                <EmblaCarousel slides={slides} options={OPTIONS} />
+                <EmblaCarousel slides={slides} options={OPTIONS} setIsRegisterBlockActive={setIsRegisterBlockActive}/>
             </S.EmblaWrapper>
 
             <S.RegisterButtonWrapper>
-                {isRegisterBlockVisible &&
+                {isRegisterBlockActive &&
                     <CommonButton
                         width="60px"
                         height="60px"

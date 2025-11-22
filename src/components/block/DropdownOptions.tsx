@@ -16,23 +16,25 @@ export const CATEGORY_IDEA_OPTIONS = [
 
 // 기술 -> 디자인
 export const CATEGORY_TECH_DESIGN_OPTIONS = [
-  { value: '브랜드' },
-  { value: '아이콘' },
-  { value: '상호작용 모션' },
-  { value: 'UI/UX' }
+  { value: 'UI/UX디자인' },
+  { value: '비주얼 그래픽 디자인' },
+  { value: '브랜드 디자인' },
+  { value: '아이콘 디자인' },
+  { value: '인터렉션 및 모션 디자인' },
+  
 ];
 
 // 기술 -> 백엔드
 export const CATEGORY_TECH_BACK_OPTIONS = [
-  { value: 'AI', },
+  { value: 'AI 기능 활용', },
   { value: '백엔드' }
 ];
 
 // 기술 -> 프론트
 export const CATEGORY_TECH_FRONT_OPTIONS = [
-  { value: 'API연동' },
+  { value: 'API 연동' },
   { value: '데이터 시각화' },
-  { value: '인터렉션 애니메이션' },
+  { value: '인터렉션/애니메이션' },
   { value: '레이아웃/그리드' },
   { value: '성능 최적화' },
   { value: '상태 관리' }

@@ -14,22 +14,23 @@ export const categoryBackground: Record<string, string> = {
   '기술/AI': '/assets/card/ideaTechnologyAI.svg',
 
 
-  // 기술 타입, 디자인 기술파트
-  '브랜드': '/assets/card/designBrand.svg',
-  '아이콘': '/assets/card/designIcon.svg',
-  '상호작용 모션': '/assets/card/designMotionInteraction.svg',
-  'UI/UX': '/assets/card/designUIUX.svg',
+  // 기술 타입 -> 디자인 기술파트
+  '브랜드 디자인': '/assets/card/designBrand.svg',
+  '아이콘 디자인': '/assets/card/designIcon.svg',
+  '인터렉션 및 모션 디자인': '/assets/card/designMotionInteraction.svg',
+  'UI/UX디자인': '/assets/card/designUIUX.svg',
+  '비주얼 그래픽 디자인': '/assets/card/designVisualGraphic.svg',
 
 
-  // 기술 타입 백엔드 기술파트
-  'AI': '/assets/card/backAI.svg',
+  // 기술 타입 -> 백엔드 기술파트
+  'AI 기능 활용': '/assets/card/backAI.svg',
   '백엔드': '/assets/card/backBack.svg',
 
 
-  // 기술 파트, 프론트엔드 기술파트
-  'API연동': '/assets/card/frontAPIintegration.svg',
+  // 기술 파트 -> 프론트엔드 기술파트
+  'API 연동': '/assets/card/frontAPIintegration.svg',
   '데이터 시각화': '/assets/card/frontDatavisualization.svg',
-  '인터렉션 애니메이션': '/assets/card/frontInteractionAnimation.svg',
+  '인터렉션/애니메이션': '/assets/card/frontInteractionAnimation.svg',
   '레이아웃/그리드': '/assets/card/frontLayoutGrid.svg',
   '성능 최적화': '/assets/card/frontPerformanceOptimization.svg',
   '상태 관리': '/assets/card/frontStateManagement.svg',
