@@ -11,6 +11,8 @@ import { MyTeamPage } from "@pages/project/MyTeamPage";
 import { ReviewPage } from "@pages/project/ReviewPage";
 import { ProposalDetailPage } from "@pages/project/ProposalDetailPage";
 import { MyPage } from "@pages/my/MyPage";
+import { ProfileEdit } from "@pages/my/ProfileEdit";
+import { ProfileSelect } from "@pages/my/ProfileSelect";
 import { CategoryPage } from "@pages/home/category/CategoryPage";
 import { NotificationPage } from "@pages/home/notification/NotificationPage";
 import { SearchPage } from "@pages/home/search/SearchPage";
@@ -37,6 +39,8 @@ function App() {
           <Route path="/Block/detail" element={<BlockDetailPage />} />
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
+          <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
+          <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
           <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
           <Route path="/Home/Category/:techpart" element={<ViewPerCategoryPage />} />
