@@ -13,13 +13,13 @@ import { ProposalDetailPage } from "@pages/project/ProposalDetailPage";
 import { MyPage } from "@pages/my/MyPage";
 import { ProfileEdit } from "@pages/my/ProfileEdit";
 import { ProfileSelect } from "@pages/my/ProfileSelect";
-import { CategoryPage } from "@pages/home/category/CategoryPage";
+import { CategoryPage } from "@pages/category/CategoryPage";
 import { NotificationPage } from "@pages/home/notification/NotificationPage";
 import { SearchPage } from "@pages/home/search/SearchPage";
 import { BlockDetailPage } from '@pages/block/BlockDetailPage'
 import { BlockEditPage } from '@pages/block/BlockEditPage'
 import { BlockRegisterPage } from '@pages/block/BlockRegisterPage'
-import { ViewPerCategoryPage } from "@pages/home/category/ViewPerCategoryPage";
+import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
 
 function App() {
   return (
@@ -33,9 +33,9 @@ function App() {
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
-          <Route path="/Home/category" element={<CategoryPage />} />
-          <Route path="/Home/notification" element={<NotificationPage />} />
-          <Route path="/Home/search" element={<SearchPage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/notification" element={<NotificationPage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/Block/detail" element={<BlockDetailPage />} />
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
@@ -43,7 +43,7 @@ function App() {
           <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
           <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
-          <Route path="/Home/Category/:techpart" element={<ViewPerCategoryPage />} />
+          <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
         </Route>
       </Routes>
     </OverlayProvider>
