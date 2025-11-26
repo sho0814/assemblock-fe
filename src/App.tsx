@@ -16,11 +16,11 @@ import { ProfileSelect } from "@pages/my/ProfileSelect";
 import { CategoryPage } from "@pages/category/CategoryPage";
 import { NotificationPage } from "@pages/home/notification/NotificationPage";
 import { SearchPage } from "@pages/home/search/SearchPage";
-import { BlockDetailPage } from "@pages/block/BlockDetailPage";
-import { BlockEditPage } from "@pages/block/BlockEditPage";
-import { BlockRegisterPage } from "@pages/block/BlockRegisterPage";
-import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
 import { BoardDetailPage } from "@pages/board/BoardDetailPage";
+import { BlockDetailPage } from "@pages/Block/BlockDetailPage";
+import { BlockEditPage } from "@pages/Block/BlockEditPage";
+import { BlockRegisterPage } from "@pages/Block/BlockRegisterPage";
+import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
 
 function App() {
   return (
@@ -30,21 +30,30 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/Board" element={<BoardPage />} />
           <Route path="/Project" element={<ProjectPage />} />
-          <Route path="/Project/team/:proposalId/review" element={<ReviewPage />} />
+          <Route
+            path="/Project/team/:proposalId/review"
+            element={<ReviewPage />}
+          />
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/notification" element={<NotificationPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => {}} />} />
+          <Route
+            path="/Board/detail"
+            element={<BoardDetailPage boards={[]} setBoards={() => {}} />}
+          />
           <Route path="/Block/detail" element={<BlockDetailPage />} />
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
           <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
           <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
-          <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
+          <Route
+            path="/Project/proposal/:proposalId"
+            element={<ProposalDetailPage />}
+          />
           <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
         </Route>
       </Routes>
