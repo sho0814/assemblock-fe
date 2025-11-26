@@ -1,14 +1,14 @@
 // src/components/common/Layout.styled.ts
 import styled from "styled-components";
 
-export const LayoutContainer = styled.div`
+export const LayoutContainer = styled.div<{ noPadding?: boolean }>`
   min-width: 375px;
   max-width: 400px;
   height: 100vh;
   background: #FAFAFA;
   padding-bottom: 20px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: ${({ noPadding }) => (noPadding ? '0' : '20px')};
+  padding-right: ${({ noPadding }) => (noPadding ? '0' : '20px')};
   margin: 0 auto;
   display: flex;
   flex-direction: column;

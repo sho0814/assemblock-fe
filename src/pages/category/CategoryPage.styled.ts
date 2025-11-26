@@ -37,6 +37,7 @@ export const CategoryItem = styled.li`
   flex-direction: column;
   align-items: center;
   max-width: 48px;
+  cursor: pointer;
 `;
 
 export const ImagePlaceholder = styled.div`

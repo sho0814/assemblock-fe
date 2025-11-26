@@ -4,13 +4,15 @@ import * as S from './SimpleHeader.styled'
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { CSSProperties } from 'styled-components';
 
 interface HeaderProps {
   title: string;
   onBackClick?: () => void;
+  style?: CSSProperties;
 }
 
-export default function SimpleHeader({ title, onBackClick }: HeaderProps): React.JSX.Element {
+export default function SimpleHeader({ title, onBackClick, style }: HeaderProps): React.JSX.Element {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
@@ -22,7 +24,7 @@ export default function SimpleHeader({ title, onBackClick }: HeaderProps): React
   };
 
   return (
-    <S.Header>
+    <S.Header style={{...style}}>
       
       <S.IconWrapper  onClick={handleBackClick}>
         <S.Icon src={backArrow}/>
