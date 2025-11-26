@@ -16,9 +16,9 @@ type RenderCardsProps = {
 const RenderCards: React.FC<RenderCardsProps> = ({ frontendCategory, backendCategory, designCategory, ideaCategory, }) => {
     const [isRegisterBlockActive, setIsRegisterBlockActive] = useState(true);
     const cards = useCardList(undefined, frontendCategory, backendCategory, designCategory, ideaCategory)
-    if (!cards.length) return <p>해당 카테고리에 등록된 블록이 없습니다.</p>
+    if (!cards.length) return <p style={{position:"absolute", left: '18%', top: '50%', fontWeight: '500', fontSize:'16px', color: '#868286'}}>해당 카테고리에 등록된 블록이 없습니다.</p>
 
-    const SLIDES = cards.map((card) => (
+    const SLIDES = cards.map((card) => (    
         <Card key={card.block_id}
             isRegisterBlockActive={isRegisterBlockActive}
             setIsRegisterBlockActive={setIsRegisterBlockActive}

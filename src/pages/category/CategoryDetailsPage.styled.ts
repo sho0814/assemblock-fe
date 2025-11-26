@@ -31,5 +31,5 @@ export const NavTab = styled.button<{ selected: boolean }>`
 export const CarouselWrapper = styled.div`
   overflow-x: visible;
   flex-grow: 1;
-  margin-top: 80px;
+  margin-top: 25%;
 `
