@@ -16,10 +16,11 @@ import { ProfileSelect } from "@pages/my/ProfileSelect";
 import { CategoryPage } from "@pages/category/CategoryPage";
 import { NotificationPage } from "@pages/home/notification/NotificationPage";
 import { SearchPage } from "@pages/home/search/SearchPage";
-import { BlockDetailPage } from '@pages/block/BlockDetailPage'
-import { BlockEditPage } from '@pages/block/BlockEditPage'
-import { BlockRegisterPage } from '@pages/block/BlockRegisterPage'
+import { BlockDetailPage } from "@pages/block/BlockDetailPage";
+import { BlockEditPage } from "@pages/block/BlockEditPage";
+import { BlockRegisterPage } from "@pages/block/BlockRegisterPage";
 import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
+import { BoardDetailPage } from "@pages/board/BoardDetailPage";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/notification" element={<NotificationPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => {}} />} />
           <Route path="/Block/detail" element={<BlockDetailPage />} />
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
