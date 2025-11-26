@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { OverlayProvider } from "@components/common/OverlayContext";
 import { MainLayout } from "@components/common/MainLayout";
@@ -13,12 +13,13 @@ import { ProposalDetailPage } from "@pages/project/ProposalDetailPage";
 import { MyPage } from "@pages/my/MyPage";
 import { ProfileEdit } from "@pages/my/ProfileEdit";
 import { ProfileSelect } from "@pages/my/ProfileSelect";
-import { CategoryPage } from "@pages/home/category/CategoryPage";
+import { CategoryPage } from "@pages/category/CategoryPage";
 import { NotificationPage } from "@pages/home/notification/NotificationPage";
 import { SearchPage } from "@pages/home/search/SearchPage";
 import { BlockDetailPage } from "@pages/block/BlockDetailPage";
 import { BlockEditPage } from "@pages/block/BlockEditPage";
 import { BlockRegisterPage } from "@pages/block/BlockRegisterPage";
+import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
 import { BoardDetailPage } from "@pages/board/BoardDetailPage";
 
 function App() {
@@ -29,30 +30,22 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/Board" element={<BoardPage />} />
           <Route path="/Project" element={<ProjectPage />} />
-          <Route
-            path="/Project/team/:proposalId/review"
-            element={<ReviewPage />}
-          />
+          <Route path="/Project/team/:proposalId/review" element={<ReviewPage />} />
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
-          <Route path="/Home/category" element={<CategoryPage />} />
-          <Route path="/Home/notification" element={<NotificationPage />} />
-          <Route path="/Home/search" element={<SearchPage />} />
-          <Route
-            path="/Board/detail"
-            element={<BoardDetailPage boards={[]} setBoards={() => {}} />}
-          />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/notification" element={<NotificationPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => {}} />} />
           <Route path="/Block/detail" element={<BlockDetailPage />} />
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
           <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
           <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
-          <Route
-            path="/Project/proposal/:proposalId"
-            element={<ProposalDetailPage />}
-          />
+          <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
+          <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
         </Route>
       </Routes>
     </OverlayProvider>
