@@ -1,10 +1,12 @@
 // src/pages/home/category/SearchPage.tsx
-import SimpleHeader from "@components/shared/SimpleHeader"
+import SearchBar from "@components/search/SearchBar"
+import RecentSearches from "@components/search/RecentSearches"
 
 export function SearchPage() {
     return(
         <>
-        <SimpleHeader title={"검색"} />
+        <SearchBar />
+        <RecentSearches />
         </>
     )
 }

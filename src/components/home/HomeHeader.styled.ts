@@ -1,5 +1,6 @@
 // src/components/home/HomeHeader.styled.ts
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 export const Header = styled.div`
     display: flex;
@@ -37,6 +38,8 @@ export const IconWrapper = styled.div`
     justify-content: flex-end;
     width: 144px;
     gap: 16px;
+`
+export const Item = styled(Link)`
 `
 
 export const Icon = styled.img`
