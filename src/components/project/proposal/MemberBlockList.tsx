@@ -1,0 +1,65 @@
+import styled from "styled-components";
+import { MemberBlockItem } from "./MemberBlockItem";
+
+export interface MemberBlock {
+  blockId: number;
+  imageUrl: string;
+  title: string;
+  description: string;
+}
+
+interface MemberBlockListProps {
+  blocks: MemberBlock[];
+}
+
+export function MemberBlockList({ blocks }: MemberBlockListProps) {
+  return (
+    <Wrap>
+      <HeaderRow>
+        <SectionTitle>팀원 블록</SectionTitle>
+        <Count>{blocks.length}개</Count>
+      </HeaderRow>
+
+      <List>
+        {blocks.map((b) => (
+          <MemberBlockItem
+            key={b.blockId}
+            imageUrl={b.imageUrl}
+            title={b.title}
+            description={b.description}
+          />
+        ))}
+      </List>
+    </Wrap>
+  );
+}
+
+const Wrap = styled.section`
+  margin-top: 14px;
+  width: 100%;
+`;
+
+const HeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 8px 2px;
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+`;
+
+const Count = styled.span`
+  font-size: 12px;
+  color: #888;
+  font-weight: 600;
+`;
+
+const List = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
