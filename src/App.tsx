@@ -19,6 +19,7 @@ import { SearchPage } from "@pages/home/search/SearchPage";
 import { BlockDetailPage } from "@pages/block/BlockDetailPage";
 import { BlockEditPage } from "@pages/block/BlockEditPage";
 import { BlockRegisterPage } from "@pages/block/BlockRegisterPage";
+import { BoardDetailPage } from "@pages/board/BoardDetailPage";
 
 function App() {
   return (
@@ -38,6 +39,10 @@ function App() {
           <Route path="/Home/category" element={<CategoryPage />} />
           <Route path="/Home/notification" element={<NotificationPage />} />
           <Route path="/Home/search" element={<SearchPage />} />
+          <Route
+            path="/Board/detail"
+            element={<BoardDetailPage boards={[]} setBoards={() => {}} />}
+          />
           <Route path="/Block/detail" element={<BlockDetailPage />} />
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
