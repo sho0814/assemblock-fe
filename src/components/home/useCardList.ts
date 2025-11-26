@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_BACK_OPTIONS, CATEGORY_IDEA_OPTIONS } from "@components/block/DropdownOptions";
 
-type BlockType = {
+export type BlockType = {
     block_id: number
     block_title: string
     category_name: string
