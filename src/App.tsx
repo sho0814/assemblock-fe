@@ -42,7 +42,7 @@ function App() {
           <Route path="/notification" element={<NotificationPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/search/:keyword" element={<SearchResultPage />} />
-          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => { }} />} />
+          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => {}} />} />
           <Route path="/block/detail" element={<BlockDetailPage />} />
           <Route path="/block/edit" element={<BlockEditPage />} />
           <Route path="/block/register" element={<BlockRegisterPage />} />
