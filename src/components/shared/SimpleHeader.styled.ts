@@ -1,6 +1,11 @@
 import styled from 'styled-components';
+import type { CSSProperties } from 'react';
 
-export const Header = styled.div`
+interface HeaderProps {
+  style?: CSSProperties;
+}
+
+export const Header = styled.div<HeaderProps>`
     display: flex;
     align-items: center;
     justify-content: space-between;
