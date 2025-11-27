@@ -250,16 +250,16 @@ export const MOCK_PROPOSALS: Proposal[] = [
     proposal_id: 101,
     proposer_id: 2,
     discord_id: "hyunseo#1234",
-    recruit_start_date: "2025-11-01",
-    recruit_end_date: "2025-11-08",
+    recruit_start_date: "2025-11-23",
+    recruit_end_date: "2025-11-31",
     created_at: "2025-11-01T09:00:00",
     project_title: "어셈블록 웹 앱 개발",
     project_memo: "아이디어 블록 공유/조립 플랫폼",
   },
-  // ✅ MOCK_PROPOSALS 맨 아래에 추가
+  // ✅ 내가 보낸 제안 (SENT) - 채용중
   {
     proposal_id: 102,
-    proposer_id: 1, // ✅ 내가 보낸 제안(SENT)
+    proposer_id: 1,
     discord_id: "dawoon#0001",
     recruit_start_date: "2025-11-20",
     recruit_end_date: "2025-11-27",
@@ -267,9 +267,10 @@ export const MOCK_PROPOSALS: Proposal[] = [
     project_title: "리액트 UI 개선 프로젝트",
     project_memo: "기존 화면 UX 개선 + 컴포넌트 리팩토링",
   },
+  // ✅ 남이 보낸 제안 (RECEIVED) - 완료
   {
     proposal_id: 103,
-    proposer_id: 4, // ✅ 남이 보낸 제안 (내가 받는 제안 RECEIVED)
+    proposer_id: 4,
     discord_id: "yeyoung#4444",
     recruit_start_date: "2025-11-05",
     recruit_end_date: "2025-11-12",
@@ -277,14 +278,48 @@ export const MOCK_PROPOSALS: Proposal[] = [
     project_title: "디자인 시스템 구축",
     project_memo: "공통 컴포넌트/토큰 정리 및 문서화",
   },
+  // ✅ 내가 보낸 제안 (SENT) - 진행중
+  {
+    proposal_id: 104,
+    proposer_id: 1,
+    discord_id: "dawoon#0002",
+    recruit_start_date: "2025-10-01",
+    recruit_end_date: "2025-10-15",
+    created_at: "2025-10-01T09:00:00",
+    project_title: "디자인 시스템 개선 사이드 프로젝트",
+    project_memo: "디자인 토큰 정리 + 공통 컴포넌트 리팩토링",
+  },
+  // ✅ 내가 보낸 제안 (SENT) - 완료
+  {
+    proposal_id: 105,
+    proposer_id: 1,
+    discord_id: "dawoon#0003",
+    recruit_start_date: "2025-09-01",
+    recruit_end_date: "2025-09-10",
+    created_at: "2025-09-01T09:00:00",
+    project_title: "FE 코딩 테스트 준비 스터디",
+    project_memo: "알고리즘 + 프론트엔드 과제 스터디",
+  },
+  // ✅ 내가 받은 제안 (RECEIVED) - 채용중
+  {
+    proposal_id: 106,
+    proposer_id: 3, // 김지수(BackEnd)가 제안자
+    discord_id: "jisu#3333",
+    recruit_start_date: "2025-11-22",
+    recruit_end_date: "2025-11-30",
+    created_at: "2025-11-22T10:00:00",
+    project_title: "API 성능 튜닝 & 대시보드",
+    project_memo: "백엔드 성능 개선 + FE 모니터링 대시보드",
+  },
 ];
 
-// 4) Proposal_target (Proposal + Block FK 일치)
+/// 4) Proposal_target (Proposal + Block FK 일치)
 export const MOCK_PROPOSAL_TARGETS: ProposalTarget[] = [
+  // proposal 101 (받은 제안 - 진행중)
   {
     proposal_id: 101,
     proposer_id: 2,
-    proposalblock_id: 11,
+    proposalblock_id: 11, // 내 블록 (정다운)
     response_status: "accepted",
   },
   {
@@ -293,9 +328,8 @@ export const MOCK_PROPOSAL_TARGETS: ProposalTarget[] = [
     proposalblock_id: 12,
     response_status: "accepted",
   },
-  // ✅ MOCK_PROPOSAL_TARGETS 맨 아래에 추가
 
-  // proposal 102 (내가 보낸 제안)
+  // proposal 102 (내가 보낸 제안 - 채용중)
   {
     proposal_id: 102,
     proposer_id: 1,
@@ -309,23 +343,65 @@ export const MOCK_PROPOSAL_TARGETS: ProposalTarget[] = [
     response_status: "accepted",
   },
 
-  // proposal 103 (받은 제안) — 내 블록이 들어간 케이스
+  // proposal 103 (받은 제안 - 완료)
   {
     proposal_id: 103,
     proposer_id: 4,
-    proposalblock_id: 14, // ✅ 정다운(나) 블록
+    proposalblock_id: 14, // 내 블록
     response_status: "accepted",
   },
   {
     proposal_id: 103,
     proposer_id: 4,
-    proposalblock_id: 12, // 송현서 블록
+    proposalblock_id: 12,
     response_status: "accepted",
+  },
+
+  // proposal 104 (내가 보낸 제안 - 진행중)
+  {
+    proposal_id: 104,
+    proposer_id: 1,
+    proposalblock_id: 11, // 내 블록도 같이 쓰는 느낌
+    response_status: "accepted",
+  },
+  {
+    proposal_id: 104,
+    proposer_id: 1,
+    proposalblock_id: 13, // 김지수 블록
+    response_status: "accepted",
+  },
+
+  // proposal 105 (내가 보낸 제안 - 완료)
+  {
+    proposal_id: 105,
+    proposer_id: 1,
+    proposalblock_id: 11,
+    response_status: "accepted",
+  },
+  {
+    proposal_id: 105,
+    proposer_id: 1,
+    proposalblock_id: 12,
+    response_status: "accepted",
+  },
+
+  // proposal 106 (내가 받은 제안 - 채용중)
+  {
+    proposal_id: 106,
+    proposer_id: 3, // 김지수 제안
+    proposalblock_id: 14, // 내 블록 포함 → '받은 제안'
+    response_status: "accepted",
+  },
+  {
+    proposal_id: 106,
+    proposer_id: 3,
+    proposalblock_id: 13, // 본인 블록
+    response_status: "pending",
   },
 ];
-
 // 5) Project (proposal_id unique, FK 일치)
 export const MOCK_PROJECTS: Project[] = [
+  // ✅ 받은 제안 + 진행중
   {
     project_id: 201,
     proposal_id: 101,
@@ -333,7 +409,7 @@ export const MOCK_PROJECTS: Project[] = [
     project_status: "ongoing",
     created_at: "2025-11-09T10:00:00",
   },
-  // ✅ MOCK_PROJECTS 맨 아래에 추가
+  // ✅ 내가 보낸 제안 + 채용중
   {
     project_id: 202,
     proposal_id: 102,
@@ -341,6 +417,7 @@ export const MOCK_PROJECTS: Project[] = [
     project_status: "recruiting",
     created_at: "2025-11-20T10:00:00",
   },
+  // ✅ 받은 제안 + 완료
   {
     project_id: 203,
     proposal_id: 103,
@@ -348,8 +425,31 @@ export const MOCK_PROJECTS: Project[] = [
     project_status: "done",
     created_at: "2025-11-13T09:00:00",
   },
+  // ✅ 내가 보낸 제안 + 진행중
+  {
+    project_id: 204,
+    proposal_id: 104,
+    proposer_id: 1,
+    project_status: "ongoing",
+    created_at: "2025-10-05T09:00:00",
+  },
+  // ✅ 내가 보낸 제안 + 완료
+  {
+    project_id: 205,
+    proposal_id: 105,
+    proposer_id: 1,
+    project_status: "done",
+    created_at: "2025-09-15T09:00:00",
+  },
+  // ✅ 받은 제안 + 채용중
+  {
+    project_id: 206,
+    proposal_id: 106,
+    proposer_id: 3,
+    project_status: "recruiting",
+    created_at: "2025-11-23T10:00:00",
+  },
 ];
-
 // 6) Project_member (Project + Proposal + User FK 일치)
 export const MOCK_PROJECT_MEMBERS: ProjectMember[] = [
   {
@@ -379,9 +479,8 @@ export const MOCK_PROJECT_MEMBERS: ProjectMember[] = [
     member_role: "BackEnd",
     is_proposer: false,
   },
-  // ✅ MOCK_PROJECT_MEMBERS 맨 아래에 추가
 
-  // project 202 (recruiting, proposer=나)
+  // project 202 (내가 보낸 제안 + 채용중)
   {
     member_id: 304,
     project_id: 202,
@@ -401,7 +500,7 @@ export const MOCK_PROJECT_MEMBERS: ProjectMember[] = [
     is_proposer: false,
   },
 
-  // project 203 (done, proposer=안예영)
+  // project 203 (받은 제안 + 완료)
   {
     member_id: 306,
     project_id: 203,
@@ -416,7 +515,7 @@ export const MOCK_PROJECT_MEMBERS: ProjectMember[] = [
     project_id: 203,
     proposal_id: 103,
     proposer_id: 4,
-    user_id: 1, // ✅ 나도 참여(그래서 '받은 제안' 프로젝트로 처리 가능)
+    user_id: 1,
     member_role: "FrontEnd",
     is_proposer: false,
   },
@@ -427,6 +526,84 @@ export const MOCK_PROJECT_MEMBERS: ProjectMember[] = [
     proposer_id: 4,
     user_id: 2,
     member_role: "PM",
+    is_proposer: false,
+  },
+
+  // 🔹 project 204 (내가 보낸 제안 + 진행중)
+  {
+    member_id: 309,
+    project_id: 204,
+    proposal_id: 104,
+    proposer_id: 1,
+    user_id: 1, // 나
+    member_role: "FrontEnd",
+    is_proposer: true,
+  },
+  {
+    member_id: 310,
+    project_id: 204,
+    proposal_id: 104,
+    proposer_id: 1,
+    user_id: 2,
+    member_role: "PM",
+    is_proposer: false,
+  },
+  {
+    member_id: 311,
+    project_id: 204,
+    proposal_id: 104,
+    proposer_id: 1,
+    user_id: 3,
+    member_role: "BackEnd",
+    is_proposer: false,
+  },
+
+  // 🔹 project 205 (내가 보낸 제안 + 완료)
+  {
+    member_id: 312,
+    project_id: 205,
+    proposal_id: 105,
+    proposer_id: 1,
+    user_id: 1,
+    member_role: "FrontEnd",
+    is_proposer: true,
+  },
+  {
+    member_id: 313,
+    project_id: 205,
+    proposal_id: 105,
+    proposer_id: 1,
+    user_id: 2,
+    member_role: "PM",
+    is_proposer: false,
+  },
+
+  // 🔹 project 206 (받은 제안 + 채용중)
+  {
+    member_id: 314,
+    project_id: 206,
+    proposal_id: 106,
+    proposer_id: 3,
+    user_id: 3,
+    member_role: "BackEnd",
+    is_proposer: true,
+  },
+  {
+    member_id: 315,
+    project_id: 206,
+    proposal_id: 106,
+    proposer_id: 3,
+    user_id: 1, // 나 (받은 제안 참여)
+    member_role: "FrontEnd",
+    is_proposer: false,
+  },
+  {
+    member_id: 316,
+    project_id: 206,
+    proposal_id: 106,
+    proposer_id: 3,
+    user_id: 4,
+    member_role: "Design",
     is_proposer: false,
   },
 ];

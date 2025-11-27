@@ -11,6 +11,9 @@ import {
   type MemberBlock,
 } from "@components/project/proposal/MemberBlockList";
 
+import AcceptButton from "@components/project/proposal/AcceptButton";
+import RejectButton from "@components/project/proposal/RejectButton";
+
 import {
   MOCK_PROPOSALS,
   MOCK_USERS,
@@ -18,6 +21,8 @@ import {
   MOCK_PROPOSAL_TARGETS,
   MOCK_BLOCKS,
 } from "../../mocks/mockAssemblock";
+
+const MY_USER_ID = 1;
 
 export function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
@@ -50,13 +55,35 @@ export function ProposalDetailPage() {
     .filter((b): b is NonNullable<typeof b> => Boolean(b));
 
   // 5) "페이지 안에서만" MemberBlockList용으로 변환
-
   const viewBlocks: MemberBlock[] = rawBlocks.map((b) => ({
     blockId: b.block_id,
     imageUrl: b.result_url ?? "/placeholder-block.png",
     title: b.block_title,
     description: b.oneline_summary,
   }));
+
+  // 6) 받은 제안인지 + 마감 전인지 판단
+  const hasMyBlock = rawBlocks.some((b) => b.user_id === MY_USER_ID);
+  const isProposerMe = proposal.proposer_id === MY_USER_ID;
+
+  const isReceivedProposal = hasMyBlock && !isProposerMe;
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const isBeforeDeadline = proposal.recruit_end_date >= todayStr;
+
+  const isActionActive = isReceivedProposal && isBeforeDeadline;
+
+  const handleAccept = () => {
+    if (!isActionActive) return;
+    // TODO: 수락 API 연결
+    console.log("제안 수락:", proposalIdNum);
+  };
+
+  const handleReject = () => {
+    if (!isActionActive) return;
+    // TODO: 거절 API 연결
+    console.log("제안 거절:", proposalIdNum);
+  };
 
   return (
     <Page>
@@ -89,6 +116,14 @@ export function ProposalDetailPage() {
 
         {/* 3) 팀원 블록 리스트 */}
         <MemberBlockList blocks={viewBlocks} />
+
+        {/* 4) 받은 제안일 때만 수락/거절 버튼 노출 (새로 추가한 영역) */}
+        {isReceivedProposal && (
+          <BottomActions>
+            <AcceptButton disabled={!isActionActive} onClick={handleAccept} />
+            <RejectButton disabled={!isActionActive} onClick={handleReject} />
+          </BottomActions>
+        )}
       </Body>
     </Page>
   );
@@ -108,4 +143,12 @@ const Body = styled.div`
 
 const SectionGap = styled.div`
   height: 4px;
+`;
+
+const BottomActions = styled.div`
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 38px; /* 피그마 하단 여백 */
 `;
