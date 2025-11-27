@@ -7,14 +7,12 @@ export const NavBar = styled.nav`
   bottom: 0;
   transform: translateX(-50%);
   display: flex;
-  justify-content: space-around;
-  align-items: center;
+  justify-content: space-between;
+  padding: 16px 30px 32px 30px;
 
   background: #FFFFFF;
   width: 100%;
-  min-width: 375px;
-  max-width: 400px;
-  height: 99px;
+  height: 100px;
 
   border-top: 1px solid #F0EFF1;
   border-radius: 20px 20px 0 0;
@@ -26,19 +24,20 @@ export const NavItem = styled(Link)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 55px;
-  height: 43px;
-  text-decoration: none;
+  width: 67px;
+  height: 50px;
+  padding: 12px 0;
+  gap: 4px;
 `;
 
 export const Icon = styled.img`
   width: 24px;
   height: 24px;
   align-items: center;
-  margin-bottom: 4px;
+  justify-content: center;
 `;
 
-export const Label = styled.strong<{ $active?: boolean }>`
+export const Label = styled.div<{ $active?: boolean }>`
   font-size: 10px;
   font-weight: ${({ $active }) => ($active ? 600 : 500)};
   color: ${({ $active }) => ($active ? "#352F36" : "#868286")};

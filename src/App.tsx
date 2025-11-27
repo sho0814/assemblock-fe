@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { OverlayProvider } from "@components/common/OverlayContext";
 import { MainLayout } from "@components/common/MainLayout";
@@ -11,12 +11,19 @@ import { MyTeamPage } from "@pages/project/MyTeamPage";
 import { ReviewPage } from "@pages/project/ReviewPage";
 import { ProposalDetailPage } from "@pages/project/ProposalDetailPage";
 import { MyPage } from "@pages/my/MyPage";
-import { CategoryPage } from "@pages/home/category/CategoryPage";
-import { NotificationPage } from "@pages/home/notification/NotificationPage";
-import { SearchPage } from "@pages/home/search/SearchPage";
-import { BlockDetailPage } from "@pages/Block/BlockDetailPage";
-import { BlockEditPage } from "@pages/Block/BlockEditPage";
-import { BlockRegisterPage } from "@pages/Block/BlockRegisterPage";
+import { ProfileEdit } from "@pages/my/ProfileEdit";
+import { ProfileSelect } from "@pages/my/ProfileSelect";
+import { CategoryPage } from "@pages/category/CategoryPage";
+import { NotificationPage } from "@pages/notification/NotificationPage";
+import { SearchPage } from "@pages/search/SearchPage";
+import { SearchResultPage } from "@pages/search/SearchResultPage";
+import { BlockDetailPage } from "@pages/block/BlockDetailPage";
+import { BlockEditPage } from "@pages/block/BlockEditPage";
+import { BlockRegisterPage } from "@pages/block/BlockRegisterPage";
+import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
+import { BoardDetailPage } from "@pages/board/BoardDetailPage";
+import { OtherUserProfile } from "@pages/OtherUser/OtherUserProfile";
+import { BlockDetail } from "@pages/OtherUser/BlockDetail";
 
 function App() {
   return (
@@ -30,12 +37,19 @@ function App() {
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
-          <Route path="/Home/category" element={<CategoryPage />} />
-          <Route path="/Home/notification" element={<NotificationPage />} />
-          <Route path="/Home/search" element={<SearchPage />} />
-          <Route path="/Block/detail" element={<BlockDetailPage />} />
-          <Route path="/Block/edit" element={<BlockEditPage />} />
-          <Route path="/Block/register" element={<BlockRegisterPage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
+          <Route path="/notification" element={<NotificationPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/search/:keyword" element={<SearchResultPage />} />
+          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => {}} />} />
+          <Route path="/block/detail" element={<BlockDetailPage />} />
+          <Route path="/block/edit" element={<BlockEditPage />} />
+          <Route path="/block/register" element={<BlockRegisterPage />} />
+          <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
+          <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
+          <Route path="/OtherUser/Profile" element={<OtherUserProfile />} />
+          <Route path="/OtherUser/BlockDetail" element={<BlockDetail />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
           <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
         </Route>

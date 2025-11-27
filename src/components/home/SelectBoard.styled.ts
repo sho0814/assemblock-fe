@@ -93,3 +93,9 @@ export const BottomBtn = styled.button`
   font-size: 14px;
   font-weight: 500;
 `;
+
+export const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background: #f3f3f3;
+`;

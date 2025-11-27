@@ -11,7 +11,7 @@ export function BlockRegisterPage() {
     const { showOverlay, closeOverlay } = useOverlay();
     const navigate = useNavigate();
     const location = useLocation();
-    const { isSkill } = location.state || { isSkill: false };
+    const { isTech } = location.state || { isTech: false };
 
     return (
         <>
@@ -29,7 +29,7 @@ export function BlockRegisterPage() {
                         onPrevClick={() => {closeOverlay(); navigate(-1);}} />
                 )} />
             <InformText />
-            <BlockDetails isSkill={isSkill} />
+            <BlockDetails isSkill={isTech} />
         </>
     )
 }
