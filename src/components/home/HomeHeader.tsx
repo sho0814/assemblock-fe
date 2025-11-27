@@ -1,6 +1,4 @@
 // src/components/home/HomeHeader.tsx
-import { useNavigate } from 'react-router-dom';
-
 import * as S from './HomeHeader.styled'
 import notificationIcon from '@assets/home/notification.svg'
 import searchIcon from '@assets/home/search.svg'
@@ -11,21 +9,26 @@ interface HomeHeaderProps {
   setIsTech: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function HomeHeader({isTech: isTech, setIsTech: setIsSkill}: HomeHeaderProps): React.JSX.Element {
-  const navigate = useNavigate();
+export default function HomeHeader({ isTech: isTech, setIsTech }: HomeHeaderProps): React.JSX.Element {
 
   return (
     <S.Header>
-      
+
       <S.TitleWrapper>
-        <S.Title $active={isTech} onClick={() => setIsSkill(true)}>기술</S.Title>
-        <S.Title $active={!isTech} onClick={() => setIsSkill(false)}>아이디어</S.Title>
+        <S.Title $active={isTech} onClick={() => setIsTech(true)}>기술</S.Title>
+        <S.Title $active={!isTech} onClick={() => setIsTech(false)}>아이디어</S.Title>
       </ S.TitleWrapper>
 
       <S.IconWrapper>
-        <S.Icon src={notificationIcon} onClick={() => navigate('/notification')} />
-        <S.Icon src={searchIcon} onClick={() => navigate('/search')} />
-        <S.Icon src={menuIcon} onClick={() => navigate('/category')} />
+        <S.Item to='/notification' aria-label='notification'>
+          <S.Icon src={notificationIcon} />
+        </S.Item>
+        <S.Item to='/search' aria-label='search'>
+          <S.Icon src={searchIcon} />
+        </S.Item>
+        <S.Item to='/category' aria-label='category'>
+          <S.Icon src={menuIcon}/>
+        </S.Item>
       </S.IconWrapper>
 
     </S.Header>
