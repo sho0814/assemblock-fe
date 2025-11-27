@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as S from './MyBlockCard.styled';
 
 // 추후 카드 이미지와 1:1 연결
@@ -30,7 +29,6 @@ interface MyBlockProps {
 }
 
 export default function BlockList({ blocks, activeTab = 'all' }: MyBlockProps) {
-  const navigate = useNavigate();
   const [blockList, setBlockList] = useState<BlockData[]>([]);
 
   useEffect(() => {
@@ -51,11 +49,6 @@ export default function BlockList({ blocks, activeTab = 'all' }: MyBlockProps) {
     }
   }, [blocks]);
 
-  const handleBlockClick = (blockId: string) => {
-    // 추후 연결: 블록 상세 페이지로 이동
-    navigate(`/Block/detail?id=${blockId}`);
-  };
-
   // activeTab에 따라 블록 필터링
   const filteredBlocks = blockList.filter((block) => {
     if (activeTab === 'all') {
@@ -73,7 +66,7 @@ export default function BlockList({ blocks, activeTab = 'all' }: MyBlockProps) {
       {filteredBlocks.length > 0 && (
         <S.BlockListContainer>
           {filteredBlocks.map((block) => (
-            <S.BlockCard key={block.block_id} onClick={() => handleBlockClick(block.block_id.toString())}>
+            <S.BlockCard key={block.block_id}>
               <S.BlockIcon>
                 {/* 추후 카드 이미지와 1:1 연결 */}
                 <img src={mediumIdeaCulture} alt="Block Icon" />

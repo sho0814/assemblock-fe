@@ -1,10 +1,13 @@
 import styled from "styled-components";
 
-export const ProfileEditContainer = styled.div`
-  min-width: 375px;
-  max-width: 400px;
-  width: 100%;
-  margin: 0 auto;
+export const ProfileEditContainer = styled.div`                  
+  min-width: 375px;        
+  height: 100vh;
+  margin: 0 auto;          
+  padding: 0 20px 56px 20px;         
+  background: #FAFAFA;     
+  overflow-y: auto;       
+  overflow-x: hidden;
 `;
 
 export const HeaderBar = styled.div`
@@ -14,8 +17,6 @@ export const HeaderBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 20px;
-  padding-right: 20px;
   margin: 0 auto;
   opacity: 1;
 `;
@@ -242,13 +243,12 @@ export const HiddenFileInput = styled.input`
 export const ProfileEditButton = styled.button`
   display: flex;
   width: 335px;
+  margin-top: 36px;
   padding: 12px 10px;
   justify-content: center;
   align-items: center;
-  gap: 32px;
   border-radius: 16px;
   background: var(--Primary-BK, #352F36);
-  margin: 32px auto 24px;
   color: #FAFAFA;
   border: none;
   cursor: pointer;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  MyPageContainer,
+  MyPageContainer, 
   HeaderBar,
   HeaderSlot,
   CenterTextBox,
@@ -38,7 +38,16 @@ import AssemBlcokDefault from '@assets/MyPage/AssemBlcokDefault.svg';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
 import BlockList from '@components/block/MyBlockCard';
-import type { ReviewData } from '../../types/database';
+
+// 리뷰 데이터 인터페이스
+interface ReviewData {
+  review_id: number;
+  user_id: number;
+  reviewed_id: number;
+  project_id: number;
+  review: string;
+  created_at: string;
+}
 
 export function MyPage() {
     const [activeTab, setActiveTab] = useState<'all' | 'idea' | 'tech'>('all');
@@ -66,49 +75,36 @@ export function MyPage() {
     ];
 
     useEffect(() => {
-      // localStorage에서 선택된 프로필 정보 읽기 나중에 연결하기
+      // localStorage 데이터 로드 로직 (기존 동일)
       const savedProfile = localStorage.getItem('selectedProfile');
       if (savedProfile) {
         try {
-          const profile = JSON.parse(savedProfile) as ProfileData;
-          setSelectedProfile(profile);
-        } catch (e) {
-          console.error('Failed to parse saved profile:', e);
-        }
+          setSelectedProfile(JSON.parse(savedProfile) as ProfileData);
+        } catch (e) { console.error(e); }
       }
       
-      // localStorage에서 저장된 프로필 데이터 읽기 나중에 연결하기
       const savedUserProfile = localStorage.getItem('userProfile');
       if (savedUserProfile) {
         try {
-          const profile = JSON.parse(savedUserProfile);
-          setUserProfile(profile);
-        } catch (e) {
-          console.error('Failed to parse saved user profile:', e);
-        }
+          setUserProfile(JSON.parse(savedUserProfile));
+        } catch (e) { console.error(e); }
       }
       
-      // localStorage에서 저장된 블록 목록 확인
       const savedBlocks = localStorage.getItem('registeredBlocks');
       if (savedBlocks) {
         try {
           const blocks = JSON.parse(savedBlocks);
           setHasBlocks(blocks && blocks.length > 0);
-        } catch (e) {
-          console.error('Failed to parse saved blocks:', e);
-        }
+        } catch (e) { console.error(e); }
       }
       
-      // localStorage에서 저장된 후기 목록 확인 (추후 연결)
       const savedReviews = localStorage.getItem('reviews');
       if (savedReviews) {
         try {
           const parsedReviews = JSON.parse(savedReviews) as ReviewData[];
           setReviews(parsedReviews);
           setHasReviews(parsedReviews && parsedReviews.length > 0);
-        } catch (e) {
-          console.error('Failed to parse saved reviews:', e);
-        }
+        } catch (e) { console.error(e); }
       }
     }, []);
     
@@ -121,6 +117,7 @@ export function MyPage() {
           </HeaderSlot>
           <HeaderSlot />
         </HeaderBar>
+        
         <Profile>
           <ProfileImg>
             {selectedProfile ? (
@@ -131,10 +128,7 @@ export function MyPage() {
                   id: 'img1',
                   src: Img1,
                   alt: 'backend',
-                  colorMap: {
-                    '#C2C1C3': '#2E3B00',
-                    '#F0EFF1': '#B8EB00'
-                  }
+                  colorMap: { '#C2C1C3': '#2E3B00', '#F0EFF1': '#B8EB00' }
                 }} 
                 isSelected={true} 
                 size="small" 
@@ -160,10 +154,13 @@ export function MyPage() {
             <UserIntroduction>{userProfile?.introduction || '한 줄 소개'}</UserIntroduction>
           </RightColumn>
         </Profile>
+
         <ProfileEditButton onClick={() => navigate('/My/ProfileEdit')}>
           프로필 수정하기
         </ProfileEditButton>
+
         <PortfolioDivider />
+        
         <Portfolio>
           <PortfolioItem className="l600">나의 포트폴리오</PortfolioItem>
           <PortfolioItem className="l500" $isL500>
@@ -175,26 +172,18 @@ export function MyPage() {
             {userProfile?.fileName ? (
               <PortfolioFileLink
                 onClick={() => {
-                  if (userProfile.fileData) {
+                   // 파일 다운로드 로직 (기존 동일)
+                   if (userProfile.fileData) {
                     try {
                       const base64Data = userProfile.fileData;
                       const base64Match = base64Data.match(/^data:([^;]+);base64,(.+)$/);
-                      
-                      if (!base64Match) {
-                        alert('파일 형식이 올바르지 않습니다.');
-                        return;
-                      }
-                      
+                      if (!base64Match) { alert('파일 형식이 올바르지 않습니다.'); return; }
                       const mimeType = base64Match[1];
                       const base64String = base64Match[2];
                       const byteString = atob(base64String);
                       const ab = new ArrayBuffer(byteString.length);
                       const ia = new Uint8Array(ab);
-                      
-                      for (let i = 0; i < byteString.length; i++) {
-                        ia[i] = byteString.charCodeAt(i);
-                      }
-                      
+                      for (let i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
                       const blob = new Blob([ab], { type: mimeType });
                       const url = URL.createObjectURL(blob);
                       const link = document.createElement('a');
@@ -205,13 +194,7 @@ export function MyPage() {
                       link.click();
                       document.body.removeChild(link);
                       URL.revokeObjectURL(url);
-                    } catch (error) {
-                      console.error('Error downloading file:', error);
-                      alert('파일 다운로드 중 오류가 발생했습니다.');
-                    }
-                  } else {
-                    console.warn('File data is missing');
-                    alert('파일 데이터가 없습니다.');
+                    } catch (error) { console.error(error); alert('오류 발생'); }
                   }
                 }}
               >
@@ -221,8 +204,8 @@ export function MyPage() {
               '아직 등록된 파일이 없어요'
             )}
           </PortfolioItem>
-
         </Portfolio>
+
         <Review>나의 후기블록 
           {hasReviews && (
             <ReviewTabContainer>
@@ -247,38 +230,22 @@ export function MyPage() {
             </ReviewBlock>
           ) : (
             <ReviewBlock>
-              {/* 추후 연결: 받은 후기/보낸 후기 목록 렌더링 */}
               {activeReviewTab === 'received' ? (
-                <ReviewBlockText>받은 후기 목록 (추후 연결)</ReviewBlockText>
+                <ReviewBlockText>받은 후기</ReviewBlockText>
               ) : (
-                <ReviewBlockText>보낸 후기 목록 (추후 연결)</ReviewBlockText>
+                <ReviewBlockText>보낸 후기</ReviewBlockText>
               )}
             </ReviewBlock>
           )}
         </Review>
+
         <MyBlock>
           <MyBlockHeader>나의 어셈블록</MyBlockHeader>
-          {/*블록 등록이랑 연결해서 조건식으로 바꾸기*/}
           {hasBlocks && (
             <BlockdivTab>
-              <BlockTab 
-                $isActive={activeTab === 'all'}
-                onClick={() => setActiveTab('all')}
-              >
-                모든 블록
-              </BlockTab>
-              <BlockTab 
-                $isActive={activeTab === 'idea'}
-                onClick={() => setActiveTab('idea')}
-              >
-                아이디어 블록
-              </BlockTab>
-              <BlockTab 
-                $isActive={activeTab === 'tech'}
-                onClick={() => setActiveTab('tech')}
-              >
-                기술 블록
-              </BlockTab>
+              <BlockTab $isActive={activeTab === 'all'} onClick={() => setActiveTab('all')}>모든 블록</BlockTab>
+              <BlockTab $isActive={activeTab === 'idea'} onClick={() => setActiveTab('idea')}>아이디어 블록</BlockTab>
+              <BlockTab $isActive={activeTab === 'tech'} onClick={() => setActiveTab('tech')}>기술 블록</BlockTab>
             </BlockdivTab>
           )}
           <BlockListWrapper>
@@ -295,5 +262,3 @@ export function MyPage() {
       </MyPageContainer>
     )
 }
-
-

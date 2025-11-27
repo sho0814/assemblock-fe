@@ -1,6 +1,5 @@
 // src/components/home/Card.tsx
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useDrag } from '@use-gesture/react'
 import { useSpring, animated } from '@react-spring/web'
 import { categoryBackground } from './CategoryBackground'
@@ -24,7 +23,6 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ block_id, block_title, oneline_summary, user_name, tech_part: techpart_id, category_name, isRegisterBlockVisible: isStoreToBoardVisible, setIsRegisterBlockVisible: setIsStoreToBoardVisible }: CardProps) => {
-  const navigate = useNavigate();
   const { showOverlay } = useOverlay();
   const [y, setY] = useState(0)
   const bgImage = categoryBackground[category_name]
@@ -73,7 +71,7 @@ const Card: React.FC<CardProps> = ({ block_id, block_title, oneline_summary, use
   return (
     <>
       <animated.div {...bind()} style={{ y: spring.y }}>
-        <S.Card key={block_id} bgImage={bgImage} onClick={() => navigate('/Block/detail')}>
+        <S.Card key={block_id} bgImage={bgImage}>
           <S.Title>{block_title}</S.Title>
           <S.Summary>{oneline_summary}</S.Summary>
           <S.Username>{user_name} 님</S.Username>
