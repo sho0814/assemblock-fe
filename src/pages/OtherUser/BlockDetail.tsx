@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from '../block/BlockDetailPage.styled';
 import SimpleHeader from '@components/shared/SimpleHeader';
@@ -17,6 +17,7 @@ const TECH_PARTS_MAP: Record<number, { name: string; color: string }> = {
 };
 
 export function BlockDetail() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
   const [block, setBlock] = useState<BlockData | null>(null);
@@ -108,7 +109,7 @@ export function BlockDetail() {
           
           <S.BlockTitle>{safeBlock.block_title}</S.BlockTitle>
 
-          <S.ProfileSection>
+          <S.ProfileSection onClick={() => navigate('/OtherUser/Profile')}>
             <S.ProfileImg>
               {selectedProfile ? (
                 <ProfileAct profile={selectedProfile} isSelected={true} size="small" />
