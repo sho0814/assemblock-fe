@@ -14,7 +14,8 @@ export default defineConfig({
       { find: "@components", replacement: resolve(__dirname, "src/components") },
       { find: "@pages", replacement: resolve(__dirname, "src/pages") },
       { find: "@utils", replacement: resolve(__dirname, "src/utils") },
-      { find: "@apis", replacement: resolve(__dirname, "src/api")}
+      { find: "@apis", replacement: resolve(__dirname, "src/api")},
+      { find: "@mocks", replacement: resolve(__dirname, "src/mocks")},      
     ],
   },
   server: {
