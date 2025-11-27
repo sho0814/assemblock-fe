@@ -51,11 +51,6 @@ const SectionTitle = styled.h3`
   color: #111;
 `;
 
-const Count = styled.span`
-  font-size: 12px;
-  color: #888;
-  font-weight: 600;
-`;
 
 const List = styled.ul`
   display: flex;

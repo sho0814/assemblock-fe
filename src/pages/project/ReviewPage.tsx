@@ -170,11 +170,11 @@ const DoneTitle = styled.h2`
   color: #111827;
 `;
 
-const DoneDesc = styled.p`
-  font-size: 14px;
-  font-weight: 600;
-  color: #6b7280;
-`;
+// const DoneDesc = styled.p`
+//   font-size: 14px;
+//   font-weight: 600;
+//   color: #6b7280;
+// `;
 
 const DoneButton = styled.button`
   margin-top: 16px;

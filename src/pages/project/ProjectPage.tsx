@@ -1,5 +1,5 @@
 // src/pages/project/ProjectPage.tsx
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import ProjectHeader from "@components/project/project/ProjectHeader";
 import ProjectTabBar from "@components/project/project/ProjectTabBar";
 import ProposalList, {

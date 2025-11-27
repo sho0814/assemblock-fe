@@ -26,10 +26,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/Board" element={<BoardPage />} />
           <Route path="/Project" element={<ProjectPage />} />
-          <Route
-            path="/Project/team/:proposalId/review"
-            element={<ReviewPage />}
-          />
+          <Route path="/Project/team/:proposalId/review" element={<ReviewPage />} />
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
@@ -40,10 +37,7 @@ function App() {
           <Route path="/Block/edit" element={<BlockEditPage />} />
           <Route path="/Block/register" element={<BlockRegisterPage />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
-          <Route
-            path="/Project/proposal/:proposalId"
-            element={<ProposalDetailPage />}
-          />
+          <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
         </Route>
       </Routes>
     </OverlayProvider>
