@@ -9,7 +9,7 @@ import {
   MOCK_PROPOSALS,
   MOCK_USERS,
   getMembersByProposalId,
-} from "../../mocks/mockAssemblock";
+} from "@mocks/mockAssemblock";
 
 const List = styled.ul`
   display: flex;
