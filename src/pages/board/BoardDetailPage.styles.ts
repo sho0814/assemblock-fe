@@ -6,7 +6,7 @@ type Styles = Record<string, CSSProperties>;
 export const boardDetailStyles: Styles = {
   //상쇄
   root: {
-    marginTop: -48,
+    marginTop: -15,
     marginBottom: -99,
     marginLeft: -20,
     marginRight: -20,
@@ -362,5 +362,4 @@ export const boardDetailStyles: Styles = {
     fontSize: "14px",
     fontWeight: 500,
   },
-
 };
