@@ -33,7 +33,8 @@
       "@pages/*": ["./src/pages/*"],
       "@store/*": ["src/store/*"],
       "@type/*": ["src/type/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@mocks/*": ["src/mocks/*"],
     }
   },
   "include": ["src"]

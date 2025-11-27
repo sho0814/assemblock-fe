@@ -1,9 +1,11 @@
 import styled from "styled-components";
 
-export const ProfileContainer = styled.div`
-  width: 100%;
+export const MyPageContainer = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 56px;
 `;
 
 export const HeaderBar = styled.div`
@@ -13,33 +15,14 @@ export const HeaderBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0;
-  opacity: 1;
 `;
 
 export const HeaderSlot = styled.div`
   display: flex;
   align-items: center;
-  top: 0;
-`;
-
-export const BackButton = styled.button`
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  aspect-ratio: 1/1;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 export const CenterTextBox = styled.div`
-  min-width: 70px;
-  min-height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,9 +35,8 @@ export const CenterTextBox = styled.div`
 export const Profile = styled.div`
   display: flex;
   align-items: center;
-  max-width: 400px;
+  width: 100%;
   gap: 20px;
-  margin: 0 20px;
 `;
 
 export const ProfileImg = styled.div`
@@ -106,16 +88,13 @@ export const UserIntroduction = styled.div`
 export const Portfolio = styled.div`
   display: flex;
   width: 100%;
-  max-width: 335px;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-  margin: 16px auto 0;
 `;
 
 export const PortfolioItem = styled.div<{ $isL500?: boolean }>`
   width: 100%;
-  max-width: 335px;
   height: 21px;
   display: flex;
   align-items: center;
@@ -134,42 +113,20 @@ export const PortfolioFileLink = styled.span`
 
 export const PortfolioDivider = styled.div`
   width: 100%;
-  max-width: 335px;
   height: 1px;
   background: #F0EFF1;
-  margin: 10px auto 0;
+  margin-bottom: 24px;
 `;
 
 export const Review = styled.div`
   display: flex;
   width: 100%;
-  max-width: 336px;
   flex-direction: column;
   align-items: flex-start;
-  margin: 36px auto 0;
+  margin-top: 36px;
   font-family: 'Pretendard', sans-serif;
   font-size: 14px;
   font-weight: 600;
-`;
-
-export const ReviewTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
-
-export const ReviewBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #F05C5C;
-  color: #FAFAFA;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1;
 `;
 
 export const ReviewTabContainer = styled.div`
@@ -180,7 +137,6 @@ export const ReviewTabContainer = styled.div`
 
 export const ReviewTab = styled.div<{ $isActive?: boolean }>`
   display: flex;
-  padding: 6px 16px;
   justify-content: center;
   align-items: center;
   gap: 8px;
@@ -194,8 +150,8 @@ export const ReviewTab = styled.div<{ $isActive?: boolean }>`
 
 export const ReviewBlock = styled.div`
   width: 100%;
-  max-width: 335px;
   min-height: 255px;
+  background: border-radius: 16px;
   background: var(--GrayScale-GR10, #F0EFF1);
   border-radius: 16px;
   display: flex;
@@ -221,7 +177,6 @@ export const ReviewBlockText = styled.div`
 export const MyBlock = styled.div`
   display: flex;
   width: 100%;
-  max-width: 335px;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
@@ -257,14 +212,13 @@ export const BlockTab = styled.div<{ $isActive?: boolean }>`
 export const BlockListWrapper = styled.div`
   width: 100%;
   margin-top: 24px;
-  max-width: 335px;
   min-height: auto;
 `;
 
 export const BlockContent = styled.div`
   width: 100%;
-  max-width: 335px;
   min-height: 255px;
+  background: border-radius: 16px;
   background: var(--GrayScale-WT, #FAFAFA);
   border-radius: 16px;
   display: flex;
@@ -285,4 +239,3 @@ export const BlockContentText = styled.div`
   color: var(--GrayScale-GR30, #C2C1C3);
   text-align: center;
 `;
-

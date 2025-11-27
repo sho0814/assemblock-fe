@@ -2,34 +2,6 @@
 import styled from "styled-components";
 import type { ProjectStatus } from "./MyTeamTypes";
 
-const Wrapper = styled.section`
-  margin-bottom: 16px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: #f6f6f6;
-`;
-
-const BarOuter = styled.div`
-  margin-top: 4px;
-  height: 8px;
-  border-radius: 999px;
-  background: #e1e1e1;
-  overflow: hidden;
-`;
-
-const BarInner = styled.div<{ widthPercent: number }>`
-  height: 100%;
-  border-radius: 999px;
-  background: #333;
-  width: ${({ widthPercent }) => `${widthPercent}%`};
-`;
-
-const DateText = styled.div`
-  margin-top: 6px;
-  font-size: 11px;
-  color: #999;
-`;
-
 type Props = {
   status: ProjectStatus;
   startDate: string;
@@ -46,6 +18,8 @@ const diffDays = (from: Date, to: Date) => {
   const toMidnight = new Date(to.getFullYear(), to.getMonth(), to.getDate());
   return Math.floor((toMidnight.getTime() - fromMidnight.getTime()) / DAY);
 };
+
+const TOTAL_SEGMENTS = 7;
 
 export const ProjectProgress = ({ status, startDate, endDate }: Props) => {
   const today = new Date();
@@ -75,18 +49,107 @@ export const ProjectProgress = ({ status, startDate, endDate }: Props) => {
     widthPercent = 100;
   }
 
-  return (
-    <Wrapper>
-      <div style={{ fontSize: 13 }}>{label}</div>
-      <BarOuter>
-        <BarInner widthPercent={widthPercent} />
-      </BarOuter>
+  // 🔹 연속 퍼센트를 “칸” 개수로 변환
+  const filledSegments =
+    status === "recruiting"
+      ? Math.min(
+          TOTAL_SEGMENTS,
+          Math.max(0, Math.round((widthPercent / 100) * TOTAL_SEGMENTS))
+        )
+      : TOTAL_SEGMENTS;
 
-      {status === "recruiting" && (
-        <DateText>
-          {startDate} ~ {endDate}
-        </DateText>
-      )}
-    </Wrapper>
+  return (
+    <Card>
+      <ContentCol>
+        <HeaderRow>
+          <LabelText>{label}</LabelText>
+          {status === "recruiting" && (
+            <PeriodText>
+              {startDate}~{endDate}
+            </PeriodText>
+          )}
+        </HeaderRow>
+
+        <ProgressBar>
+          {Array.from({ length: TOTAL_SEGMENTS }).map((_, idx) => (
+            <BarSegment
+              key={idx}
+              filled={idx < filledSegments}
+              isFirst={idx === 0}
+              isLast={idx === TOTAL_SEGMENTS - 1}
+            />
+          ))}
+        </ProgressBar>
+      </ContentCol>
+    </Card>
   );
 };
+
+/* ======================= styled-components ======================= */
+
+const Card = styled.section`
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 20px 36px;
+  background: var(--GrayScale-WT, #fafafa);
+  box-shadow: 0px 4px 4px rgba(53, 47, 54, 0.1);
+  border-radius: 16px;
+  outline: 1px solid var(--GrayScale-GR10, #f0eff1);
+  outline-offset: -1px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ContentCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+`;
+
+const HeaderRow = styled.div`
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 8px;
+`;
+
+const LabelText = styled.span`
+  color: var(--Primary-BK, #352f36);
+  font-size: 16px;
+  font-family: Pretendard;
+  font-weight: 600;
+  line-height: 24px;
+`;
+
+const PeriodText = styled.span`
+  color: var(--GrayScale-GR50, #868286);
+  font-size: 12px;
+  font-family: Pretendard;
+  font-weight: 500;
+  line-height: 18px;
+`;
+
+const ProgressBar = styled.div`
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+`;
+
+const BarSegment = styled.div<{
+  filled: boolean;
+  isFirst: boolean;
+  isLast: boolean;
+}>`
+  width: 36px;
+  height: 8px;
+  background: ${({ filled }) =>
+    filled ? "var(--Primary-BK, #352F36)" : "var(--GrayScale-GR10, #F0EFF1)"};
+
+  border-top-left-radius: ${({ isFirst }) => (isFirst ? "24px" : "0")};
+  border-bottom-left-radius: ${({ isFirst }) => (isFirst ? "24px" : "0")};
+  border-top-right-radius: ${({ isLast }) => (isLast ? "24px" : "0")};
+  border-bottom-right-radius: ${({ isLast }) => (isLast ? "24px" : "0")};
+`;
