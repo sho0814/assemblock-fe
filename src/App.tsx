@@ -22,6 +22,8 @@ import { BlockEditPage } from "@pages/block/BlockEditPage";
 import { BlockRegisterPage } from "@pages/block/BlockRegisterPage";
 import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
 import { BoardDetailPage } from "@pages/board/BoardDetailPage";
+import { OtherUserProfile } from "@pages/OtherUser/OtherUserProfile";
+import { BlockDetail } from "@pages/OtherUser/BlockDetail";
 
 function App() {
   return (
@@ -46,6 +48,8 @@ function App() {
           <Route path="/block/register" element={<BlockRegisterPage />} />
           <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
           <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
+          <Route path="/OtherUser/Profile" element={<OtherUserProfile />} />
+          <Route path="/OtherUser/BlockDetail" element={<BlockDetail />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
           <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
         </Route>

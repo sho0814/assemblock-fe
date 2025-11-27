@@ -1,16 +1,13 @@
-import { useEffect, useState, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { BlockData } from '@components/block/MyBlockCard';
-import * as S from './BlockDetailPage.styled';
-import backArrow from '@assets/common/back-arrow.svg';
-import more from '@assets/common/more.svg';
+import * as S from '../block/BlockDetailPage.styled';
+import SimpleHeader from '@components/shared/SimpleHeader';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import linkIcon from '@assets/MyPage/link.svg';
 import folderIcon from '@assets/MyPage/folder.svg';
-import OptionMenu from '@components/block/OptionMenu';
-import CancelGuide from '@components/block/CancleGuide';
-import { useOverlay } from '@components/common/OverlayContext';
+import CommonButton from '@components/shared/CommonButton';
 
 // Tech_parts 매핑
 const TECH_PARTS_MAP: Record<number, { name: string; color: string }> = {
@@ -19,15 +16,10 @@ const TECH_PARTS_MAP: Record<number, { name: string; color: string }> = {
   3: { name: '백엔드', color: '#B8EB00' },
 };
 
-export function BlockDetailPage() {
+export function BlockDetail() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { showOverlay } = useOverlay();
   
   const [block, setBlock] = useState<BlockData | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const moreButtonRef = useRef<HTMLButtonElement>(null); 
   const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
   const [userProfile, setUserProfile] = useState<{
     nickname: string;
@@ -37,7 +29,6 @@ export function BlockDetailPage() {
 
   useEffect(() => {
     const blockId = searchParams.get('id');
-    // ID가 없어도 리턴하지 않고 아래 로직 진행 (block은 null 상태 유지)
     if (!blockId) return;
 
     const savedBlocks = localStorage.getItem('registeredBlocks');
@@ -79,11 +70,10 @@ export function BlockDetailPage() {
   }, []);
 
   // 데이터가 없을 때 사용할 기본값
-  // 타입을 'TECHNOLOGY'로 가정하고 빈 값 채움
   const safeBlock: BlockData = block || {
     block_id: 0,
-    block_title: '제목 없는 블록', // 디폴트 제목
-    block_type: 'TECHNOLOGY', // 모든 섹션(기술 스택 포함)을 보여주기 위해 기본 설정
+    block_title: '제목 없는 블록',
+    block_type: 'TECHNOLOGY',
     category_name: '카테고리 없음',
     oneline_summary: '',
     contribution_score: 0,
@@ -94,7 +84,6 @@ export function BlockDetailPage() {
     techparts: [],
   } as unknown as BlockData; 
 
-  // 이후 로직에서는 block 대신 safeBlock 사용
   const isTechnology = safeBlock.block_type === 'TECHNOLOGY' || safeBlock.block_type === 'technology';
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
   const techParts = safeBlock.techparts || [];
@@ -110,95 +99,9 @@ export function BlockDetailPage() {
     return safeBlock.category_name || '';
   };
 
-  const handleMoreButtonClick = () => {
-    setIsMenuOpen(prev => !prev);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        moreButtonRef.current &&
-        !moreButtonRef.current.contains(event.target as Node)
-      ) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    if (isMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isMenuOpen]);
-
-  const handleEdit = () => {
-    setIsMenuOpen(false);
-    const blockId = searchParams.get('id');
-    if (blockId) {
-      navigate(`/Block/edit?id=${blockId}`);
-    }
-  };
-
-  const handleDelete = () => {
-    setIsMenuOpen(false);
-    showOverlay(
-      <CancelGuide
-        title="삭제 확인"
-        description={
-          <>
-            블록을 정말 삭제하시겠습니까? <br />
-            한 번 삭제한 블록은 복구할 수 없어요
-          </>
-        }
-        prevContent="삭제하기"
-        onPrevClick={() => {
-          if (block) { // 실제 데이터가 있을 때만 삭제 로직 동작
-            const savedBlocks = localStorage.getItem('registeredBlocks');
-            if (savedBlocks) {
-              try {
-                const blocks = JSON.parse(savedBlocks) as BlockData[];
-                const filteredBlocks = blocks.filter(
-                  (b) => b.block_id !== block.block_id
-                );
-                localStorage.setItem('registeredBlocks', JSON.stringify(filteredBlocks));
-                navigate(-1);
-              } catch (e) {
-                console.error('블록 삭제 실패:', e);
-              }
-            }
-          } else {
-             // 데이터가 없는 상태면 그냥 뒤로가기
-             navigate(-1);
-          }
-        }}
-      />
-    );
-  };
-
-
   return (
     <>
-      {isMenuOpen && <S.DimBackground onClick={() => setIsMenuOpen(false)} />}
-      <S.Header>
-        <S.BackButton onClick={() => navigate(-1)}>
-          <S.BackIcon src={backArrow} alt="뒤로가기" />
-        </S.BackButton>
-        <S.HeaderTitle>블록 상세</S.HeaderTitle>
-        <S.MoreButtonWrapper>
-          <S.MoreButton ref={moreButtonRef} onClick={handleMoreButtonClick}>
-            <S.MoreIcon src={more} alt="삭제 및 수정 더보기 버튼" />
-          </S.MoreButton>
-          {isMenuOpen && (
-            <S.MenuWrapper ref={menuRef}>
-              <OptionMenu onEdit={handleEdit} onDelete={handleDelete} />
-            </S.MenuWrapper>
-          )}
-        </S.MoreButtonWrapper>
-      </S.Header>
+      <SimpleHeader title="블록 상세" />
       <S.Container>
         <>
           <S.CategoryBreadcrumb>{getCategoryPath()}</S.CategoryBreadcrumb>
@@ -268,7 +171,6 @@ export function BlockDetailPage() {
               <S.ProgressBarContainer>
                 {Array.from({ length: 10 }, (_, index) => {
                   const segmentValue = (index + 1) * 10;
-                  // 값이 없으면 0 처리
                   const score = safeBlock.contribution_score ?? 0;
                   const isFilled = score >= segmentValue;
                   return (
@@ -322,6 +224,17 @@ export function BlockDetailPage() {
               </S.FileLink>
             )}
           </S.Section>
+
+          <div style={{ marginTop: '36px'}}>
+            <CommonButton 
+              content="보드에 담기"
+              width="335px"
+              onClick={() => {
+                // 보드에 담기 로직 추가
+                console.log('보드에 담기');
+              }}
+            />
+          </div>
         </>
       </S.Container>
     </>

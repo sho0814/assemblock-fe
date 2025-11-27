@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
-export const ProfileEditContainer = styled.div`
-  min-width: 375px;
-  max-width: 400px;
+export const ProfileEditContainer = styled.div`                  
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  margin: 0 auto;
+  height: 100%;
 `;
 
 export const HeaderBar = styled.div`
@@ -14,21 +14,27 @@ export const HeaderBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 20px;
-  padding-right: 20px;
-  margin: 0 auto;
-  opacity: 1;
 `;
 
 export const HeaderSlot = styled.div`
   display: flex;
   align-items: center;
-  top: 0;
+  flex: 1;
+  
+  &:first-child {
+    justify-content: flex-start;
+  }
+  
+  &:nth-child(2) {
+    justify-content: center;
+  }
+  
+  &:last-child {
+    justify-content: flex-end;
+  }
 `;
 
 export const CenterTextBox = styled.div`
-  min-width: 70px;
-  min-height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,17 +45,16 @@ export const CenterTextBox = styled.div`
 `;
 
 export const BackButton = styled.button`
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  aspect-ratio: 1/1;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
 `;
 
 export const Profile = styled.div`
@@ -169,7 +174,7 @@ export const PartButtonContainer = styled.div`
 `;
 
 export const PartButton = styled.button<{ $isSelected?: boolean; $color?: string }>`
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: none;
   border-radius: 20px;
   font-size: 14px;
@@ -242,13 +247,12 @@ export const HiddenFileInput = styled.input`
 export const ProfileEditButton = styled.button`
   display: flex;
   width: 335px;
+  margin-top: 36px;
   padding: 12px 10px;
   justify-content: center;
   align-items: center;
-  gap: 32px;
   border-radius: 16px;
   background: var(--Primary-BK, #352F36);
-  margin: 32px auto 24px;
   color: #FAFAFA;
   border: none;
   cursor: pointer;
