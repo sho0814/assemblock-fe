@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_BACK_OPTIONS, CATEGORY_IDEA_OPTIONS } from "@components/block/DropdownOptions";
 
-type BlockType = {
+export type BlockType = {
     block_id: number
     block_title: string
     category_name: string
@@ -11,20 +12,56 @@ type BlockType = {
     user_name: string
 }
 
-const useCardList = (isTech: boolean) => {
+const useCardList = (
+    isTech?: boolean,
+    frontendCategory?: string,
+    backendCategory?: string,
+    designCategory?: string,
+    ideaCategory?: string
+) => {
     const [cards, setCards] = useState<BlockType[]>([])
 
     useEffect(() => {
         fetch('/dummyBlocks.json')
             .then(res => res.json())
             .then((data: BlockType[]) => {
-                const filtered = data.filter(block =>
-                    isTech ? block.block_type === 'technology' : block.block_type === 'idea'
-                )
+                let filtered: BlockType[] = []
+
+                if (typeof isTech === 'boolean') {
+                    filtered = data.filter(block =>
+                        isTech ? block.block_type === 'technology' : block.block_type === 'idea'
+                    )
+                } else if (frontendCategory) {
+                    const matchedOption = CATEGORY_TECH_FRONT_OPTIONS.find(option => option.label === frontendCategory);
+                    const categoryValue = matchedOption?.value;
+                    filtered = data.filter(block =>
+                        block.block_type === 'technology' &&
+                        block.tech_part === 'frontend' &&
+                        block.category_name === categoryValue
+                    )
+                } else if (backendCategory) {
+                    filtered = data.filter(block =>
+                        block.block_type === 'technology' &&
+                        block.tech_part === 'backend' &&
+                        block.category_name === backendCategory
+                    )
+                } else if (designCategory) {
+                    filtered = data.filter(block =>
+                        block.block_type === 'technology' &&
+                        block.tech_part === 'design' &&
+                        block.category_name === designCategory
+                    )
+                } else if (ideaCategory) {
+                    filtered = data.filter(block =>
+                        block.block_type === 'idea' &&
+                        block.category_name === ideaCategory
+                    )
+                }
+
                 setCards(filtered)
             })
             .catch(console.error)
-    }, [isTech]) // isTech가 바뀔 때마다 재실행
+    }, [isTech, frontendCategory, backendCategory, designCategory, ideaCategory])
 
     return cards
 }

@@ -1,14 +1,11 @@
 import styled from "styled-components";
 
-export const MyPageContainer = styled.div`          
-  min-width: 375px;              
-  height: 100vh;
-  margin: 0 auto;          
-  padding: 0 20px 99px 20px;         
-  background: #FAFAFA;    
-  flex: 1; 
-  overflow-y: auto;       
-  overflow-x: hidden;
+export const MyPageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 400px;
 `;
 
 export const HeaderBar = styled.div`
@@ -18,8 +15,6 @@ export const HeaderBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 auto;
-  opacity: 1;
 `;
 
 export const HeaderSlot = styled.div`
@@ -28,7 +23,6 @@ export const HeaderSlot = styled.div`
 `;
 
 export const CenterTextBox = styled.div`
-  min-width: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +35,7 @@ export const CenterTextBox = styled.div`
 export const Profile = styled.div`
   display: flex;
   align-items: center;
-  width: 100%; /* max-width 제거 (MainLayout 패딩에 맞춤) */
+  width: 100%;
   gap: 20px;
 `;
 
@@ -121,7 +115,7 @@ export const PortfolioDivider = styled.div`
   width: 100%;
   height: 1px;
   background: #F0EFF1;
-  margin: 24px 0;
+  margin-bottom: 24px;
 `;
 
 export const Review = styled.div`
@@ -185,6 +179,7 @@ export const ProfileEditButton = styled.button`
   width: 100%;
   padding: 12px 10px;
   margin-top: 32px;
+  margin-bottom: 24px;
   justify-content: center;
   align-items: center;
   gap: 32px;

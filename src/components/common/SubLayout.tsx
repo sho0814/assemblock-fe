@@ -1,10 +1,13 @@
 // src/components/common/SubLayout.tsx
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 import * as S from './SubLayout.styled'
 
 export const SubLayout = () => {
+    const location = useLocation();
+    const isCategoryDetail = location.pathname.startsWith("/category/")
+
     return (
-        <S.LayoutContainer>
+        <S.LayoutContainer noPadding={isCategoryDetail}>
             <Outlet />
         </S.LayoutContainer>
     );
