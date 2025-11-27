@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { ProjectProgress } from "@components/project/myteam/ProjectProgress";
 import { ProjectDescription } from "@components/project/proposal/ProjectDescription";
+import { ContactMethod } from "@components/project/proposal/ContactSection";
 import {
   MemberBlockList,
   type MemberBlock,
@@ -67,6 +68,11 @@ export function ProposalDetailPage() {
           title={proposal.project_title}
           proposerName={proposer?.nickname ?? "익명"}
           description={proposal.project_memo}
+        />
+
+        <ContactMethod
+          title="연락수단"
+          description="디스코드 @asdfggg_ 로 연락주세요!"
         />
 
         {/* 2) 프로젝트 진행상황 (project 있을 때만) */}

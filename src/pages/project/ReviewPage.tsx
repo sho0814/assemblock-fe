@@ -100,9 +100,8 @@ export function ReviewPage() {
       <Page>
         <SimpleHeader title="리뷰 블록 남기기" />
         <DoneWrapper>
-          <DoneTitle>모든 팀원에게 리뷰를 남겼어요!</DoneTitle>
-          <DoneDesc>프로필에서 작성한 리뷰를 확인할 수 있어요 🙂</DoneDesc>
-          <DoneButton onClick={() => navigate(-1)}>돌아가기</DoneButton>
+          <DoneTitle>모든 팀원에게 리뷰 블록을 남겼어요!</DoneTitle>
+          <DoneButton onClick={() => navigate("/")}>홈으로 돌아가기</DoneButton>
         </DoneWrapper>
       </Page>
     );

@@ -18,11 +18,6 @@ const Item = styled.li`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-
-  padding: 16px;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 `;
 
 const TopRow = styled.div`
@@ -34,8 +29,10 @@ const TopRow = styled.div`
 
 const Left = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 27px;
   align-items: center;
+
+  margin-left: 12px;
 `;
 
 const AvatarWrap = styled.div`
@@ -54,7 +51,7 @@ const Avatar = styled.div<{ src?: string }>`
 const Badge = styled.div`
   position: absolute;
   right: -4px;
-  bottom: -4px;
+  bottom: -1px;
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -79,42 +76,68 @@ const TextWrap = styled.div`
 `;
 
 const Title = styled.div`
+  color: var(--Primary-BK, #352f36);
   font-size: 16px;
+  font-family: Pretendard;
   font-weight: 600;
-  color: #000;
+  line-height: 24px;
+  word-wrap: break-word;
 `;
 
 const Sub = styled.div`
-  margin-top: 2px;
-  font-size: 12px;
+  color: var(--GrayScale-GR70, #726d72);
+  font-size: 14px;
+  font-family: Pretendard;
   font-weight: 400;
-  color: #5d595e;
+  line-height: 21px;
+  word-wrap: break-word;
 `;
 
-// 버튼 그룹
 const CTAGroup = styled.div`
-  margin-top: 12px;
+  margin-top: 16px;
   width: 100%;
-  display: flex;
-  border-radius: 16px;
-  border: 1px solid #d0ced1;
-  overflow: hidden;
+  padding: 0 15px;
+  background: var(--GrayScale-WT, #fafafa);
+  border-radius: 8px;
+  outline: 1px solid var(--GrayScale-GR50, #868286);
+  outline-offset: -1px;
+
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const CTAButton = styled.button`
-  flex: 1;
-  padding: 10px 0;
+  height: 40px;
+  padding: 10px 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
   border: none;
-  background: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
-  color: #352f36;
+  background: transparent;
   cursor: pointer;
+
+  color: var(--GrayScale-GR70, #726d72);
+  font-size: 14px;
+  font-family:
+    Pretendard,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-weight: 600;
+  line-height: 21px;
+  word-wrap: break-word;
 `;
 
+// 두 버튼 사이 세로 구분선
 const Divider = styled.div`
   width: 1px;
-  background: #d0ced1;
+  height: 24px;
+  background: var(--GrayScale-GR70, #726d72);
 `;
 
 export default function ProposalItem({

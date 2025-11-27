@@ -16,8 +16,7 @@ export function MemberBlockList({ blocks }: MemberBlockListProps) {
   return (
     <Wrap>
       <HeaderRow>
-        <SectionTitle>팀원 블록</SectionTitle>
-        <Count>{blocks.length}개</Count>
+        <SectionTitle>팀원들의 블록</SectionTitle>
       </HeaderRow>
 
       <List>

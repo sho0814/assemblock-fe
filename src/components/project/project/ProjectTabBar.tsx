@@ -8,24 +8,22 @@ interface Props {
 }
 
 const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: inline-flex;
+  justify-content: center;
   align-items: center;
+  gap: 11px;
 
+  width: 100%;
   padding: 5px;
-  width: 335px;
-  height: 45px;
-  background-color: #f0eff1;
-  border-radius: 40px;
 
-  margin: 8px auto 16px;
+  background: var(--GrayScale-GR10, #f0eff1);
+  border-radius: 20px;
 `;
-
 const Tab = styled.button<{ active: boolean }>`
-  width: 156px;
+  width: 100%;
   height: 35px;
   border: none;
-  border-radius: 40px;
+  border-radius: 16px;
   background-color: ${({ active }) => (active ? "#352F36" : "transparent")};
   color: ${({ active }) => (active ? "#FFFFFF" : "#A5A1A6")};
   font-size: 14px;
@@ -35,7 +33,7 @@ const Tab = styled.button<{ active: boolean }>`
   transition: all 0.2s ease;
 
   &:not(:last-child) {
-    margin-right: 11px;
+    margin-right: 11px; /* 오른쪽 탭과의 간격 */
   }
 
   &:hover {
