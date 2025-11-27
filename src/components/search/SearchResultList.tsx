@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { BlockType } from "@components/home/useCardList";
 import { categoryToSmallImageMap } from "./SmallBg";
 import * as S from './SearchResultsList.styled'
 
-const SearchResultList: React.FC<{ searchQuery: string }> = () => {
+const SearchResultList: React.FC = () => {
+  const navigate = useNavigate();
   const [blocks, setBlocks] = useState<BlockType[]>([]);
   const [loading, setLoading] = useState(true);
-  const getCategoryThumbnail = (category: string) => {
-    return categoryToSmallImageMap[category] ?? "/thumb_placeholder.png";
-  };
 
   useEffect(() => {
     fetch('/dummyBlocks.json')
@@ -31,10 +30,18 @@ const SearchResultList: React.FC<{ searchQuery: string }> = () => {
     );
   }
 
+  const getCategoryThumbnail = (category: string) => {
+    return categoryToSmallImageMap[category] ?? "/thumb_placeholder.png";
+  };
+
+  const handleClick = () => {
+    navigate('/block/detail');
+  }
+
   return (
     <S.BlockListWrapper>
       {blocks.map(block => (
-        <S.BlockItem key={block.block_id}>
+        <S.BlockItem key={block.block_id} onClick={handleClick}>
           <S.Thumbnail
             src={getCategoryThumbnail(block.category_name)}
             alt="블록 썸네일"

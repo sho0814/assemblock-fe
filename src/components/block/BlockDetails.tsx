@@ -42,16 +42,15 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
     // 필수 조건 검사
     useEffect(() => {
         const isBlockTitleValid = blockTitle.trim() !== '';
-        const isPartsValid = isSkillState ? selectedTechPart !== null : false;
+        const isPartsValid = isSkillState ? selectedTechPart !== null : true;
         const isCategoriesValid = selectedCategory.length > 0;
         const isToolsValid = isSkillState ? selectedTools.length > 0 : true;
         const isOnelineSummaryValid = onelineSummary.trim() !== '';
+        const isContributionRateValid = contributionRate > 0;
 
-        setIsFormValid(isBlockTitleValid && isPartsValid && isCategoriesValid && isToolsValid && isOnelineSummaryValid);
+        setIsFormValid(isBlockTitleValid && isPartsValid && isCategoriesValid && isToolsValid && isOnelineSummaryValid && isContributionRateValid);
 
-    }, [isSkillState, blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary]);
-
-
+    }, [blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary, contributionRate]);
 
 
     // 블록 타입 변경 이벤트 핸들러
