@@ -17,32 +17,19 @@ type Props = {
   sortByNicknameClient?: boolean;
 };
 
-const Card = styled.ul`
+const ListContainer = styled.ul`
   list-style: none;
-  width: 335px;
-  padding: 8px 0;
-  background: #fafafa;
-  border: 1.2px solid var(--GrayScale-GR10, #efedef);
-  border-radius: 20px;
-  margin: 0 auto;
-
-  & > li + li {
-    margin-top: 8px;
-  }
-`;
-
-const Divider = styled.hr`
-  margin: 8px auto;
-  width: 300px;
-  border: 0;
-  border-top: 1.2px solid var(--GrayScale-GR10, #efedef);
+  margin: 0;
+  padding: 40px 0 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 `;
 
 export default function ProposalList({
   items,
   sortByNicknameClient = false,
 }: Props) {
-  // 정렬 옵션 (선택)
   const sortedItems = React.useMemo(() => {
     const clone = [...items];
     if (sortByNicknameClient) {
@@ -54,9 +41,9 @@ export default function ProposalList({
   if (sortedItems.length === 0) return null;
 
   return (
-    <Card>
-      {sortedItems.map((it, idx) => (
-        <React.Fragment key={it.proposalId}>
+    <ListContainer>
+      {sortedItems.map((it) => (
+        <li key={it.proposalId}>
           <ProposalItem
             kind={it.kind}
             topNickname={it.topNickname}
@@ -65,9 +52,8 @@ export default function ProposalList({
             projectId={it.projectId}
             proposalId={it.proposalId}
           />
-          {idx !== sortedItems.length - 1 && <Divider />}
-        </React.Fragment>
+        </li>
       ))}
-    </Card>
+    </ListContainer>
   );
 }
