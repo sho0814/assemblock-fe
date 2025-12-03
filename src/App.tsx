@@ -4,6 +4,7 @@ import { OverlayProvider } from "@components/common/OverlayContext";
 import { MainLayout } from "@components/common/MainLayout";
 import { SubLayout } from "@components/common/SubLayout";
 
+import { Onboarding } from "@pages/Onboarding/Onboarding";
 import { HomePage } from "@pages/home/HomePage";
 import { BoardPage } from "@pages/board/BoardPage";
 import { ProjectPage } from "@pages/project/ProjectPage";
@@ -37,12 +38,13 @@ function App() {
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
           <Route path="/notification" element={<NotificationPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/search/:keyword" element={<SearchResultPage />} />
-          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => {}} />} />
+          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => { }} />} />
           <Route path="/block/detail" element={<BlockDetailPage />} />
           <Route path="/block/edit" element={<BlockEditPage />} />
           <Route path="/block/register" element={<BlockRegisterPage />} />
