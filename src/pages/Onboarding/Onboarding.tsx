@@ -3,10 +3,11 @@ import { useState } from "react";
 import type { EmblaOptionsType } from 'embla-carousel'
 import OnBoardingCarousel from "@components/login/onboardingCarousel";
 import { getKakaoLoginUrl, sendKakaoCodeToBackend } from "@api";
+import kakaoLoginIcon from "/assets/onBoarding/kakao-login-icon.svg";
 import onBoardingStep1 from "/assets/onBoarding/onboarding-step1.svg";
 import onBoardingStep2 from "/assets/onBoarding/onboarding-step2.svg";
 import onBoardingStep3 from "/assets/onBoarding/onboarding-step3.svg";
-import kakaoLoginIcon from "/assets/onBoarding/kakao-login-icon.svg";
+
 import * as S from "./Onboarding.styled";
 
 const OPTIONS: EmblaOptionsType = {}
