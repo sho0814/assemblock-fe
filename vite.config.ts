@@ -15,10 +15,12 @@ export default defineConfig({
       { find: "@pages", replacement: resolve(__dirname, "src/pages") },
       { find: "@utils", replacement: resolve(__dirname, "src/utils") },
       { find: "@api", replacement: resolve(__dirname, "src/api")},
-      { find: "@mocks", replacement: resolve(__dirname, "src/mocks")},      
+      { find: "@mocks", replacement: resolve(__dirname, "src/mocks")},
+      { find: "@stores", replacement: resolve(__dirname, "src/stores")}, 
     ],
   },
   server: {
+    port: 8080,
     host: true
   }
 })

@@ -12,10 +12,10 @@ export function KakaoCallbackPage() {
 
         sendKakaoCodeToBackend(code)
             .then(() => {
-                navigate("/");
+                navigate("/auth/success");
             })
             .catch((e) => {
-                alert(e.message);
+                navigate("/auth/error");
             });
     }, [navigate]);
 
