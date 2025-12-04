@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL!;
+import { api } from "@api";
+
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY!;
 const REDIRECT_URI = `${window.location.origin}/callback`;
 
@@ -10,14 +11,12 @@ export function getKakaoLoginUrl() {
   return url.toString();
 }
 
-export async function sendKakaoCodeToBackend(code: string) {
-  const res = await fetch(`${API_BASE_URL}/auth/kakao`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code }),
-  });
-  if (!res.ok) {
-    throw new Error("카카오 로그인 진행 중 오류가 발생했습니다.");
+export const sendKakaoCodeToBackend = async (code: string): Promise<any> => {
+  const requestBody = { "authorizationCode": code };
+  console.log('Request JSON body:', requestBody);
+  const response = await api.post('/auth/kakao', requestBody);
+  if (response.status !== 200) {
+    throw new Error('Send Kakao code to backend failed');
   }
-  return res.json();
-}
+  return response.data;
+};

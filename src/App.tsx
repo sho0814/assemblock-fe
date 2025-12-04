@@ -1,12 +1,11 @@
 import { Route, Routes } from "react-router-dom";
 import { useState } from 'react';
 
-import Lottie from 'lottie-react';
-import splashAnimation from '../public/assets/animations/splash.json';
 import { OverlayProvider } from "@components/common/OverlayContext";
 import { MainLayout } from "@components/common/MainLayout";
 import { SubLayout } from "@components/common/SubLayout";
 
+import { Splash } from "@pages/splash/Splash";
 import { OnboardingPage } from "@pages/Onboarding/OnboardingPage";
 import { KakaoCallbackPage } from "@pages/Onboarding/KakaoCallbackPage";
 import { SuccessPage } from "@pages/Onboarding/SuccessPage";
@@ -33,39 +32,18 @@ import { OtherUserProfile } from "@pages/OtherUser/OtherUserProfile";
 import { BlockDetail } from "@pages/OtherUser/BlockDetail";
 
 function App() {
-  const [isSplash, setIsSplash] = useState(true);
-
-  const handleAnimationComplete = () => {
-    setIsSplash(false);
-  };
-
-  if (isSplash) {
-    return (
-      <div style={{
-        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-        background: '#FAFAFA', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-      }}>
-        <Lottie
-          animationData={splashAnimation}
-          loop={false}
-          autoplay
-          onComplete={handleAnimationComplete} // 애니메이션 완료 시 콜백
-        />
-      </div>
-    );
-  }
-
   return (
     <OverlayProvider>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/Home" element={<HomePage />} />
           <Route path="/Board" element={<BoardPage />} />
           <Route path="/Project" element={<ProjectPage />} />
           <Route path="/Project/team/:proposalId/review" element={<ReviewPage />} />
           <Route path="/My" element={<MyPage />} />
         </Route>
         <Route element={<SubLayout />}>
+          <Route path="/" element={<Splash />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/callback" element={<KakaoCallbackPage />} />
           <Route path="/auth/success" element={<SuccessPage />} />

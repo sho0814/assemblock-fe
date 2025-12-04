@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@stores';
 
 // 엑세스토큰 필요없는 api
-// import api from './client';
+// import api from '@api';
 // const fetchbBlocks = () => api.get('/blocks');
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -10,14 +10,13 @@ export const api = axios.create({
 
 
 // 엑세스토큰 필요한 api
-// import apiAuth from './authClient';
+// import authApi from '@api';
 // const fetchUserBlocks = () => apiAuth.get('/user/blocks');
-export const apiAuth = axios.create({
+export const authApi = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-
-apiAuth.interceptors.request.use((config) => {
+authApi.interceptors.request.use((config) => {
     const { accessToken } = useAuthStore.getState();
     if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
@@ -25,7 +24,7 @@ apiAuth.interceptors.request.use((config) => {
     return config;
 });
 
-apiAuth.interceptors.response.use(
+authApi.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {

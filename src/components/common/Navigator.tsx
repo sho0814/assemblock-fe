@@ -14,14 +14,14 @@ import profileInactive from '@assets/common/Nav/profile-inactive.svg'
 export const Navigator = () => {
   const { pathname } = useLocation();
 
-  const isHome = pathname === "/";
+  const isHome = pathname === "/home";
   const isProject = pathname === "/Project";
   const isBoard = pathname === "/Board";
   const isMy = pathname === "/My";
 
   return (
     <S.NavBar>
-      <S.NavItem to="/" aria-label="Home">
+      <S.NavItem to="/home" aria-label="Home">
         <S.Icon src={isHome ? homeActive : homeInactive} alt="home" />
         <S.Label className='l500' $active={isHome}>홈</S.Label>
       </S.NavItem>
