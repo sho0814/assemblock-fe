@@ -1,0 +1,129 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import SimpleHeader from '@components/shared/SimpleHeader';
+import CommonButton from '@components/shared/CommonButton';
+import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
+import * as S from './ProfileImage.styled';
+import Img1 from '@assets/common/ProfileImg/Img1.svg';
+import Img2 from '@assets/common/ProfileImg/Img2.svg';
+import Img3 from '@assets/common/ProfileImg/Img3.svg';
+import Img4 from '@assets/common/ProfileImg/Img4.svg';
+import Img5 from '@assets/common/ProfileImg/Img5.svg';
+
+export function ProfileImage() {
+  const navigate = useNavigate();
+  const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
+
+  const profiles: ProfileData[] = [
+    { 
+      id: 'img1', 
+      src: Img1, 
+      alt: 'backend',
+      colorMap: {
+        '#C2C1C3': '#2E3B00',
+        '#F0EFF1': '#B8EB00'
+      }
+    },
+    { 
+      id: 'img2', 
+      src: Img2, 
+      alt: 'design',
+      colorMap: {
+        '#C2C1C3': '#FF1BB3',
+        '#F0EFF1': '#4D0836'
+      }
+    },
+    { 
+      id: 'img3', 
+      src: Img3, 
+      alt: 'frontend',
+      colorMap: {
+        '#C2C1C3': '#FF6017',
+        '#F0EFF1': '#4D1D07'
+      }
+    },
+    { 
+      id: 'img4', 
+      src: Img4, 
+      alt: 'plan',
+      colorMap: {
+        '#C2C1C3': '#35CDFF',
+        '#F0EFF1': '#103E4D'
+      }
+    },
+    { 
+      id: 'img5', 
+      src: Img5, 
+      alt: 'pm',
+      colorMap: {
+        '#C2C1C3': '#6F35FF',
+        '#F0EFF1': '#22104D'
+      }
+    }
+  ];
+
+  const handleConfirm = () => {
+    if (selectedProfile) {
+      const profile = profiles.find(p => p.id === selectedProfile);
+      if (profile) {
+        // localStorage에 선택된 프로필 정보 저장
+        localStorage.setItem('selectedProfile', JSON.stringify({
+          id: profile.id,
+          src: profile.src,
+          alt: profile.alt,
+          colorMap: profile.colorMap
+        }));
+
+        // userProfile에도 저장 (profile_url 키값 사용)
+        const savedUserProfile = localStorage.getItem('userProfile');
+        let profileData = savedUserProfile ? JSON.parse(savedUserProfile) : {};
+        
+        profileData = {
+          ...profileData,
+          profile_url: profile.src, // profile_url 키값 사용
+        };
+        
+        localStorage.setItem('userProfile', JSON.stringify(profileData));
+      }
+    }
+    
+    navigate('/Onboarding/ProfileIntro');
+  };
+
+  return (
+    <>
+      <SimpleHeader title="프로필 설정" />
+      <S.Container>
+        <S.MainInstructionText>프로필 이미지를 선택해주세요</S.MainInstructionText>
+        <S.SubInstructionText>원하는 이미지 한 개를 선택할 수 있어요</S.SubInstructionText>
+        
+        <S.ProfileGrid>
+          {profiles.map((profile) => (
+            <S.ProfileItem
+              key={profile.id}
+              $selected={selectedProfile === profile.id}
+              onClick={() => setSelectedProfile(profile.id)}
+            >
+              {profile.colorMap ? (
+                <ProfileAct profile={profile} isSelected={selectedProfile === profile.id} size="large" />
+              ) : (
+                <S.ProfileImage src={profile.src} alt={profile.alt} />
+              )}
+            </S.ProfileItem>
+          ))}
+          <S.ProfilePlaceholder />
+        </S.ProfileGrid>
+
+        <S.Footer>
+          <CommonButton
+            content="확인"
+            width="100%"
+            onClick={handleConfirm}
+            disabled={selectedProfile === null}
+          />
+        </S.Footer>
+      </S.Container>
+    </>
+  );
+}
+

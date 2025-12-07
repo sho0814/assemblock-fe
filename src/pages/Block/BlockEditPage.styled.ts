@@ -1,7 +1,6 @@
 // src/pages/block/BlockEditPage.styled.ts
 import styled from "styled-components";
 
-// 페이지 전체 컨테이너
 export const Container = styled.div`
     min-width: 375px;
     max-width: 400px;
