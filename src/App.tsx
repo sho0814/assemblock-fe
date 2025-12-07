@@ -24,6 +24,11 @@ import { CategoryDetailsPage } from "@pages/category/CategoryDetailsPage";
 import { BoardDetailPage } from "@pages/board/BoardDetailPage";
 import { OtherUserProfile } from "@pages/OtherUser/OtherUserProfile";
 import { BlockDetail } from "@pages/OtherUser/BlockDetail";
+import { ProfileName } from "@pages/Onboarding/profile/ProfileName";
+import { ProfilePart } from "@pages/Onboarding/profile/ProfilePart";
+import { ProfileImage } from "@pages/Onboarding/profile/ProfileImage";
+import { ProfileIntro } from "@pages/Onboarding/profile/ProfileIntro";
+import { ProfilePortfolio } from "@pages/Onboarding/profile/ProfilePortfolio";
 
 function App() {
   return (
@@ -52,6 +57,11 @@ function App() {
           <Route path="/OtherUser/BlockDetail" element={<BlockDetail />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
           <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
+          <Route path="/Onboarding/ProfileName" element={<ProfileName />} />
+          <Route path="/Onboarding/ProfilePart" element={<ProfilePart />} />
+          <Route path="/Onboarding/ProfileImage" element={<ProfileImage />} />
+          <Route path="/Onboarding/ProfileIntro" element={<ProfileIntro />} />
+          <Route path="/Onboarding/ProfilePortfolio" element={<ProfilePortfolio />} />
         </Route>
       </Routes>
     </OverlayProvider>
