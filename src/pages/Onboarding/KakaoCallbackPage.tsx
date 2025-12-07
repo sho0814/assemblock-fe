@@ -1,25 +1,27 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { sendKakaoCodeToBackend } from "@api";
+import { useAuthStore } from "@stores";
 
 export function KakaoCallbackPage() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const setTokens = useAuthStore((s) => s.setTokens);
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get("code");
-        if (!code) return;
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (!code) return;
 
-        sendKakaoCodeToBackend(code)
-            .then(() => {
-                navigate("/auth/success");
-            })
-            .catch((e) => {
-                navigate("/auth/error");
-            });
-    }, [navigate]);
+    sendKakaoCodeToBackend(code)
+      .then((data) => {
+        // data 안에 accessToken, refreshToken 있다고 가정
+        setTokens(data.accessToken, data.refreshToken);
+        navigate("/auth/success");
+      })
+      .catch(() => {
+        navigate("/auth/error");
+      });
+  }, [navigate, setTokens]);
 
-    return (
-        <div>카카오 로그인 처리 중...</div>
-    );
+  return <div>카카오 로그인 처리 중...</div>;
 }

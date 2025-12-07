@@ -8,7 +8,7 @@ export function SuccessPage() {
                 <S.SuccessIcon src={AssemblockLogo} alt="성공 아이콘" />
                 <S.MessageTitle>회원가입이 완료되었어요!</S.MessageTitle>
             </S.MessageContainer>
-            <S.RetryButton to="/">시작하기</S.RetryButton>
+            <S.RetryButton to="/Home">시작하기</S.RetryButton>
         </S.PageContainer>
     );
 }

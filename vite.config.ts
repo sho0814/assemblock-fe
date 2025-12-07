@@ -17,6 +17,7 @@ export default defineConfig({
       { find: "@api", replacement: resolve(__dirname, "src/api")},
       { find: "@mocks", replacement: resolve(__dirname, "src/mocks")},
       { find: "@stores", replacement: resolve(__dirname, "src/stores")}, 
+      { find: "@hooks", replacement: resolve(__dirname, "src/hooks")},
     ],
   },
   server: {

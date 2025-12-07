@@ -1,27 +1,16 @@
-// stores/authStore.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware'; // sessionStorage 영속화
+// stores/useAuthStore.ts
+import { create } from "zustand";
 
 interface AuthState {
   accessToken: string | null;
-  user: { id: string; nickname: string } | null;
-  setToken: (token: string | null) => void;
-  setUser: (user: AuthState['user']) => void;
+  refreshToken: string | null;
+  setTokens: (access: string | null, refresh: string | null) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
-      accessToken: null,
-      user: null,
-      setToken: (token) => set({ accessToken: token }),
-      setUser: (user) => set({ user }),
-      logout: () => {
-        set({ accessToken: null, user: null });
-        sessionStorage.removeItem('zustand'); // persist 플러그인 이름
-      },
-    }),
-    { name: 'auth-storage' } // sessionStorage 키
-  )
-);
+export const useAuthStore = create<AuthState>((set) => ({
+  accessToken: null,
+  refreshToken: null,
+  setTokens: (access, refresh) => set({ accessToken: access, refreshToken: refresh }),
+  logout: () => set({ accessToken: null, refreshToken: null }),
+}));
