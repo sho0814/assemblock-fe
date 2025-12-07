@@ -14,7 +14,6 @@ export function KakaoCallbackPage() {
 
     sendKakaoCodeToBackend(code)
       .then((data) => {
-        // data 안에 accessToken, refreshToken 있다고 가정
         setTokens(data.accessToken, data.refreshToken);
         navigate("/auth/success");
       })
