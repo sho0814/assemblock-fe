@@ -22,12 +22,19 @@ import {
   PartButton,
   FileUploadArea,
   FileUploadText,
-  FileName,
+  FileFormatText,
+  UploadProgressContainer,
+  ProgressContainer,
+  ProgressText,
+  CancelButton,
+  FileNameContainer,
+  FileNameText,
   FileRemoveButton,
   HiddenFileInput,
   ProfileEditButton,
 } from './ProfileEdit.styled';
 import EditIcon from '@assets/MyPage/Edit.svg';
+import CloseStrokeIcon from '@assets/MyPage/CloseStroke.svg';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
 import { useOverlay } from '@components/common/OverlayContext';
 import EditCancelModal from './EditCancelModal';
@@ -36,12 +43,15 @@ export function ProfileEdit() {
   const navigate = useNavigate();
   const { showOverlay } = useOverlay();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [nickname, setNickname] = useState('');
   const [introduction, setIntroduction] = useState('');
   const [selectedParts, setSelectedParts] = useState<string[]>(['design', 'frontend']);
   const [portfolioUrl, setPortfolioUrl] = useState('');
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
   const [isComposing, setIsComposing] = useState(false);
 
@@ -91,15 +101,55 @@ export function ProfileEdit() {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setPortfolioFile(file);
-      setFileName(file.name);
+    if (file && file.type === 'application/pdf') {
+      setIsUploading(true);
+      setUploadProgress(0);
+      
+      // 업로드 진행률 표시
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            uploadIntervalRef.current = null;
+            setIsUploading(false);
+            setPortfolioFile(file);
+            setFileName(file.name);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 200);
+      
+      uploadIntervalRef.current = interval;
+    } else {
+      alert('PDF 파일만 업로드할 수 있어요.');
     }
   };
 
   const handleFileRemove = () => {
     setPortfolioFile(null);
     setFileName('');
+    setUploadProgress(0);
+    setIsUploading(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleCancelUpload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // 업로드 중단
+    if (uploadIntervalRef.current) {
+      clearInterval(uploadIntervalRef.current);
+      uploadIntervalRef.current = null;
+    }
+    
+    setUploadProgress(0);
+    setIsUploading(false);
+    setPortfolioFile(null);
+    setFileName('');
+    
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -297,36 +347,51 @@ export function ProfileEdit() {
 
         <FormSection>
           <SectionTitle>포트폴리오 파일</SectionTitle>
-          <FileUploadArea onClick={() => fileInputRef.current?.click()}>
+          <FileUploadArea $isUploading={isUploading} onClick={() => !isUploading && fileInputRef.current?.click()}>
             <HiddenFileInput
               ref={fileInputRef}
               type="file"
               accept=".pdf"
               onChange={handleFileUpload}
             />
-            {fileName ? (
-              <FileName>
-                {fileName}
-                <FileRemoveButton onClick={(e) => {
-                  e.stopPropagation();
-                  handleFileRemove();
-                }}>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </FileRemoveButton>
-              </FileName>
+            {isUploading ? (
+              <UploadProgressContainer>
+                <FileUploadText>이 곳을 눌러 파일을 업로드 하세요</FileUploadText>
+                <ProgressContainer>
+                  <ProgressText>업로드 {uploadProgress}% 완료...</ProgressText>
+                  <CancelButton onClick={handleCancelUpload}>
+                    <img src={CloseStrokeIcon} alt="cancel" />
+                  </CancelButton>
+                </ProgressContainer>
+              </UploadProgressContainer>
+            ) : fileName ? (
+              <>
+                <FileUploadText>이 곳을 눌러 파일을 업로드 하세요</FileUploadText>
+                <FileNameContainer>
+                  <FileNameText>{fileName}</FileNameText>
+                  <FileRemoveButton onClick={(e) => {
+                    e.stopPropagation();
+                    handleFileRemove();
+                  }}>
+                    <img src={CloseStrokeIcon} alt="remove" />
+                  </FileRemoveButton>
+                </FileNameContainer>
+              </>
             ) : (
-              <FileUploadText>이 곳을 눌러 파일을 업로드 하세요</FileUploadText>
+              <>
+                <FileUploadText>이 곳을 눌러 파일을 업로드 하세요</FileUploadText>
+                <FileFormatText>지원되는 형식: PDF</FileFormatText>
+              </>
             )}
           </FileUploadArea>
           <HelperText>포트폴리오를 PDF 형태로 첨부해 주세요.</HelperText>
         </FormSection>
       </FormContainer>
-
+      
       <ProfileEditButton onClick={handleSave}>
         프로필 수정하기
       </ProfileEditButton>
+
     </ProfileEditContainer>
   );
 }
