@@ -49,9 +49,8 @@ function App() {
         </Route>
         <Route element={<SubLayout />}>
           <Route path="/" element={<Splash />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/callback" element={<KakaoCallbackPage />} />
-          <Route path="/auth/success" element={<SuccessPage />} />
+          <Route path="/auth/success/:isProfileComplete" element={<SuccessPage />} />
           <Route path="/auth/error" element={<ErrorPage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
@@ -68,6 +67,7 @@ function App() {
           <Route path="/OtherUser/BlockDetail" element={<BlockDetail />} />
           <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
           <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
+          <Route path="/Onboarding" element={<OnboardingPage />} />
           <Route path="/Onboarding/ProfileName" element={<ProfileName />} />
           <Route path="/Onboarding/ProfilePart" element={<ProfilePart />} />
           <Route path="/Onboarding/ProfileImage" element={<ProfileImage />} />

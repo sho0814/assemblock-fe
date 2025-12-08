@@ -26,6 +26,8 @@ authApi.interceptors.request.use((config) => {
     return config;
 });
 
+
+
 // ----- refresh 토큰 관련 상태 -----
 let isRefreshing = false;
 let failedQueue: {
@@ -45,6 +47,7 @@ const processQueue = (error: AxiosError | null, token: string | null = null) => 
     failedQueue = [];
 };
 
+
 // ----- refresh 요청 함수 -----
 const refreshAccessToken = async () => {
     const { refreshToken, setTokens, logout } = useAuthStore.getState();
@@ -62,6 +65,7 @@ const refreshAccessToken = async () => {
     setTokens(newAccessToken, newRefreshToken);
     return newAccessToken;
 };
+
 
 // ----- 응답 인터셉터: 401 시 refresh & 재시도 -----
 authApi.interceptors.response.use(

@@ -48,8 +48,7 @@ export function ProfileName() {
   };
 
   const handleLater = () => {
-    // 나중에 하기 - 이전 페이지로 이동
-    navigate(-1);
+    navigate('/Home');
   };
 
   return (

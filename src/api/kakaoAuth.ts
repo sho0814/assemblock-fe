@@ -1,4 +1,5 @@
 import { api } from "@api";
+import type { KakaoUserJwt } from "@types";
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY!;
 const REDIRECT_URI = `${window.location.origin}/callback`;
@@ -11,7 +12,7 @@ export function getKakaoLoginUrl() {
   return url.toString();
 }
 
-export const sendKakaoCodeToBackend = async (code: string): Promise<any> => {
+export const sendKakaoCodeToBackend = async (code: string): Promise<KakaoUserJwt> => {
   const requestBody = { "authorizationCode": code };
   console.log('Request JSON body:', requestBody);
   const response = await api.post('/auth/kakao', requestBody);

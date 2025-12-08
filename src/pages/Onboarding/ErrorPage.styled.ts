@@ -41,7 +41,7 @@ export const MessageSubtitle = styled.div`
     margin-top: 8px;
 `
 
-export const RetryButton = styled(Link)`
+export const RetryButton = styled.div`
     margin: auto 0 40px;
     padding: 12px 10px;
     background-color: #352F36;

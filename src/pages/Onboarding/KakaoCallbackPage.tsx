@@ -15,7 +15,7 @@ export function KakaoCallbackPage() {
     sendKakaoCodeToBackend(code)
       .then((data) => {
         setTokens(data.accessToken, data.refreshToken);
-        navigate("/auth/success");
+        navigate(`/auth/success/${encodeURIComponent(data.profileComplete)}`);
       })
       .catch(() => {
         navigate("/auth/error");
