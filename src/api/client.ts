@@ -1,3 +1,4 @@
+// src/api/client.ts
 import axios, { AxiosError } from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useAuthStore } from "@stores";

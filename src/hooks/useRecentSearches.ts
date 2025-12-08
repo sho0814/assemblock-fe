@@ -1,7 +1,7 @@
 // hooks/useRecentSearches.ts
 import { useState, useEffect, useCallback } from 'react';
 import { getRecentSearches, deleteSearchHistory, deleteAllSearchHistory } from '@api';
-import type { HistoryItem } from '@api';
+import type { HistoryItem } from '@types';
 import { useNavigate } from 'react-router-dom';
 
 export const useRecentSearches = () => {

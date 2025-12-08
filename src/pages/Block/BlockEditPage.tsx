@@ -6,8 +6,8 @@ import CancelGuide from '@components/block/CancleGuide';
 import SimpleHeader from '@components/shared/SimpleHeader';
 import Dropdown from '@components/block/DropDown';
 import {
-    CATEGORY_IDEA_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_BACK_OPTIONS,
-    TOOLS_DESIGN_OPTIONS, TOOLS_FRONT_OPTIONS, TOOLS_BACK_OPTIONS
+    CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK,
+    TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK
 } from '@components/block/DropdownOptions';
 import { logFormData, submitFormData } from '@utils/formSubmit';
 import CommonButton from '@components/shared/CommonButton';
@@ -120,18 +120,18 @@ export function BlockEditPage() {
     };
 
     // 블록 타입, 블록 기술파트에 따라 카테고리 선택지 변경
-    let categoryOptions = CATEGORY_IDEA_OPTIONS;
-    let toolsOptions = TOOLS_DESIGN_OPTIONS;
+    let categoryOptions = CATEGORY_IDEA;
+    let toolsOptions = TOOLS_DESIGN;
 
     if (isSkillState) {
-        if (selectedTechPart === 'design') categoryOptions = CATEGORY_TECH_DESIGN_OPTIONS;
+        if (selectedTechPart === 'design') categoryOptions = CATEGORY_TECH_DESIGN;
         else if (selectedTechPart === 'frontend') {
-            categoryOptions = CATEGORY_TECH_FRONT_OPTIONS;
-            toolsOptions = TOOLS_FRONT_OPTIONS;
+            categoryOptions = CATEGORY_TECH_FRONT;
+            toolsOptions = TOOLS_FRONT;
         }
         else if (selectedTechPart === 'backend') {
-            categoryOptions = CATEGORY_TECH_BACK_OPTIONS;
-            toolsOptions = TOOLS_BACK_OPTIONS;
+            categoryOptions = CATEGORY_TECH_BACK;
+            toolsOptions = TOOLS_BACK;
         }
     }
 

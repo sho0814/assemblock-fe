@@ -1,5 +1,3 @@
-// 카테고리 선택지
-// 아이디어
 export const CATEGORY_IDEA = [
   { label: 'culture', value: '문화/생활' },
   { label: 'education', value: '교육/학습' },
@@ -38,38 +36,4 @@ export const CATEGORY_TECH_FRONT = [
   { label: 'layout-grid', value: '레이아웃/그리드' },
   { label: 'performance-optimization', value: '성능 최적화' },
   { label: 'state-management', value: '상태 관리' }
-]
-
-// 사용 툴 및 언어 선택지
-// 디자인
-export const TOOLS_DESIGN = [
-  { value: 'Figma' },
-  { value: 'Illustrator' },
-  { value: 'Photoshop' },
-  { value: 'LottieFiles' },
-  { value: 'Protopie' },
-  { value: 'Miro' },
-  { value: 'Adobe XD' },
-  { value: 'Sketch' },
-  { value: 'Zeplin' },
-];
-
-// 프론트
-export const TOOLS_FRONT = [
-  { value: 'React' },
-  { value: 'Vue' },
-  { value: 'Typescript' },
-  { value: 'Javscript' },
-  { value: 'CSS' },
-  { value: 'SCSS' },
-  { value: 'TailwindCSS' },
-  { value: 'prittier' },
-  { value: 'eslint' },
-]
-
-// 백
-export const TOOLS_BACK = [
-  { value: 'Spring' },
-  { value: 'Django' },
-  { value: 'Node.js' },
 ]

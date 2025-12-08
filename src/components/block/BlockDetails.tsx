@@ -5,9 +5,9 @@ import CancelGuide from './CancleGuide.tsx';
 
 import Dropdown from './DropDown';
 import {
-    CATEGORY_IDEA_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_BACK_OPTIONS,
-    TOOLS_DESIGN_OPTIONS, TOOLS_FRONT_OPTIONS, TOOLS_BACK_OPTIONS
-} from './DropdownOptions.tsx';
+    CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK,
+    TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK
+} from '@types';
 import { logFormData, submitFormData } from '@utils/formSubmit';
 import CommonButton from '@components/shared/CommonButton'
 import { Dot } from './InformText.styled'
@@ -94,17 +94,17 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
 
 
     // 블록 타입, 블록 기술파트에 따라 카테고리 선택지 변경
-    let categoryOptions = CATEGORY_IDEA_OPTIONS;
-    let toolsOptions = TOOLS_DESIGN_OPTIONS;
+    let categoryOptions = CATEGORY_IDEA;
+    let toolsOptions = TOOLS_DESIGN;
     if (isSkill) {
-        if (selectedTechPart === 'design') categoryOptions = CATEGORY_TECH_DESIGN_OPTIONS;
+        if (selectedTechPart === 'design') categoryOptions = CATEGORY_TECH_DESIGN;
         else if (selectedTechPart === 'frontend') {
-            categoryOptions = CATEGORY_TECH_FRONT_OPTIONS;
-            toolsOptions = TOOLS_FRONT_OPTIONS;
+            categoryOptions = CATEGORY_TECH_FRONT;
+            toolsOptions = TOOLS_FRONT;
         }
         else if (selectedTechPart === 'backend') {
-            categoryOptions = CATEGORY_TECH_BACK_OPTIONS;
-            toolsOptions = TOOLS_BACK_OPTIONS;
+            categoryOptions = CATEGORY_TECH_BACK;
+            toolsOptions = TOOLS_BACK;
         }
 
         // selectedTechPart가 변경되면 selectedCategories 초기화
@@ -168,7 +168,7 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
         <S.Form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data">
             <S.Row>
                 <S.Label>블록 타입<Dot /> </S.Label>
-                <input name="block_type" type="hidden" value={isSkillState ? "technology" : "idea"} />
+                <input name="blockType" type="hidden" value={isSkillState ? "technology" : "idea"} />
                 <div>
                     <S.BlockTypeButton type="button" $selected={!isSkillState} onClick={() => handleShowCancelGuide(false)}>아이디어</S.BlockTypeButton>
                     <S.BlockTypeButton type="button" $selected={isSkillState} onClick={() => handleShowCancelGuide(true)}>기술</S.BlockTypeButton>
@@ -178,14 +178,14 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
 
             <S.Row>
                 <S.Label>블록 이름<Dot /> </S.Label>
-                <S.Input name="block_title" type="text" placeholder="블록 이름" value={blockTitle} onChange={(e) => setBlockTitle(e.target.value)} />
+                <S.Input name="blockTitle" type="text" placeholder="블록 이름" value={blockTitle} onChange={(e) => setBlockTitle(e.target.value)} />
                 <S.Desc>블록 이름은 최대 (N자)까지 입력할 수 있어요</S.Desc>
             </S.Row>
 
             {isSkillState && (
                 <S.Row>
                     <S.Label>기술 파트<Dot /> </S.Label>
-                    <input name="tech_part" type="hidden" value={selectedTechPart ?? ''} />
+                    <input name="techPart" type="hidden" value={selectedTechPart ?? ''} />
                     <div>
                         <S.BlockTypeButton type="button" $selected={selectedTechPart === 'design'} onClick={() => toggleTechPart('design')}>디자인</S.BlockTypeButton>
                         <S.BlockTypeButton type="button" $selected={selectedTechPart === 'frontend'} onClick={() => toggleTechPart('frontend')}>프론트엔드</S.BlockTypeButton>
@@ -197,7 +197,7 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
 
             <S.Row>
                 <S.Label>블록 카테고리<Dot /></S.Label>
-                <input name="category_name" type="hidden" value={selectedCategory} />
+                <input name="categoryName" type="hidden" value={selectedCategory} />
                 <Dropdown
                     content={
                         selectedCategory && selectedCategory.length > 0 ?
@@ -212,7 +212,7 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
             {isSkillState && (
                 <S.Row>
                     <S.Label>사용 툴 및 언어<Dot /></S.Label>
-                    <input name="tools_text" type="hidden" value={selectedTools} />
+                    <input name="toolsText" type="hidden" value={selectedTools} />
                     <Dropdown
                         content={
                             selectedTools && selectedTools.length > 0 ?
@@ -227,7 +227,7 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
 
             <S.Row>
                 <S.Label>기존 프로젝트 한 줄 소개<Dot /></S.Label>
-                <S.Input name="oneline_summary" type="text" placeholder="프로젝트를 자유롭게 소개해 주세요" value={onelineSummary} onChange={(e) => setOnelineSummary(e.target.value)} />
+                <S.Input name="onelineSummary" type="text" placeholder="프로젝트를 자유롭게 소개해 주세요" value={onelineSummary} onChange={(e) => setOnelineSummary(e.target.value)} />
                 <S.Desc>해당 블록이 사용되었던 기존 프로젝트를 (N)자 이내로 소개해 주세요</S.Desc>
             </S.Row>
 
@@ -237,7 +237,7 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
                     <S.ChangeButton type="button" onClick={() => changeRate(-10)}>-</S.ChangeButton>
                     <S.ValueBox
                         type="number"
-                        name="contribution_score"
+                        name="contributionScore"
                         value={contributionRate}
                         readOnly
                     />
@@ -248,14 +248,14 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
 
             <S.Row>
                 <S.Label>기존 프로젝트에서 개선하고 싶은 점</S.Label>
-                <S.Input name="improvements_point" type="text" placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" />
+                <S.Input name="improvementPoint" type="text" placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" />
                 <S.Desc>어셈블록에서 새로운 팀원들과 변경하거나 보완, 개선하고 싶은 부분이 있다면<br />
                     (N)자 내로 작성해 주세요</S.Desc>
             </S.Row>
 
             <S.Row>
                 <S.Label>기존 프로젝트 결과물 URL</S.Label>
-                <S.Input name="result_url" type="text" placeholder="URL" />
+                <S.Input name="resultUrl" type="text" placeholder="URL" />
                 <S.Desc>기존 프로젝트의 산출물 및 결과물을 URL 형식으로 첨부해 주세요</S.Desc>
             </S.Row>
 
@@ -272,7 +272,7 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
                             <span style={{ fontSize: '12px', color: '#C2C1C3' }}>지원되는 형식: PDF</span>
                         </>
                     )}
-                    <S.HiddenFileInput name="result_file" type="file" accept="application/pdf" onChange={handleFileChange} />
+                    <S.HiddenFileInput name="resultFile" type="file" accept="application/pdf" onChange={handleFileChange} />
                 </S.FileInputWrapper>
                 <S.Desc>프로젝트 결과물을 PDF 파일 형태로 첨부해 주세요</S.Desc>
             </S.Row>

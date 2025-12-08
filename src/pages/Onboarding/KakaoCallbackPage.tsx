@@ -6,6 +6,7 @@ import { useAuthStore } from "@stores";
 export function KakaoCallbackPage() {
   const navigate = useNavigate();
   const setTokens = useAuthStore((s) => s.setTokens);
+  const setProfileComplete = useAuthStore((s) => s.setProfileComplete);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -15,7 +16,8 @@ export function KakaoCallbackPage() {
     sendKakaoCodeToBackend(code)
       .then((data) => {
         setTokens(data.accessToken, data.refreshToken);
-        navigate(`/auth/success/${encodeURIComponent(data.profileComplete)}`);
+        setProfileComplete(data.profileComplete);
+        navigate("/auth/success");
       })
       .catch(() => {
         navigate("/auth/error");
