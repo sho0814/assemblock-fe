@@ -1,13 +1,14 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@stores";
 import * as S from "./ErrorPage.styled";
 import AssemblockLogo from "/assets/onBoarding/assemblock-logo.svg";
 
 export function SuccessPage() {
-    const location = useLocation();
     const navigate = useNavigate();
-    const isProfileComplete = location.state?.profileComplete;
+    const { profileComplete } = useAuthStore();
+    
     const handleStart = () => {
-        if (isProfileComplete) {
+        if (profileComplete) {
             navigate("/Home");
         } else {
             navigate("/onboarding/profileName");
@@ -21,7 +22,6 @@ export function SuccessPage() {
                 <S.MessageTitle>회원가입이 완료되었어요!</S.MessageTitle>
             </S.MessageContainer>
             <S.RetryButton onClick={handleStart}>시작하기</S.RetryButton>
-            {/* <S.RetryButton onClick={() => navigate('/Home')}>시작하기</S.RetryButton> */}
         </S.PageContainer>
     );
 }

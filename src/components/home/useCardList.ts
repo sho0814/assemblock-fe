@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_BACK_OPTIONS, CATEGORY_IDEA_OPTIONS } from "@components/block/DropdownOptions";
+import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@components/block/DropdownOptions";
 
 export type BlockType = {
     block_id: number
@@ -32,7 +32,7 @@ const useCardList = (
                         isTech ? block.block_type === 'technology' : block.block_type === 'idea'
                     )
                 } else if (frontendCategory) {
-                    const matchedOption = CATEGORY_TECH_FRONT_OPTIONS.find(option => option.label === frontendCategory);
+                    const matchedOption = CATEGORY_TECH_FRONT.find(option => option.label === frontendCategory);
                     const categoryValue = matchedOption?.value;
                     filtered = data.filter(block =>
                         block.block_type === 'technology' &&

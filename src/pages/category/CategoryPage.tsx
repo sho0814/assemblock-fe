@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
-import { CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_BACK_OPTIONS, CATEGORY_IDEA_OPTIONS } from "@components/block/DropdownOptions";
+import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@components/block/DropdownOptions";
 
 import * as S from "./CategoryPage.styled";
 import backAi from '@assets/category/backAi.svg'
@@ -45,7 +45,7 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>프론트엔드</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_TECH_FRONT_OPTIONS.map((item, idx) => (
+            {CATEGORY_TECH_FRONT.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("frontend", item.label)}
@@ -67,7 +67,7 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>백엔드</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_TECH_BACK_OPTIONS.map((item, idx) => (
+            {CATEGORY_TECH_BACK.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("backend", item.label)}
@@ -85,7 +85,7 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>디자인</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_TECH_DESIGN_OPTIONS.map((item, idx) => (
+            {CATEGORY_TECH_DESIGN.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("design", item.label)}
@@ -107,7 +107,7 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>아이디어</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_IDEA_OPTIONS.map((item, idx) => (
+            {CATEGORY_IDEA.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("idea", item.label)}

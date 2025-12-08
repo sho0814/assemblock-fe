@@ -50,7 +50,7 @@ function App() {
         <Route element={<SubLayout />}>
           <Route path="/" element={<Splash />} />
           <Route path="/callback" element={<KakaoCallbackPage />} />
-          <Route path="/auth/success/:isProfileComplete" element={<SuccessPage />} />
+          <Route path="/auth/success" element={<SuccessPage />} />
           <Route path="/auth/error" element={<ErrorPage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/category/:techpart" element={<CategoryDetailsPage />} />

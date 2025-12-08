@@ -1,37 +1,47 @@
 // Splash.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authApi } from '@api';
+import { getKakaoLoginUrl } from '@api';
 import { useAuthStore } from '@stores';
 import Lottie from 'lottie-react';
 import splashAnimation from '@assets/animations/splash.json';
 
 export const Splash = () => {
     const navigate = useNavigate();
-    const { accessToken } = useAuthStore();
-    const [isReady, setIsReady] = useState(false);
+    const { accessToken, refreshToken, profileComplete } = useAuthStore();
+    const [isSplash, setIsSplash] = useState(true);
+
+    const checkAuthAndRedirect = async () => {
+        // 최소 스플래시 표시 시간 보장
+        await new Promise(resolve => setTimeout(resolve, 4000));
+
+        // 1. 토큰 전혀 없음 → 온보딩
+        if (!accessToken && !refreshToken) {
+            navigate('/onboarding', { replace: true });
+            return;
+        }
+        try {
+            // 2. authApi 호출 → 인터셉터가 자동으로 토큰 검증/refresh 처리
+            await authApi.get('/boards');
+
+            // 성공 → 프로필 상태에 따라 리다이렉트
+            navigate(profileComplete ? '/Home' : '/onboarding/profileName', { replace: true });
+
+        } catch (error: any) {
+            // 3. 인터셉터가 처리 후에도 실패 (refreshToken도 만료) → 카카오 로그인
+            const url = getKakaoLoginUrl();
+            window.location.href = url;
+        }
+    };
 
     useEffect(() => {
-        const checkAuthAndRedirect = async () => {
-            // 최소 스플래시 표시 시간 (2초) 보장
-            await new Promise(resolve => setTimeout(resolve, 3200));
-
-            // 토큰 존재 여부로 리다이렉트
-            if (accessToken) {
-                navigate('/Home', { replace: true });
-            } else {
-                navigate('/onboarding', { replace: true });
-            }
-        };
-
         checkAuthAndRedirect();
-    }, [accessToken, navigate]);
-
-    const [isSplash, setIsSplash] = useState(true);
+    }, []);
 
     const handleAnimationComplete = () => {
         setIsSplash(false);
     };
-
     if (isSplash) {
         return (
             <div style={{
@@ -42,12 +52,12 @@ export const Splash = () => {
                     animationData={splashAnimation}
                     loop={false}
                     autoplay
-                    onComplete={handleAnimationComplete} // 애니메이션 완료 시 콜백
+                    onComplete={handleAnimationComplete}
                 />
             </div>
         );
     }
-    return null; // 애니메이션이 끝난 후에는 아무것도 렌더링하지 않음
+    return null;
 };
 
 export default Splash;
