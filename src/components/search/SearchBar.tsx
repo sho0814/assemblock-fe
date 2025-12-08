@@ -1,14 +1,11 @@
 // src/components/shared/Header.tsx
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import type { SearchBarProps } from '@types';
 
 import backArrow from '@assets/common/back-arrow.svg'
 import search from '@assets/common/search.svg'
 import * as S from './SearchBar.styled'
-
-type SearchBarProps = {
-  PrevSearch?: string;
-};
 
 export default function SearchBar({ PrevSearch }: SearchBarProps) {
   const navigate = useNavigate();

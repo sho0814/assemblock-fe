@@ -8,7 +8,7 @@ export function SearchResultPage() {
     return (
         <>
             <SearchBar PrevSearch={keyword ?? ""} />
-            <SearchResultList />
+            <SearchResultList keyword={keyword?? ""}/>
         </>
     );
 }

@@ -25,16 +25,28 @@
 
     "baseUrl": ".",
     "paths": {
-      "@apis/*": ["src/apis/*"],
+      "@api": ["src/api"],
+      "@api/*": ["src/api/*"],
+      "@assets": ["src/assets"],
       "@assets/*": ["src/assets/*"],
+      "@pages": ["src/pages"],
+      "@pages/*": ["src/pages/*"],
+      "@components": ["src/components"],
       "@components/*": ["src/components/*"],
+      "@constant": ["src/constant"],
       "@constant/*": ["src/constant/*"],
+      "@hooks": ["src/hooks"],
       "@hooks/*": ["src/hooks/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@store/*": ["src/store/*"],
+      "@stores": ["src/stores"],
+      "@stores/*": ["src/stores/*"],
+      "@type": ["src/type"],
       "@type/*": ["src/type/*"],
+      "@utiles": ["src/utils"],
       "@utils/*": ["src/utils/*"],
+      "@mocks": ["src/mocks"],
       "@mocks/*": ["src/mocks/*"],
+      "@types": ["src/types"],
+      "@types/*": ["src/types/*"]
     }
   },
   "include": ["src"]
