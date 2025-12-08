@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import type { BlockType } from "@components/home/useCardList";
 import { categoryToSmallImageMap } from "./SmallBg";
 import { searchBlocks } from "@api";
 import type { SearchBlock } from "@types";
