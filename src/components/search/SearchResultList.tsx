@@ -1,22 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { BlockType } from "@components/home/useCardList";
 import { categoryToSmallImageMap } from "./SmallBg";
+import { searchBlocks } from "@api";
+import type { SearchBlock } from "@types";
 import * as S from './SearchResultsList.styled'
 
-const SearchResultList: React.FC = () => {
+interface SearchResultListProps {
+  keyword: string;
+}
+
+const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
   const navigate = useNavigate();
-  const [blocks, setBlocks] = useState<BlockType[]>([]);
+  const [blocks, setBlocks] = useState<SearchBlock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchBlocks = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await searchBlocks(keyword);
+      setBlocks(data);
+    } catch (err) {
+      setError('검색 결과를 불러오지 못했습니다.');
+      console.error('Search failed:', err);
+      setBlocks([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [keyword]);
 
   useEffect(() => {
-    fetch('/dummyBlocks.json')
-      .then(res => res.json())
-      .then(data => {
-        setBlocks(data);
-        setLoading(false);
-      });
-  }, []);
+    fetchBlocks();
+  }, [fetchBlocks]);
 
   // 결과 없음 화면
   if (!loading && blocks.length === 0) {
@@ -31,7 +48,7 @@ const SearchResultList: React.FC = () => {
   }
 
   const getCategoryThumbnail = (category: string) => {
-    return categoryToSmallImageMap[category] ?? "/thumb_placeholder.png";
+    return categoryToSmallImageMap[category] ?? "/sample.png";
   };
 
   const handleClick = () => {
@@ -41,14 +58,14 @@ const SearchResultList: React.FC = () => {
   return (
     <S.BlockListWrapper>
       {blocks.map(block => (
-        <S.BlockItem key={block.block_id} onClick={handleClick}>
+        <S.BlockItem key={block.blockId} onClick={handleClick}>
           <S.Thumbnail
-            src={getCategoryThumbnail(block.category_name)}
+            src={getCategoryThumbnail(block.categoryName)}
             alt="블록 썸네일"
           />
           <div>
-            <S.BlockTitle>{block.block_title}</S.BlockTitle>
-            <S.BlockSummary>{block.oneline_summary}</S.BlockSummary>
+            <S.BlockTitle>{block.title}</S.BlockTitle>
+            <S.BlockSummary>{block.onelineSummary}</S.BlockSummary>
           </div>
         </S.BlockItem>
       ))}

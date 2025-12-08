@@ -13,7 +13,9 @@ if (!container) {
 }
 
 ReactDOM.createRoot(container).render(
+  // <React.StrictMode> 배포 단계에서 반드시 해제!!
     <BrowserRouter>
       <App />
     </BrowserRouter>
+  // </React.StrictMode>
 );
