@@ -54,7 +54,7 @@ function App() {
           <Route path="/auth/error" element={<ErrorPage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
-          <Route path="/notification" element={<NotificationPage />} />
+          <Route path="/Home/notification" element={<NotificationPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/search/:keyword" element={<SearchResultPage />} />
           <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => { }} />} />
