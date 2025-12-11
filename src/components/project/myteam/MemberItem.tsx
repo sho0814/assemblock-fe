@@ -1,25 +1,31 @@
 // src/components/myTeam/MemberItem.tsx
 import styled from "styled-components";
+import type { ReactNode } from "react";
 import type { Member, ProjectStatus } from "./MyTeamTypes";
 
 const Item = styled.li`
+  list-style: none;
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: #ffffff;
+
+  & + & {
+    border-top: 1.5px solid var(--GrayScale-GR10, #f0eff1);
+  }
 `;
 
 const Left = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
 `;
 
 const Avatar = styled.div`
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border-radius: 999px;
   background: #ddd;
 `;
@@ -29,11 +35,44 @@ const NameRole = styled.div`
   flex-direction: column;
 `;
 
-const Chip = styled.span`
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  background: #eee;
+const Chip = styled.span<{
+  variant: "leader" | "pending" | "rejected" | "accepted";
+}>`
+  height: 26px;
+  width: 64px;
+  padding: 4px 0;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  background: ${({ variant }) => {
+    switch (variant) {
+      case "leader":
+        return "#49444A";
+      case "pending":
+      case "rejected":
+        return "#F0EFF1";
+      case "accepted":
+        return "#726D72";
+      default:
+        return "#F0EFF1";
+    }
+  }};
+
+  color: ${({ variant }) => {
+    switch (variant) {
+      case "pending":
+      case "rejected":
+        return "#726D72";
+      default:
+        return "#FAFAFA";
+    }
+  }};
 `;
 
 type Props = {
@@ -42,22 +81,21 @@ type Props = {
 };
 
 export const MemberItem = ({ status, member }: Props) => {
-  let right: React.ReactNode = null;
+  let right: ReactNode = null;
 
   if (status === "recruiting") {
-    // 모집 중: 기존 로직 유지
     if (member.isLeader) {
-      right = <Chip>팀장</Chip>;
+      right = <Chip variant="leader">팀장</Chip>;
     } else if (member.responseStatus === "pending") {
-      right = <Chip>대기 중</Chip>;
+      right = <Chip variant="pending">대기 중</Chip>;
     } else if (member.responseStatus === "rejected") {
-      right = <Chip>거절됨</Chip>;
+      right = <Chip variant="rejected">거절됨</Chip>;
     } else if (member.responseStatus === "accepted") {
-      right = <Chip>수락 완료</Chip>;
+      right = <Chip variant="accepted">수락 완료</Chip>;
     }
   } else if (status === "ongoing") {
     if (member.isLeader) {
-      right = <Chip>팀장</Chip>;
+      right = <Chip variant="leader">팀장</Chip>;
     }
   }
 
@@ -66,8 +104,10 @@ export const MemberItem = ({ status, member }: Props) => {
       <Left>
         <Avatar />
         <NameRole>
-          <span>{member.name} 님</span>
-          <span style={{ fontSize: 11, color: "#999" }}>{member.role}</span>
+          <span style={{ fontSize: 16, color: "#000000", fontWeight: 600 }}>
+            {member.name} 님
+          </span>
+          <span style={{ fontSize: 12, color: "#5D595E" }}>{member.role}</span>
         </NameRole>
       </Left>
       {right}

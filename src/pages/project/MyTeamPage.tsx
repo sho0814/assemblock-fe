@@ -1,24 +1,16 @@
 // src/pages/project/MyTeamPage.tsx
-
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
-import styled from "styled-components";
-import pattern from "@assets/project/pattern.png";
 
 import { ProjectProgress } from "@components/project/myteam/ProjectProgress";
 import { ContactSection } from "@components/project/myteam/ContactSection";
 import { MemberList } from "@components/project/myteam/MemberList";
-import { MyTeamHeader } from "@components/project/myteam/MyTeamHeader";
-
-import { ProjectFinishButton } from "@components/project/myteam/ProjectFinishButton";
-import { ReviewButton } from "@components/project/myteam/ReviewButton";
-
 import type {
   Member,
   ResponseStatus,
+  ProjectStatus,
 } from "@components/project/myteam/MyTeamTypes";
-
 import {
   MOCK_PROPOSALS,
   MOCK_PROJECTS,
@@ -27,17 +19,34 @@ import {
   MOCK_USERS,
   MOCK_BLOCKS,
 } from "../../mocks/mockAssemblock";
+import {
+  Page,
+  HeaderWrapper,
+  HeaderTitle,
+  HeaderSub,
+  Counter,
+  ActionButton,
+} from "./MyTeamPage.styled";
 
-const Page = styled.div`
-  min-height: 100vh;
-  background-color: #f9f9fb;
-  background-image: url(${pattern});
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: top center;
-`;
+const HEADER_COPY: Record<ProjectStatus, { title: string; subtitle: string }> =
+  {
+    recruiting: {
+      title: "팀원들 모두 수락해줄 때까지\n조금만 기다려볼까요?",
+      subtitle: "모두가 수락하지 않아도 팀빌딩을 완료할 수 있어요.",
+    },
+    ongoing: {
+      title: "즐거운 마음으로\n프로젝트를 진행해볼까요?",
+      subtitle:
+        "프로젝트 완료하기를 누르면 프로젝트가 끝나고,\n팀원 모두가 리뷰 블록을 작성할 수 있어요.",
+    },
+    done: {
+      title: "우리 팀의 여정이 마무리됐어요.\n멋진 협업이었네요!",
+      subtitle: "",
+    },
+  };
 
 export const MyTeamPage = () => {
+  const navigate = useNavigate();
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
 
@@ -64,7 +73,6 @@ export const MyTeamPage = () => {
   const proposalTargets = MOCK_PROPOSAL_TARGETS.filter(
     (t) => t.proposal_id === proposalIdNum
   );
-
   const acceptedCount = proposalTargets.filter(
     (t) => t.response_status === "accepted"
   ).length;
@@ -76,7 +84,6 @@ export const MyTeamPage = () => {
     : [];
 
   const responseStatusByUserId = new Map<number, ResponseStatus>();
-
   proposalTargets.forEach((t) => {
     const block = MOCK_BLOCKS.find((b) => b.block_id === t.proposalblock_id);
     if (!block) return;
@@ -85,7 +92,6 @@ export const MyTeamPage = () => {
 
   const members: Member[] = rawMembers.map((m) => {
     const user = MOCK_USERS.find((u) => u.user_id === m.user_id);
-
     const mappedResponseStatus: ResponseStatus = m.is_proposer
       ? "accepted"
       : (responseStatusByUserId.get(m.user_id) ?? "pending");
@@ -102,17 +108,33 @@ export const MyTeamPage = () => {
   // 5) 연락 수단
   const contactMethod = proposal.discord_id;
 
+  // 6) 헤더 카피
+  const headerCopy = HEADER_COPY[status];
+
+  // 7) 버튼 핸들러
+  const handleProjectFinish = () => {
+    console.log("프로젝트 완료하기 클릭됨");
+  };
+
+  const handleReviewClick = () => {
+    if (!proposalId) return;
+    navigate(`/Project/team/${proposalId}/review`);
+  };
+
   return (
     <Page>
       <SimpleHeader title="내 팀 보기" />
 
       {/* 1. 헤더 */}
-      <MyTeamHeader
-        status={status}
-        acceptedCount={acceptedCount}
-        totalCount={totalCount}
-      />
-
+      <HeaderWrapper>
+        <HeaderTitle>{headerCopy.title}</HeaderTitle>
+        <HeaderSub>{headerCopy.subtitle}</HeaderSub>
+      </HeaderWrapper>
+      {status === "recruiting" && (
+        <Counter>
+          수락한 팀원 {acceptedCount}/{totalCount}
+        </Counter>
+      )}
       {/* 2. 프로젝트 진행 상태 */}
       <ProjectProgress
         status={status}
@@ -128,16 +150,18 @@ export const MyTeamPage = () => {
       {/* 4. 멤버 리스트 */}
       <MemberList status={status} members={members} />
 
-      {/*  5. 상태별 버튼 */}
+      {/* 5. 상태별 버튼 */}
       {status === "ongoing" && (
-        <ProjectFinishButton
-          onFinish={() => {
-            console.log("프로젝트 완료하기 클릭됨");
-          }}
-        />
+        <ActionButton onClick={handleProjectFinish}>
+          프로젝트 완료하기
+        </ActionButton>
       )}
 
-      {status === "done" && <ReviewButton />}
+      {status === "done" && (
+        <ActionButton onClick={handleReviewClick}>
+          팀원 리뷰 남기러 가기
+        </ActionButton>
+      )}
     </Page>
   );
 };
