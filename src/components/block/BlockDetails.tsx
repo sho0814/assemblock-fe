@@ -28,10 +28,12 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
     const [isFormValid, setIsFormValid] = useState(false);
 
     const { showOverlay, closeOverlay } = useOverlay();
-    const { createNewBlock } = useBlocks();
+    const { loading, createNewBlock } = useBlocks();
     const { categoryOptions, toolsOptions } = getCategoryOptions(isTechType, selectedTechPart)
 
-    const onSubmit = () => {
+    const onSubmit = async () => {
+        if (loading) return;
+
         const blockData = {
             blockType,
             blockTitle,
@@ -42,10 +44,15 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
             contributionScore,
             improvementPoint,
             resultUrl,
-            resultFile: "dummy-pdf-base64-string-for-testing"
+            resultFile: "dummy-pdf-base64-string-for-testing",
         };
-        createNewBlock(blockData);
-    }
+
+        try {
+            await createNewBlock(blockData);
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     // 필수 조건 검사
     useEffect(() => {
@@ -123,7 +130,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
                 <S.Dot />
                 <S.Text>필수 작성 요소</S.Text>
             </S.TextWrapper>
-            
+
             <S.Form>
                 <S.Row>
                     <S.Label>블록 타입<S.Dot /> </S.Label>

@@ -2,24 +2,25 @@ import { useState } from 'react';
 import { useOverlay } from '@components/common/OverlayContext'
 import { useBoards, useBlocks } from '@hooks';
 import cancelButton from '@assets/common/cancel-btn.svg'
-import * as S from './SelectBoard.styled'
+import * as S from './BoardSelector.styled'
 
-interface SelectBoardProps {
+interface BoardSelectorProps {
   blockId: number;
-  setIsRegisterBlockActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsRegisterBlockActive?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function SelectBoard({ blockId, setIsRegisterBlockActive }: SelectBoardProps) {
+export default function BoardSelector({ blockId, setIsRegisterBlockActive }: BoardSelectorProps) {
   const { closeOverlay } = useOverlay();
   const [selectedBoardId, setSelectedBoardId] = useState<number>(0);
   const [newBoardName, setNewBoardName] = useState('');
-  
+
   const { boards, createNewBoard } = useBoards();
-  const { addToBoard } = useBlocks();
+  const { loading, addToBoard } = useBlocks();
 
   const handleCloseButton = () => {
     closeOverlay();
-    setIsRegisterBlockActive(true);
+    if (setIsRegisterBlockActive)
+      setIsRegisterBlockActive(true);
   };
 
   const handleAddBoard = () => {
@@ -29,12 +30,20 @@ export default function SelectBoard({ blockId, setIsRegisterBlockActive }: Selec
     setNewBoardName('');
   }
 
-  const handleAddBlockToBoard = (boardId: number, blockId: number) => {
-    addToBoard(boardId, blockId);
+  const handleAddBlockToBoard = async (boardId: number, blockId: number) => {
+    if (loading) return;
 
-    closeOverlay();
-    setIsRegisterBlockActive(true);
-  }
+    try {
+      await addToBoard(boardId, blockId);
+
+      closeOverlay();
+      if (setIsRegisterBlockActive) {
+        setIsRegisterBlockActive(true);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <S.Wrapper>

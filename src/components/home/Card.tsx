@@ -6,7 +6,7 @@ import { useSpring, animated } from '@react-spring/web'
 
 import { cardBackgrounds } from '@constants'
 import { useOverlay } from '@components/common/OverlayContext'
-import SelectBoard from './SelectBoard'
+import BoardSelector from './BoardSelector'
 import * as S from './Card.styled'
 
 const threshold = -70
@@ -73,9 +73,9 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
     }
   })
 
-  const handleBoardOverlay = () => {
+  const handleBoardOverlay = (blockId: number) => {
     showOverlay(
-      <SelectBoard blockId={blockId} setIsRegisterBlockActive={setIsRegisterBlockActive} />,
+      <BoardSelector blockId={blockId} setIsRegisterBlockActive={setIsRegisterBlockActive} />,
       { contentStyle: { position: 'absolute', bottom: '0', width: '100%' } }
     );
   }
@@ -96,7 +96,7 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
         </S.Card>
       </animated.div>
       {!isRegisterBlockActive &&
-        <S.StoreToBoardBtn onClick={() => handleBoardOverlay()}>보드에 추가</S.StoreToBoardBtn>}
+        <S.StoreToBoardBtn onClick={() => handleBoardOverlay(blockId)}>보드에 추가</S.StoreToBoardBtn>}
     </>
   )
 }
