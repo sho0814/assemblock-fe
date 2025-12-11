@@ -1,3 +1,4 @@
 export * from './client';
 export * from './kakaoAuth';
-export * from './search';
+export * from './block';
+export * from './board';

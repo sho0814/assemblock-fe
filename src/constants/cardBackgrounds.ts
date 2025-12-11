@@ -1,4 +1,4 @@
-export const categoryBackground: Record<string, string> = {
+export const cardBackgrounds: Record<string, string> = {
 
   // idea 타입
   '주거/공간': '/assets/card/ideaHousing.svg',

@@ -1,7 +1,7 @@
 import type { EmblaOptionsType } from 'embla-carousel'
 import { DotButton, useDotButton } from './EmblaCarouselDotButton'
 import { NextButton, usePrevNextButtons } from './EmblaCarouselArrowButtons'
-import { getKakaoLoginUrl, sendKakaoCodeToBackend } from "@api";
+import { getKakaoLoginUrl } from "@api";
 import kakaoLoginIcon from "/assets/onBoarding/kakao-login-icon.svg";
 import useEmblaCarousel from 'embla-carousel-react'
 import './onboarding.css'
@@ -28,12 +28,7 @@ const OnBoardingCarousel: React.FC<PropType> = (props) => {
         window.location.href = url;
     };
 
-    const {
-        prevBtnDisabled,
-        nextBtnDisabled,
-        onPrevButtonClick,
-        onNextButtonClick
-    } = usePrevNextButtons(emblaApi)
+    const { onNextButtonClick } = usePrevNextButtons(emblaApi)
 
     return (
         <section className="onboarding__embla">
