@@ -1,11 +1,8 @@
 // src/pages/project/ProposalDetailPage.tsx
 import SimpleHeader from "@components/shared/SimpleHeader";
-import styled from "styled-components";
 import { useParams } from "react-router-dom";
 
 import { ProjectProgress } from "@components/project/myteam/ProjectProgress";
-import { ProjectDescription } from "@components/project/proposal/ProjectDescription";
-import { ContactMethod } from "@components/project/proposal/ContactSection";
 import {
   MemberBlockList,
   type MemberBlock,
@@ -21,6 +18,22 @@ import {
   MOCK_PROPOSAL_TARGETS,
   MOCK_BLOCKS,
 } from "../../mocks/mockAssemblock";
+
+import {
+  Page,
+  Body,
+  BottomActions,
+  ProjectTitle,
+  ProjectDesc,
+  ContactWrapper,
+  ContactTitle,
+  ContactDesc,
+  ProposerProfile,
+  ProposerImage,
+  ProposerInfo,
+  ProposerName,
+  ProposerRole,
+} from "./ProposalDetailPage.styled";
 
 const MY_USER_ID = 1;
 
@@ -91,33 +104,42 @@ export function ProposalDetailPage() {
 
       <Body>
         {/* 1) 프로젝트 설명 */}
-        <ProjectDescription
-          title={proposal.project_title}
-          proposerName={proposer?.nickname ?? "익명"}
-          description={proposal.project_memo}
-        />
-
-        <ContactMethod
-          title="연락수단"
-          description="디스코드 @asdfggg_ 로 연락주세요!"
-        />
-
-        {/* 2) 프로젝트 진행상황 (project 있을 때만) */}
-        {project && (
-          <>
-            <SectionGap />
-            <ProjectProgress
-              status={project.project_status}
-              startDate={proposal.recruit_start_date}
-              endDate={proposal.recruit_end_date}
+        <div>
+          <ProjectTitle>{proposal.project_title}</ProjectTitle>
+          {/* 제안자 프로필 */}
+          <ProposerProfile>
+            <ProposerImage
+              src={"/default-profile.png"}
+              alt={proposer?.nickname ?? "제안자"}
             />
-          </>
+            <ProposerInfo>
+              <ProposerName>{proposer?.nickname ?? "익명"}</ProposerName>
+              <ProposerRole>{"역할 미정"}</ProposerRole>
+            </ProposerInfo>
+          </ProposerProfile>
+
+          <ProjectDesc>{proposal.project_memo}</ProjectDesc>
+        </div>
+
+        {/* 2) 연락수단 */}
+        <ContactWrapper>
+          <ContactTitle>연락수단</ContactTitle>
+          <ContactDesc>디스코드 @asdfggg_ 로 연락주세요!</ContactDesc>
+        </ContactWrapper>
+
+        {/* 3) 프로젝트 진행상황 (project 있을 때만) */}
+        {project && (
+          <ProjectProgress
+            status={project.project_status}
+            startDate={proposal.recruit_start_date}
+            endDate={proposal.recruit_end_date}
+          />
         )}
 
-        {/* 3) 팀원 블록 리스트 */}
+        {/* 4) 팀원 블록 리스트 */}
         <MemberBlockList blocks={viewBlocks} />
 
-        {/* 4) 받은 제안일 때만 수락/거절 버튼 노출 (새로 추가한 영역) */}
+        {/* 5) 받은 제안일 때만 수락/거절 버튼 노출 */}
         {isReceivedProposal && (
           <BottomActions>
             <AcceptButton disabled={!isActionActive} onClick={handleAccept} />
@@ -128,27 +150,3 @@ export function ProposalDetailPage() {
     </Page>
   );
 }
-
-const Page = styled.div`
-  min-height: 100vh;
-  background: #f9f9fb;
-`;
-
-const Body = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const SectionGap = styled.div`
-  height: 4px;
-`;
-
-const BottomActions = styled.div`
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 38px; /* 피그마 하단 여백 */
-`;

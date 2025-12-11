@@ -18,14 +18,13 @@ const List = styled.ul`
 
   padding: 8px 0 8px 0;
 
-  background: var(--GrayScale-WT, #FAFAFA);
+  background: var(--GrayScale-WT, #fafafa);
   border-radius: 20px;
-  outline: 1.5px solid var(--GrayScale-GR10, #F0EFF1);
+  outline: 1.5px solid var(--GrayScale-GR10, #f0eff1);
   outline-offset: -1px;
 
   width: 100%;
 `;
-
 
 // TODO: 로그인 유저 id와 연결
 const MY_USER_ID = 1;

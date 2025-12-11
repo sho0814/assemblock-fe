@@ -89,7 +89,6 @@ export const ProjectProgress = ({ status, startDate, endDate }: Props) => {
 
 const Card = styled.section`
   width: 100%;
-  margin-bottom: 16px;
   padding: 20px 36px;
   background: var(--GrayScale-WT, #fafafa);
   box-shadow: 0px 4px 4px rgba(53, 47, 54, 0.1);
@@ -143,7 +142,7 @@ const BarSegment = styled.div<{
   isFirst: boolean;
   isLast: boolean;
 }>`
-  width: 36px;
+  flex: 1;
   height: 8px;
   background: ${({ filled }) =>
     filled ? "var(--Primary-BK, #352F36)" : "var(--GrayScale-GR10, #F0EFF1)"};
