@@ -30,10 +30,3 @@ export interface NewBlockData {
   resultUrl: string;
   resultFile: string;
 }
-
-export interface SearchResultBlock {
-  blockId: number;
-  blockTitle: string;
-  oneLineSummary: string;
-  categoryName: string;
-}

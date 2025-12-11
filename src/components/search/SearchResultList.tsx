@@ -12,9 +12,24 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
   const navigate = useNavigate();
   const { blocks, loading, error } = useSearchBlocks(keyword);
 
-  // 에러 상태
-  if (error) {
-    return
+  const getCategoryThumbnail = (category: string) => {
+    return categoryToIconMap[category] ?? "/sample.png";
+  };
+
+  const handleClick = () => {
+    navigate('/OtherUser/BlockDetail');
+  }
+
+  // 오류 or 결과 없음
+  if (error || blocks.length === 0) {
+    return (
+      <S.EmptyResultWrapper>
+        <S.EmptyMessage>검색 결과가 없어요.</S.EmptyMessage>
+        <S.EmptySubMessage>
+          제대로 된 블록 제목을 입력했는지 다시 한 번 확인해주세요!
+        </S.EmptySubMessage>
+      </S.EmptyResultWrapper>
+    );
   }
 
   if (loading) {
@@ -31,26 +46,6 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
         ))}
       </S.BlockListWrapper>
     );
-  }
-
-  // 결과 없음 화면
-  if (blocks.length === 0) {
-    return (
-      <S.EmptyResultWrapper>
-        <S.EmptyMessage>검색 결과가 없어요.</S.EmptyMessage>
-        <S.EmptySubMessage>
-          제대로 된 블록 제목을 입력했는지 다시 한 번 확인해주세요!
-        </S.EmptySubMessage>
-      </S.EmptyResultWrapper>
-    );
-  }
-
-  const getCategoryThumbnail = (category: string) => {
-    return categoryToIconMap[category] ?? "/sample.png";
-  };
-
-  const handleClick = () => {
-    navigate('/OtherUser/BlockDetail');
   }
 
   return (

@@ -1,9 +1,10 @@
+// src/hooks/useSearchBlocks.ts
 import { useState, useEffect, useCallback } from "react";
 import { searchBlocks } from "@api";
-import type { SearchResultBlock } from "@types";
+import type { BlockData } from "@types";
 
 export const useSearchBlocks = (keyword: string) => {
-    const [blocks, setBlocks] = useState<SearchResultBlock[]>([]);
+    const [blocks, setBlocks] = useState<BlockData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 

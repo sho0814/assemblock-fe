@@ -1,5 +1,5 @@
 import { authApi } from '@api';
-import type { NewBlockData, BlockType, TechPart, SearchResultBlock } from '@types';
+import type { NewBlockData, BlockData,BlockType, TechPart } from '@types';
 
 export const createBlock = async (blockData: NewBlockData): Promise<any> => {
     const response = await authApi.post('/blocks', blockData, {
@@ -21,7 +21,7 @@ export const addBlockToBoard = async (boardId: number, blockId: number): Promise
     return response.data;
 }
 
-export const searchBlocks = async (keyword: string): Promise<SearchResultBlock[]> => {
+export const searchBlocks = async (keyword: string): Promise<BlockData[]> => {
     const response = await authApi.get('/search/blocks', {
         params: { q: keyword }
     });

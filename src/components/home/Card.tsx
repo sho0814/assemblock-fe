@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDrag } from '@use-gesture/react'
 import { useSpring, animated } from '@react-spring/web'
 
+import type { BlockData } from '@types'
 import { cardBackgrounds } from '@constants'
 import { useOverlay } from '@components/common/OverlayContext'
 import BoardSelector from './BoardSelector'
@@ -11,16 +12,7 @@ import * as S from './Card.styled'
 
 const threshold = -70
 
-interface CardProps {
-  blockId: number;
-  blockTitle: string;
-  blockType: string;
-  oneLineSummary: string;
-  techPart: string;
-  categoryName: string;
-  writerId: number;
-  writerNickname: string;
-  contributionScore: number;
+interface CardProps extends BlockData {
   isRegisterBlockActive: boolean;
   setIsRegisterBlockActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -49,7 +41,6 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
     return null
   }
   const techPartText = getTechPartText();
-
 
   const spring = useSpring({ y, config: { tension: 300, friction: 20 } })
 
@@ -81,7 +72,7 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
   }
 
   const handleClick = () => {
-    if (isDragging) return; // 드래그 중이면 클릭 무시
+    if (isDragging) return;
     navigate('/OtherUser/BlockDetail');
   }
 
