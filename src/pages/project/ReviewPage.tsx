@@ -9,6 +9,8 @@ import { ReviewBlocks } from "@components/project/review/ReviewBlocks";
 import type { ReviewBlockValue } from "@components/project/review/ReviewBlocks";
 import { ReviewConfirmModal } from "@components/project/review/ReviewConfirmModal";
 
+import pattern from "@assets/project/pattern.png";
+
 import {
   getMembersByProposalId,
   getReviewTargets,
@@ -101,7 +103,9 @@ export function ReviewPage() {
         <SimpleHeader title="리뷰 블록 남기기" />
         <DoneWrapper>
           <DoneTitle>모든 팀원에게 리뷰 블록을 남겼어요!</DoneTitle>
-          <DoneButton onClick={() => navigate("/")}>홈으로 돌아가기</DoneButton>
+          <DoneButton onClick={() => navigate("/Home")}>
+            홈으로 돌아가기
+          </DoneButton>
         </DoneWrapper>
       </Page>
     );
@@ -144,15 +148,19 @@ export function ReviewPage() {
 
 const Page = styled.div`
   min-height: 100vh;
-  background: #f9f9fb;
+  background-color: #f9f9fb;
+  background-image: url(${pattern});
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top center;
 `;
 
 const Content = styled.div`
-  padding: 24px 20px 40px;
+  padding: 38px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
+  gap: 56px;
 `;
 
 const DoneWrapper = styled.div`
@@ -166,25 +174,19 @@ const DoneWrapper = styled.div`
 
 const DoneTitle = styled.h2`
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 600;
   color: #111827;
 `;
 
-// const DoneDesc = styled.p`
-//   font-size: 14px;
-//   font-weight: 600;
-//   color: #6b7280;
-// `;
-
 const DoneButton = styled.button`
-  margin-top: 16px;
-  width: 180px;
-  height: 48px;
+  margin-top: 36px;
+  width: 192px;
+  height: 45px;
   border: none;
-  border-radius: 999px;
-  background: #111827;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 800;
+  border-radius: 16px;
+  background: #352f36;
+  color: #fafafa;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
 `;
