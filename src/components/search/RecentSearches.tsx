@@ -1,3 +1,4 @@
+// src/components/search/RecentSearches.tsx
 import { useRecentSearches } from '@hooks';
 import cancelButton from '@assets/common/cancel-btn.svg'
 import * as S from './RecentSearches.styled'

@@ -41,12 +41,14 @@
       "@stores/*": ["src/stores/*"],
       "@type": ["src/type"],
       "@type/*": ["src/type/*"],
-      "@utiles": ["src/utils"],
+      "@utils": ["src/utils"],
       "@utils/*": ["src/utils/*"],
       "@mocks": ["src/mocks"],
       "@mocks/*": ["src/mocks/*"],
       "@types": ["src/types"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "@constants": ["src/constants"],
+      "@constants/*": ["src/constants/*"],
     }
   },
   "include": ["src"]

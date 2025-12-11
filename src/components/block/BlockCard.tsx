@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { categoryBackground } from '@components/home/CategoryBackground';
+import { cardBackgrounds } from '@constants/cardBackgrounds';
 import * as S from './BlockCard.styled';
 
 interface BlockCardProps {
@@ -26,7 +26,7 @@ const BlockCard: React.FC<BlockCardProps> = ({
   onToggleSelect,
 }) => {
   const navigate = useNavigate();
-  const bgImage = categoryBackground[category_name];
+  const bgImage = cardBackgrounds[category_name];
 
   const getTechPartText = () => {
     if (techpart_id === 'design') return '디자인';

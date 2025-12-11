@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Form = styled.form`
+export const Form = styled.div`
     display: flex;
     flex-direction: column;
     margin-top: 15px;
@@ -22,12 +22,24 @@ export const Label = styled.label`
     font-size: 14px;
 `
 
+export const TextWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+`
+
 export const Dot = styled.div`
     width: 8px;
     height: 8px;
     border-radius: 100px;
     margin-right: 8px;
     background-color: #F05C5C;
+`
+
+export const Text = styled.div`
+    font-weight: 500;
+    font-size: 10px;
+    color: #726D72
 `
 
 export const Desc = styled.div`

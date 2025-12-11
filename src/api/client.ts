@@ -1,6 +1,7 @@
 // src/api/client.ts
 import axios, { AxiosError } from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import { getKakaoLoginUrl } from "./kakaoAuth";
 import { useAuthStore } from "@stores";
 
 // 엑세스토큰 필요없는 api
@@ -57,7 +58,7 @@ const refreshAccessToken = async () => {
         throw new Error("No refresh token");
     }
 
-    // refresh 토큰으로 재발급 요청 (엔드포인트는 백엔드에 맞게 변경)
+    // refresh 토큰으로 재발급 요청
     const res = await api.post("/auth/refresh", { refreshToken });
 
     const newAccessToken = res.data.accessToken;
@@ -68,21 +69,20 @@ const refreshAccessToken = async () => {
 };
 
 
-// ----- 응답 인터셉터: 401 시 refresh & 재시도 -----
+// ----- 응답 인터셉터: 403 시 refresh & 재시도 -----
 authApi.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
-        const { logout } = useAuthStore.getState();
         const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-        // 401 아니면 그대로 에러 반환
-        if (!error.response || error.response.status !== 401) {
+        // 403 아니면 그대로 에러 반환
+        if (!error.response || error.response.status !== 403) {
             return Promise.reject(error);
         }
 
-        // 이미 한 번 재시도한 요청이면 더 이상 시도하지 않고 로그아웃
+        // 이미 한 번 재시도한 요청이면 더 이상 시도하지 않고 카카오 로그인 페이지로 이동
         if (originalRequest._retry) {
-            logout();
+            window.location.href = getKakaoLoginUrl();
             return Promise.reject(error);
         }
         originalRequest._retry = true;
@@ -114,9 +114,9 @@ authApi.interceptors.response.use(
 
             return authApi(originalRequest);
         } catch (refreshError) {
-            // refresh 실패 → 전체 로그아웃 및 queue 실패 처리
-            logout();
+            // refresh 실패 → queue 실패 처리 및 카카오 로그인 페이지로 리다이렉트
             processQueue(refreshError as AxiosError, null);
+            window.location.href = getKakaoLoginUrl();
             return Promise.reject(refreshError);
         } finally {
             isRefreshing = false;

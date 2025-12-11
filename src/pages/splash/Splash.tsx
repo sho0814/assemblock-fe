@@ -23,13 +23,13 @@ export const Splash = () => {
         }
         try {
             // 2. authApi 호출 → 인터셉터가 자동으로 토큰 검증/refresh 처리
-            await authApi.get('/boards');
+            await authApi.get('/users/me');
 
             // 성공 → 프로필 상태에 따라 리다이렉트
             navigate(profileComplete ? '/Home' : '/onboarding/profileName', { replace: true });
 
         } catch (error: any) {
-            // 3. 인터셉터가 처리 후에도 실패 (refreshToken도 만료) → 카카오 로그인
+            // 3. 인터셉터가 처리 후에도 실패 (여기로 오면 뭔가 잘못된거) → 카카오 로그인
             const url = getKakaoLoginUrl();
             window.location.href = url;
         }
