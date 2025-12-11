@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import SimpleHeader from '@components/shared/SimpleHeader'
 import CancelGuide from "@components/block/CancleGuide";
 import { useOverlay } from '@components/common/OverlayContext'
-import InformText from '@components/block/InformText'
 import BlockDetails from '@components/block/BlockDetails'
 
 export function BlockRegisterPage() {
@@ -26,10 +25,10 @@ export function BlockRegisterPage() {
                                 작성 내용은 저장되지 않아요!
                             </>}
                         prevContent="이전으로"
-                        onPrevClick={() => {closeOverlay(); navigate(-1);}} />
+                        onPrevClick={() => { closeOverlay(); navigate(-1); }} />
                 )} />
-            <InformText />
-            <BlockDetails isSkill={isTech} />
+            
+            <BlockDetails isTech={isTech} />
         </>
     )
 }

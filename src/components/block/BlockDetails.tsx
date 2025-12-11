@@ -1,78 +1,83 @@
 // src/components/block/BlockDetails.tsx
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOverlay } from '@components/common/OverlayContext';
-import CancelGuide from './CancleGuide.tsx';
-
-import Dropdown from './DropDown';
-import {
-    CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK,
-    TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK
-} from '@types';
-import { logFormData, submitFormData } from '@utils/formSubmit';
+import { useBlocks } from '@hooks';
+import type { BlockType, TechPart } from '@types';
+import { getToolValuesFromLabels, getCategoryValuesFromLabels, getCategoryOptions } from '@utils';
 import CommonButton from '@components/shared/CommonButton'
-import { Dot } from './InformText.styled'
-
+import CancelGuide from './CancleGuide.tsx';
+import Dropdown from './DropDown';
 import * as S from './BlockDetails.styled'
 
 interface BlockDetailsProps {
-    isSkill?: boolean;
+    isTech: boolean;
 }
 
-type BlockPart = 'design' | 'frontend' | 'backend';
-
-export default function BlockDetails({ isSkill }: BlockDetailsProps) {
-    const [isSkillState, setIsSkillState] = useState(isSkill);                          // 타입
-    const [blockTitle, setBlockTitle] = useState('');                                   // 제목
-    const [selectedTechPart, setSelectedTechPart] = useState<BlockPart | null>(null);   // 기술 파트
-    const [selectedCategory, setSelectedCategory] = useState<string>('');               // 카테고리
-    const [selectedTools, setSelectedTools] = useState<string>('');                   // 사용 툴 및 언어
-    const [onelineSummary, setOnelineSummary] = useState('');                           // 기존 프로젝트 한 줄 소개
-    const [contributionRate, setContributionRate] = useState<number>(0);                // 기존 프로젝트 기여도
-    const [fileName, setFileName] = useState<string | null>(null);                      // 기존 프로젝트 결과물 PDF
+export default function BlockDetails({ isTech }: BlockDetailsProps) {
+    const [isTechType, setIsTechType] = useState<boolean>(isTech);
+    const [blockType, setBlockType] = useState<BlockType>(isTechType ? "TECHNOLOGY" : "IDEA");  // 타입
+    const [blockTitle, setBlockTitle] = useState('');                                           // 제목
+    const [selectedTechPart, setSelectedTechPart] = useState<TechPart>(null);                   // 기술 파트
+    const [selectedCategory, setSelectedCategory] = useState<string>('');                       // 카테고리
+    const [selectedTools, setSelectedTools] = useState<string | null>(null);                    // 사용 툴 및 언어
+    const [oneLineSummary, setOneLineSummary] = useState('');                                   // 기존 프로젝트 한 줄 소개
+    const [contributionScore, setContributionScore] = useState<number>(0);                      // 기존 프로젝트 기여도
+    const [improvementPoint, setImprovementPoint] = useState('');                               // 기존 프로젝트에서 개선하고 싶은 점
+    const [resultUrl, setResultUrl] = useState('');                                             // 기존 프로젝트 결과물 URL
+    const [fileName, setFileName] = useState<string | null>(null);                              // 업로드한 파일명
     const [isFormValid, setIsFormValid] = useState(false);
 
     const { showOverlay, closeOverlay } = useOverlay();
+    const { createNewBlock } = useBlocks();
+    const { categoryOptions, toolsOptions } = getCategoryOptions(isTechType, selectedTechPart)
 
-    const inputRef = useRef<HTMLInputElement>(null);
-    const formRef = useRef<HTMLFormElement>(null);
-
-
-
+    const onSubmit = () => {
+        const blockData = {
+            blockType,
+            blockTitle,
+            techPart: selectedTechPart,
+            categoryName: selectedCategory,
+            toolsText: selectedTools,
+            oneLineSummary,
+            contributionScore,
+            improvementPoint,
+            resultUrl,
+            resultFile: "dummy-pdf-base64-string-for-testing"
+        };
+        createNewBlock(blockData);
+    }
 
     // 필수 조건 검사
     useEffect(() => {
-        const isBlockTitleValid = blockTitle.trim() !== '';
-        const isPartsValid = isSkillState ? selectedTechPart !== null : true;
+        const isBlockTitleValid = blockTitle.trim().length > 0;
+        const isPartsValid = isTechType ? selectedTechPart !== null : true;
         const isCategoriesValid = selectedCategory.length > 0;
-        const isToolsValid = isSkillState ? selectedTools.length > 0 : true;
-        const isOnelineSummaryValid = onelineSummary.trim() !== '';
-        const isContributionRateValid = contributionRate > 0;
+        const isToolsValid = isTechType ? selectedTools !== null : true;
+        const isOnelineSummaryValid = oneLineSummary.trim().length > 0;
+        const isContributionRateValid = contributionScore > 0;
 
         setIsFormValid(isBlockTitleValid && isPartsValid && isCategoriesValid && isToolsValid && isOnelineSummaryValid && isContributionRateValid);
 
-    }, [blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary, contributionRate]);
+    }, [blockTitle, selectedTechPart, selectedCategory, selectedTools, oneLineSummary, contributionScore]);
 
 
     // 블록 타입 변경 이벤트 핸들러
-    // IsSkillState가 바뀌면 모든 state, input 초기화 후 closeOverlay
-    const confirmSetIsSkillState = (newValue: boolean) => {
+    // IsSkillState가 바뀌면 모든 state 초기화 후 closeOverlay
+    const confirmSetIsTechType = (newValue: boolean) => {
+        setIsTechType(newValue);
+        setBlockType(newValue ? 'TECHNOLOGY' : 'IDEA');
 
-        setIsSkillState(newValue);
         setBlockTitle('');
         setSelectedTechPart(null);
         setSelectedCategory('');
-        setOnelineSummary('');
-        setSelectedTools('');
-        setContributionRate(0);
-        setFileName(null);
-
-        // State로 관리되지 않는 native input 리셋
-        if (formRef.current) {
-            formRef.current.reset();
-        }
-
+        setOneLineSummary('');
+        setSelectedTools(null);
+        setContributionScore(0);
+        setImprovementPoint('');
+        setResultUrl('');
         closeOverlay();
     };
+
 
     // 오버레이 호출 함수
     const handleShowCancelGuide = (newValue: boolean) => {
@@ -86,68 +91,20 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
                     </>
                 }
                 prevContent="변경하기"
-                onPrevClick={() => confirmSetIsSkillState(newValue)}
+                onPrevClick={() => confirmSetIsTechType(newValue)}
             />
         );
     };
 
+    // selectedTechPart가 변경되면 selectedCategories 초기화
+    useEffect(() => {
+        setSelectedCategory('');
+        setSelectedTools(null);
+    }, [selectedTechPart]);
 
-
-    // 블록 타입, 블록 기술파트에 따라 카테고리 선택지 변경
-    let categoryOptions = CATEGORY_IDEA;
-    let toolsOptions = TOOLS_DESIGN;
-    if (isSkill) {
-        if (selectedTechPart === 'design') categoryOptions = CATEGORY_TECH_DESIGN;
-        else if (selectedTechPart === 'frontend') {
-            categoryOptions = CATEGORY_TECH_FRONT;
-            toolsOptions = TOOLS_FRONT;
-        }
-        else if (selectedTechPart === 'backend') {
-            categoryOptions = CATEGORY_TECH_BACK;
-            toolsOptions = TOOLS_BACK;
-        }
-
-        // selectedTechPart가 변경되면 selectedCategories 초기화
-        useEffect(() => {
-            setSelectedCategory('');
-            setSelectedTools('');
-        }, [selectedTechPart]);
-    }
-
-
-
-
-    // 폼 제출 관리 함수
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log("폼 제출 이벤트 발생");
-
-        if (!formRef.current) {
-            console.log("formRef.current is null");
-            return;
-        }
-
-        logFormData(formRef.current);
-
-        const response = await submitFormData(formRef.current);
-        if (response.ok) {
-            console.log('전송 성공');
-        } else {
-            console.error('전송 실패');
-        }
-    };
-
-    const toggleTechPart = (part: BlockPart) => {
+    // 기술 파트 토글 함수
+    const toggleTechPart = (part: TechPart) => {
         setSelectedTechPart(prev => (prev === part ? null : part));
-    };
-
-    // 기여도 변경 함수
-    const changeRate = (delta: number) => {
-        setContributionRate(prev => {
-            const newValue = prev + delta;
-            return newValue < 0 ? 0 :
-                newValue > 100 ? 100 : newValue;
-        });
     };
 
     // 선택한 파일명 보여주는 함수
@@ -160,124 +117,124 @@ export default function BlockDetails({ isSkill }: BlockDetailsProps) {
         }
     };
 
-    const handleClick = () => {
-        inputRef.current?.click();
-    };
-
     return (
-        <S.Form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data">
-            <S.Row>
-                <S.Label>블록 타입<Dot /> </S.Label>
-                <input name="blockType" type="hidden" value={isSkillState ? "technology" : "idea"} />
-                <div>
-                    <S.BlockTypeButton type="button" $selected={!isSkillState} onClick={() => handleShowCancelGuide(false)}>아이디어</S.BlockTypeButton>
-                    <S.BlockTypeButton type="button" $selected={isSkillState} onClick={() => handleShowCancelGuide(true)}>기술</S.BlockTypeButton>
-                </div>
-                <S.Desc>블록 타입은 중복 선택할 수 없어요</S.Desc>
-            </S.Row>
-
-            <S.Row>
-                <S.Label>블록 이름<Dot /> </S.Label>
-                <S.Input name="blockTitle" type="text" placeholder="블록 이름" value={blockTitle} onChange={(e) => setBlockTitle(e.target.value)} />
-                <S.Desc>블록 이름은 최대 (N자)까지 입력할 수 있어요</S.Desc>
-            </S.Row>
-
-            {isSkillState && (
+        <>
+            <S.TextWrapper>
+                <S.Dot />
+                <S.Text>필수 작성 요소</S.Text>
+            </S.TextWrapper>
+            
+            <S.Form>
                 <S.Row>
-                    <S.Label>기술 파트<Dot /> </S.Label>
-                    <input name="techPart" type="hidden" value={selectedTechPart ?? ''} />
+                    <S.Label>블록 타입<S.Dot /> </S.Label>
                     <div>
-                        <S.BlockTypeButton type="button" $selected={selectedTechPart === 'design'} onClick={() => toggleTechPart('design')}>디자인</S.BlockTypeButton>
-                        <S.BlockTypeButton type="button" $selected={selectedTechPart === 'frontend'} onClick={() => toggleTechPart('frontend')}>프론트엔드</S.BlockTypeButton>
-                        <S.BlockTypeButton type="button" $selected={selectedTechPart === 'backend'} onClick={() => toggleTechPart('backend')}>백엔드</S.BlockTypeButton>
+                        <S.BlockTypeButton type="button" $selected={!isTechType} onClick={() => handleShowCancelGuide(false)}>아이디어</S.BlockTypeButton>
+                        <S.BlockTypeButton type="button" $selected={isTechType} onClick={() => handleShowCancelGuide(true)}>기술</S.BlockTypeButton>
                     </div>
-                    <S.Desc>기술 파트는 중복 선택할 수 없어요</S.Desc>
+                    <S.Desc>블록 타입은 중복 선택할 수 없어요</S.Desc>
                 </S.Row>
-            )}
 
-            <S.Row>
-                <S.Label>블록 카테고리<Dot /></S.Label>
-                <input name="categoryName" type="hidden" value={selectedCategory} />
-                <Dropdown
-                    content={
-                        selectedCategory && selectedCategory.length > 0 ?
-                            selectedCategory : "카테고리를 선택해 주세요"
-                    }
-                    options={categoryOptions}
-                    selected={selectedCategory}
-                    onChange={(value: string) => setSelectedCategory(value)} />
-                <S.Desc>블록 카테고리는 중복 선택할 수 없어요</S.Desc>
-            </S.Row>
-
-            {isSkillState && (
                 <S.Row>
-                    <S.Label>사용 툴 및 언어<Dot /></S.Label>
-                    <input name="toolsText" type="hidden" value={selectedTools} />
+                    <S.Label>블록 이름<S.Dot /> </S.Label>
+                    <S.Input name="blockTitle" type="text" placeholder="블록 이름" value={blockTitle} onChange={(e) => setBlockTitle(e.target.value)} />
+                    <S.Desc>블록 이름은 최대 (N자)까지 입력할 수 있어요</S.Desc>
+                </S.Row>
+
+                {isTechType && (
+                    <S.Row>
+                        <S.Label>기술 파트<S.Dot /> </S.Label>
+                        <div>
+                            <S.BlockTypeButton type="button" $selected={selectedTechPart === 'DESIGN'} onClick={() => toggleTechPart('DESIGN')}>디자인</S.BlockTypeButton>
+                            <S.BlockTypeButton type="button" $selected={selectedTechPart === 'FRONTEND'} onClick={() => toggleTechPart('FRONTEND')}>프론트엔드</S.BlockTypeButton>
+                            <S.BlockTypeButton type="button" $selected={selectedTechPart === 'BACKEND'} onClick={() => toggleTechPart('BACKEND')}>백엔드</S.BlockTypeButton>
+                        </div>
+                        <S.Desc>기술 파트는 중복 선택할 수 없어요</S.Desc>
+                    </S.Row>
+                )}
+
+                <S.Row>
+                    <S.Label>블록 카테고리<S.Dot /></S.Label>
                     <Dropdown
                         content={
-                            selectedTools && selectedTools.length > 0 ?
-                                selectedTools : "사용 툴 및 언어를 선택해 주세요"}
-                        options={toolsOptions}
-                        selected={selectedTools}
-                        onChange={setSelectedTools}
-                    />
-                    <S.Desc>사용 툴 및 언어는 중복 선택할 수 없어요</S.Desc>
+                            selectedCategory && selectedCategory.length > 0 ?
+                                getCategoryValuesFromLabels(selectedCategory) : "카테고리를 선택해 주세요"
+                        }
+                        options={categoryOptions}
+                        selected={selectedCategory}
+                        onChange={(value: string) => setSelectedCategory(value)} />
+                    <S.Desc>블록 카테고리는 중복 선택할 수 없어요</S.Desc>
                 </S.Row>
-            )}
 
-            <S.Row>
-                <S.Label>기존 프로젝트 한 줄 소개<Dot /></S.Label>
-                <S.Input name="onelineSummary" type="text" placeholder="프로젝트를 자유롭게 소개해 주세요" value={onelineSummary} onChange={(e) => setOnelineSummary(e.target.value)} />
-                <S.Desc>해당 블록이 사용되었던 기존 프로젝트를 (N)자 이내로 소개해 주세요</S.Desc>
-            </S.Row>
+                {isTechType && (
+                    <S.Row>
+                        <S.Label>사용 툴 및 언어<S.Dot /></S.Label>
+                        <Dropdown
+                            content={
+                                selectedTools && selectedTools.length > 0 ?
+                                    getToolValuesFromLabels(selectedTools) : "사용 툴 및 언어를 선택해 주세요"
+                            }
+                            options={toolsOptions}
+                            selected={selectedTools ?? ''}
+                            onChange={setSelectedTools}
+                        />
+                        <S.Desc>사용 툴 및 언어는 중복 선택할 수 없어요</S.Desc>
+                    </S.Row>
+                )}
 
-            <S.Row>
-                <S.Label>기존 프로젝트 기여도<Dot /></S.Label>
-                <S.NumberInputWrapper>
-                    <S.ChangeButton type="button" onClick={() => changeRate(-10)}>-</S.ChangeButton>
-                    <S.ValueBox
-                        type="number"
-                        name="contributionScore"
-                        value={contributionRate}
-                        readOnly
-                    />
-                    <S.ChangeButton type="button" onClick={() => changeRate(10)}>+</S.ChangeButton>
-                </S.NumberInputWrapper>
-                <S.Desc>기존 프로젝트에 대한 기여도를 0-100 사이에서 10단위로 선택해 주세요</S.Desc>
-            </S.Row>
+                <S.Row>
+                    <S.Label>기존 프로젝트 한 줄 소개<S.Dot /></S.Label>
+                    <S.Input name="onelineSummary" type="text" placeholder="프로젝트를 자유롭게 소개해 주세요" value={oneLineSummary} onChange={(e) => setOneLineSummary(e.target.value)} />
+                    <S.Desc>해당 블록이 사용되었던 기존 프로젝트를 (N)자 이내로 소개해 주세요</S.Desc>
+                </S.Row>
 
-            <S.Row>
-                <S.Label>기존 프로젝트에서 개선하고 싶은 점</S.Label>
-                <S.Input name="improvementPoint" type="text" placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" />
-                <S.Desc>어셈블록에서 새로운 팀원들과 변경하거나 보완, 개선하고 싶은 부분이 있다면<br />
-                    (N)자 내로 작성해 주세요</S.Desc>
-            </S.Row>
+                <S.Row>
+                    <S.Label>기존 프로젝트 기여도<S.Dot /></S.Label>
+                    <S.NumberInputWrapper>
+                        <S.ChangeButton type="button" onClick={() => setContributionScore(prev => Math.max(0, prev - 10))}>-</S.ChangeButton>
+                        <S.ValueBox
+                            type="number"
+                            name="contributionScore"
+                            value={contributionScore}
+                            readOnly
+                        />
+                        <S.ChangeButton type="button" onClick={() => setContributionScore(prev => Math.min(100, prev + 10))}>+</S.ChangeButton>
+                    </S.NumberInputWrapper>
+                    <S.Desc>기존 프로젝트에 대한 기여도를 0-100 사이에서 10단위로 선택해 주세요</S.Desc>
+                </S.Row>
 
-            <S.Row>
-                <S.Label>기존 프로젝트 결과물 URL</S.Label>
-                <S.Input name="resultUrl" type="text" placeholder="URL" />
-                <S.Desc>기존 프로젝트의 산출물 및 결과물을 URL 형식으로 첨부해 주세요</S.Desc>
-            </S.Row>
+                <S.Row>
+                    <S.Label>기존 프로젝트에서 개선하고 싶은 점</S.Label>
+                    <S.Input name="improvementPoint" type="text" placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" value={improvementPoint} onChange={(e) => setImprovementPoint(e.target.value)} />
+                    <S.Desc>어셈블록에서 새로운 팀원들과 변경하거나 보완, 개선하고 싶은 부분이 있다면<br />
+                        (N)자 내로 작성해 주세요</S.Desc>
+                </S.Row>
 
-            <S.Row>
-                <S.Label>기존 프로젝트 결과물 PDF</S.Label>
-                <S.FileInputWrapper onClick={handleClick}>
-                    {fileName ? (
-                        <div>
-                            {fileName}
-                        </div>
-                    ) : (
-                        <>
-                            이 곳을 눌러 파일을 업로드 하세요<br />
-                            <span style={{ fontSize: '12px', color: '#C2C1C3' }}>지원되는 형식: PDF</span>
-                        </>
-                    )}
-                    <S.HiddenFileInput name="resultFile" type="file" accept="application/pdf" onChange={handleFileChange} />
-                </S.FileInputWrapper>
-                <S.Desc>프로젝트 결과물을 PDF 파일 형태로 첨부해 주세요</S.Desc>
-            </S.Row>
+                <S.Row>
+                    <S.Label>기존 프로젝트 결과물 URL</S.Label>
+                    <S.Input name="resultUrl" type="text" placeholder="URL" value={resultUrl} onChange={(e) => setResultUrl(e.target.value)} />
+                    <S.Desc>기존 프로젝트의 산출물 및 결과물을 URL 형식으로 첨부해 주세요</S.Desc>
+                </S.Row>
 
-            <CommonButton type="submit" content={"블록 등록하기"} disabled={!isFormValid} />
-        </S.Form>
+                <S.Row>
+                    <S.Label>기존 프로젝트 결과물 PDF</S.Label>
+                    <S.FileInputWrapper onClick={() => { }}>
+                        {fileName ? (
+                            <div>
+                                {fileName}
+                            </div>
+                        ) : (
+                            <>
+                                이 곳을 눌러 파일을 업로드 하세요<br />
+                                <span style={{ fontSize: '12px', color: '#C2C1C3' }}>지원되는 형식: PDF</span>
+                            </>
+                        )}
+                        <S.HiddenFileInput name="resultFile" type="file" accept="application/pdf" onChange={handleFileChange} />
+                    </S.FileInputWrapper>
+                    <S.Desc>프로젝트 결과물을 PDF 파일 형태로 첨부해 주세요</S.Desc>
+                </S.Row>
+
+                <CommonButton content={"블록 등록하기"} disabled={!isFormValid} onClick={onSubmit} />
+            </S.Form>
+        </>
     )
 }

@@ -4,6 +4,7 @@ import * as S from './Dropdown.styled'
 import  downArrow  from '@assets/common/down-md.svg';
 
 export interface DropDownOption {
+  label: string;
   value: string;
 }
 
@@ -37,9 +38,9 @@ export default function Dropdown({ content, selected, onChange, options }: Dropd
       <S.DropdownList open={open}>
         {options.map(opt => (
           <S.DropdownOption
-            key={opt.value}
-            selected={selected === opt.value}
-            onClick={() => handleSelect(opt.value)}
+            key={opt.label}
+            selected={selected === opt.label}
+            onClick={() => handleSelect(opt.label)}
           >
             {opt.value}
             {selected === opt.value && <S.CheckIcon />}

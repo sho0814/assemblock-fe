@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+// src/components/search/SearchResultList.tsx
 import { useNavigate } from "react-router-dom";
-import { categoryToSmallImageMap } from "./SmallBg";
-import { searchBlocks } from "@api";
-import type { SearchBlock } from "@types";
+import { categoryToIconMap } from "@constants";
+import { useSearchBlocks } from "@hooks";
 import * as S from './SearchResultsList.styled'
 
 interface SearchResultListProps {
@@ -11,31 +10,31 @@ interface SearchResultListProps {
 
 const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
   const navigate = useNavigate();
-  const [blocks, setBlocks] = useState<SearchBlock[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { blocks, loading, error } = useSearchBlocks(keyword);
 
-  const fetchBlocks = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await searchBlocks(keyword);
-      setBlocks(data);
-    } catch (err) {
-      setError('검색 결과를 불러오지 못했습니다.');
-      console.error('Search failed:', err);
-      setBlocks([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [keyword]);
+  // 에러 상태
+  if (error) {
+    return
+  }
 
-  useEffect(() => {
-    fetchBlocks();
-  }, [fetchBlocks]);
+  if (loading) {
+    return (
+      <S.BlockListWrapper>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <S.BlockItem key={`skeleton-${index}`}>
+            <S.SkeletonThumbnail />
+            <div>
+              <S.SkeletonBlockTitle />
+              <S.SkeletonBlockSummary />
+            </div>
+          </S.BlockItem>
+        ))}
+      </S.BlockListWrapper>
+    );
+  }
 
   // 결과 없음 화면
-  if (!loading && blocks.length === 0) {
+  if (blocks.length === 0) {
     return (
       <S.EmptyResultWrapper>
         <S.EmptyMessage>검색 결과가 없어요.</S.EmptyMessage>
@@ -47,11 +46,11 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
   }
 
   const getCategoryThumbnail = (category: string) => {
-    return categoryToSmallImageMap[category] ?? "/sample.png";
+    return categoryToIconMap[category] ?? "/sample.png";
   };
 
   const handleClick = () => {
-    navigate('/block/detail');
+    navigate('/OtherUser/BlockDetail');
   }
 
   return (
@@ -63,8 +62,8 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
             alt="블록 썸네일"
           />
           <div>
-            <S.BlockTitle>{block.title}</S.BlockTitle>
-            <S.BlockSummary>{block.onelineSummary}</S.BlockSummary>
+            <S.BlockTitle>{block.blockTitle}</S.BlockTitle>
+            <S.BlockSummary>{block.oneLineSummary}</S.BlockSummary>
           </div>
         </S.BlockItem>
       ))}

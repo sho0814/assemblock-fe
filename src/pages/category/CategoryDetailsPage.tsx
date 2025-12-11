@@ -2,8 +2,8 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
-import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@components/block/DropdownOptions";
-import RenderCards from "./RenderCards";
+import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@constants";
+import RenderCategoryCards from "./RenderCategoryCards";
 import * as S from './CategoryDetailsPage.styled'
 
 const PAGE_DATA: Record<string, { title: string; options: typeof CATEGORY_TECH_FRONT }> = {
@@ -24,8 +24,6 @@ export function CategoryDetailsPage() {
     const { techpart } = useParams();
     const { title, options } = getPageInfo(techpart);
 
-    useEffect(() => console.log(category), [category])
-
     return (
         <>
             <SimpleHeader title={title} style={{paddingLeft: 20, paddingRight: 20}}/>
@@ -42,7 +40,7 @@ export function CategoryDetailsPage() {
             </S.ScrollNav>
 
             <S.CarouselWrapper>
-                <RenderCards frontendCategory={category} />
+                <RenderCategoryCards frontendCategory={category} />
             </S.CarouselWrapper>
 
         </>

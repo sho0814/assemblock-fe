@@ -13,6 +13,29 @@ export const BlockItem = styled.li`
   align-items: center;
 `;
 
+export const SkeletonThumbnail = styled.div`
+  min-width: 60px;
+  min-height: 60px;
+  margin-right: 12px;
+  background-color: #F0EFF1;
+  border-radius: 15px;
+`;
+
+export const SkeletonBlockTitle = styled.div`
+  width: 122px;
+  height: 16px;
+  background-color: #F0EFF1;
+  border-radius: 7px;
+  margin-bottom: 8px;
+`;
+
+export const SkeletonBlockSummary = styled.div`
+  width: 215px;
+  height: 14px;
+  background-color: #F0EFF1;
+  border-radius: 7px;
+`;
+
 export const Thumbnail = styled.img`
   width: 60px;
   height: 60px;
@@ -30,7 +53,7 @@ export const BlockTitle = styled.div`
 `;
 
 export const BlockSummary = styled.div`
-    font-weight: 500;
+  font-weight: 500;
   font-size: 13px;
   color: #726D72;
   overflow: hidden;

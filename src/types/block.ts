@@ -1,27 +1,55 @@
 export type BlockType = "TECHNOLOGY" | "IDEA";
-export type TechPart = "FrontEnd" | "BackEnd" | "Design";
 
-export interface Block {
+export type TechPart = "FRONTEND" | "BACKEND" | "DESIGN" | null;
+
+export interface BlockData {
   blockId: number;
+  blockType: BlockType;
   blockTitle: string;
   categoryName: string;
-  techPart?: TechPart | null;
-  blockType: BlockType;
+  techPart: string;
   contributionScore: number;
-  toolsText?: string | null;
+  toolsText: string;
+  oneLineSummary: string;
+  improvementPoint: string;
+  resultUrl: string;
+  resultFile: string;
+  writerId: number;
+  writerNickname: string;
+}
+
+export interface SearchBlock {
+  blockId: number;
+  blockType: BlockType;
+  blockTitle: string;
+  categoryName: string;
+  techPart: string;
+  contributionScore: number;
+  toolsText: string;
+  oneLineSummary: string;
+  improvementPoint: string;
+  resultUrl: string;
+  resultFile: string;
+  writerId: number;
+  writerNickname: string;
+}
+
+export interface NewBlockData {
+  blockType: BlockType;
+  blockTitle: string;
+  categoryName: string;
+  techPart: TechPart;
+  contributionScore: number;
+  toolsText: string | null;
   oneLineSummary: string;
   improvementPoint: string;
   resultUrl: string;
   resultFile: string;
 }
 
-export interface SearchBlock {
+export interface SearchResultBlock {
   blockId: number;
-  title: string;
-  nickname: string;
-  onelineSummary: string;
-  profileType: string;
+  blockTitle: string;
+  oneLineSummary: string;
   categoryName: string;
-  techPart?: TechPart | null;
-  blockType: BlockType;
 }

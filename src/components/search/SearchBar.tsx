@@ -1,19 +1,19 @@
 // src/components/shared/Header.tsx
+import { useRecentSearches } from '@hooks';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import type { SearchBarProps } from '@types';
-
 import backArrow from '@assets/common/back-arrow.svg'
 import search from '@assets/common/search.svg'
 import * as S from './SearchBar.styled'
 
+type SearchBarProps = {
+  PrevSearch?: string;
+};
+
 export default function SearchBar({ PrevSearch }: SearchBarProps) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState(PrevSearch ?? "");
-
-    const handleClick = () => {
-        navigate(`/search/${encodeURIComponent(searchTerm)}`);
-    }
+  const { handleClick } = useRecentSearches();
 
     return (
         <S.Header>
@@ -30,7 +30,7 @@ export default function SearchBar({ PrevSearch }: SearchBarProps) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <S.IconWrapper>
-                    <S.Icon src={search} onClick={handleClick} />
+                    <S.Icon src={search} onClick={() => handleClick(searchTerm)} />
                 </S.IconWrapper>
             </S.SearchBarWrapper>
 
