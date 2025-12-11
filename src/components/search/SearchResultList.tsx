@@ -20,18 +20,6 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
     navigate('/OtherUser/BlockDetail');
   }
 
-  // 오류 or 결과 없음
-  if (error || blocks.length === 0) {
-    return (
-      <S.EmptyResultWrapper>
-        <S.EmptyMessage>검색 결과가 없어요.</S.EmptyMessage>
-        <S.EmptySubMessage>
-          제대로 된 블록 제목을 입력했는지 다시 한 번 확인해주세요!
-        </S.EmptySubMessage>
-      </S.EmptyResultWrapper>
-    );
-  }
-
   if (loading) {
     return (
       <S.BlockListWrapper>
@@ -45,6 +33,18 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
           </S.BlockItem>
         ))}
       </S.BlockListWrapper>
+    );
+  }
+
+  // 오류 or 결과 없음
+  if (error || blocks.length === 0) {
+    return (
+      <S.EmptyResultWrapper>
+        <S.EmptyMessage>검색 결과가 없어요.</S.EmptyMessage>
+        <S.EmptySubMessage>
+          제대로 된 블록 제목을 입력했는지 다시 한 번 확인해주세요!
+        </S.EmptySubMessage>
+      </S.EmptyResultWrapper>
     );
   }
 

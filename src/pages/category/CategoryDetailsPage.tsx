@@ -26,7 +26,7 @@ export function CategoryDetailsPage() {
 
     return (
         <>
-            <SimpleHeader title={title} style={{paddingLeft: 20, paddingRight: 20}}/>
+            <SimpleHeader title={title} style={{ paddingLeft: 20, paddingRight: 20 }} />
             <S.ScrollNav>
                 {options.map((option: { label: string, value: string }) => (
                     <S.NavTab
