@@ -29,7 +29,7 @@ export const Splash = () => {
             navigate(profileComplete ? '/Home' : '/onboarding/profileName', { replace: true });
 
         } catch (error: any) {
-            // 3. 인터셉터가 처리 후에도 실패 (refreshToken도 만료) → 카카오 로그인
+            // 3. 인터셉터가 처리 후에도 실패 (여기로 오면 뭔가 잘못된거) → 카카오 로그인
             const url = getKakaoLoginUrl();
             window.location.href = url;
         }
