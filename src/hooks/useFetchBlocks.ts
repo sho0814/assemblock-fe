@@ -1,7 +1,7 @@
 // src/hooks/useFetchBlocks.ts
 // api연결 안되어있음!! 하드코딩
 import { useEffect, useState } from 'react'
-import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@components/block/DropdownOptions";
+import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@constants";
 import type { BlockData } from '@types';
 
 export const useFetchBlocks = (
