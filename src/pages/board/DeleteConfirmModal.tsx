@@ -1,18 +1,25 @@
 import { useOverlay } from "@components/common/OverlayContext";
 import * as S from "./DeleteConfirmModal.styled";
+import closeIcon from "@assets/board/close.svg";
 
 interface DeleteConfirmModalProps {
   onConfirm: () => void;
+  title?: string;
+  desc1?: string;
+  desc2?: string;
+  confirmText?: string;
 }
 
 export default function DeleteConfirmModal({
   onConfirm,
+  title = "삭제 확인",
+  desc1 = "보드를 정말 삭제하시겠습니까?",
+  desc2 = "한 번 삭제한 보드는 복구할 수 없어요",
+  confirmText = "삭제하기",
 }: DeleteConfirmModalProps) {
   const { closeOverlay } = useOverlay();
 
-  const handleCancel = () => {
-    closeOverlay();
-  };
+  const handleCancel = () => closeOverlay();
 
   const handleConfirm = () => {
     closeOverlay();
@@ -23,19 +30,19 @@ export default function DeleteConfirmModal({
     <S.Container>
       <S.Header>
         <div style={{ width: "24px" }} />
-        <S.Title>삭제 확인</S.Title>
+        <S.Title>{title}</S.Title>
         <S.CloseButton onClick={handleCancel} aria-label="닫기">
-          X
+          <img src={closeIcon} alt="닫기" style={{ width: 18, height: 18 }} />
         </S.CloseButton>
       </S.Header>
 
       <S.Content>
         <S.Description>
-          <div>보드를 정말 삭제하시겠습니까?</div>
-          <div>한 번 삭제한 보드는 복구할 수 없어요</div>
+          <div>{desc1}</div>
+          <div>{desc2}</div>
         </S.Description>
 
-        <S.DeleteButton onClick={handleConfirm}>삭제하기</S.DeleteButton>
+        <S.DeleteButton onClick={handleConfirm}>{confirmText}</S.DeleteButton>
       </S.Content>
     </S.Container>
   );

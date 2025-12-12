@@ -20,7 +20,7 @@ export const TeamProposalConfirmModal: React.FC<
       {/* 확인 모달 */}
       <S.BottomSheet isOpen={isOpen}>
         <S.Header>
-          <S.Title>팀 제안 완료</S.Title>
+          <S.Title>팀 제안 보내기</S.Title>
           <S.CloseButton type="button" onClick={onClose} aria-label="닫기">
             <S.CloseIcon src={closeIcon} alt="닫기" />
           </S.CloseButton>

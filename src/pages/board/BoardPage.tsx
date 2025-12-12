@@ -5,7 +5,7 @@ import { useOverlay } from "@components/common/OverlayContext";
 import DeleteModal from "./DeleteModal";
 
 // 썸네일 아이콘
-import basicBoard from "@assets/board/small/basic-board.svg";
+import basicBoard from "@assets/board/small/basic.svg";
 
 // 상단 아이콘
 import addIcon from "@assets/board/add.svg";
@@ -119,29 +119,25 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
               </h1>
             </div>
             <div style={styles.topNavIcons}>
-              <button style={styles.topNavBtn} type="button">
+              <button style={styles.topNavBtn} 
+              type="button"
+              onClick={() => navigate("/notification")}
+              >
                 <img src={alarmIcon} alt="알림" style={styles.alarmIcon} />
               </button>
-              <button style={styles.topNavBtn} type="button">
+
+              <button style={styles.topNavBtn} 
+              type="button"
+              onClick={() => navigate("/search")}
+              >
                 <img src={searchIcon} alt="검색" style={styles.searchIcon} />
               </button>
+
               <button
                 ref={menuButtonRef}
                 style={styles.topNavBtn}
                 type="button"
-                onClick={() => {
-                  const rect = menuButtonRef.current?.getBoundingClientRect();
-                  const top = rect ? rect.bottom + 4 : 120;
-                  const right = rect ? window.innerWidth - rect.right : 20;
-
-                  showOverlay(<DeleteModal onDelete={handleDelete} />, {
-                    contentStyle: {
-                      position: "absolute",
-                      top: `${top}px`,
-                      right: `${right}px`,
-                    },
-                  });
-                }}
+                onClick={() => navigate("/category")}
               >
                 <img src={menuIcon} alt="메뉴" style={styles.menuIcon} />
               </button>
@@ -246,7 +242,7 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
                   }
                 }}
               />
-              <p style={styles.boardTitleHelper}>최대 14자</p>
+              <p style={styles.boardTitleHelper}>영문/한글/숫자로 14자까지 입력 가능해요</p>
             </div>
 
             {/* 메모 박스 */}
@@ -258,7 +254,7 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
                 value={memo}
                 placeholder={isMemoFocused ? "" : "메모를 작성하세요"}
                 style={styles.memoTextarea}
-                maxLength={104}
+                maxLength={300}
                 onChange={(e) => {
                   const raw = e.target.value;
                   const filtered = raw.replace(
@@ -274,7 +270,7 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
                   }
                 }}
               />
-              <p style={styles.memoHelper}>최대 104자</p>
+              <p style={styles.memoHelper}>한글/영문/숫자/특수문자로 최대 300자까지 입력할 수 있어요</p>
             </div>
 
             {/* 생성하기 버튼 */}

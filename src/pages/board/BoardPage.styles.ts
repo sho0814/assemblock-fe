@@ -136,15 +136,15 @@ export const boardPageStyles: Styles = {
 
   // 카드 리스트
   content: {
-    marginTop: 40,
+    marginTop: 30,
     paddingTop: 116,
     paddingBottom: 199,
   },
   boardsGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    columnGap: 16,
-    rowGap: 16,
+    columnGap: 18,
+    rowGap: 18,
     padding: "0 20px",
     boxSizing: "border-box",
   },

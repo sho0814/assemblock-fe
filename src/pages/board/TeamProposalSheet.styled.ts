@@ -26,7 +26,6 @@ export const BottomSheet = styled.section<{ isOpen: boolean }>`
   transform: ${(props) =>
     props.isOpen ? "translate(-50%, 0)" : "translate(-50%, 100%)"};
   height: auto;
-  max-height: 80vh;
 `;
 
 export const Header = styled.header`
@@ -38,10 +37,12 @@ export const Header = styled.header`
 `;
 
 export const Title = styled.h2`
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0 130px;
   color: #352f36;
   margin: 0;
+  white-space: nowrap;
 `;
 
 export const CloseButton = styled.button`
@@ -60,9 +61,7 @@ export const CloseIcon = styled.img`
 `;
 
 export const Content = styled.div`
-  padding: 24px 20px 32px 20px;
-  overflow-y: auto;
-  max-height: calc(80vh - 80px);
+  padding: 24px 20px 40px 20px;
 `;
 
 export const InputBox = styled.div`
@@ -73,7 +72,7 @@ export const InputLabel = styled.p`
   font-size: 14px;
   font-weight: 600;
   color: #352f36;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 `;
 
 export const Input = styled.input`
@@ -110,7 +109,7 @@ export const Textarea = styled(Input)`
 `;
 
 export const HelperText = styled.p`
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 400;
   color: #868286;
   margin-top: 8px;
@@ -128,10 +127,10 @@ export const DateInput = styled.input`
   border: none;
   outline: none;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   color: #352f36;
   padding: 12px 16px;
-  border-radius: 12px;
+  border-radius: 16px;
   background-color: #f8f8f8;
   box-sizing: border-box;
 
@@ -151,15 +150,15 @@ export const DateSeparator = styled.span`
 `;
 
 export const SendButton = styled.button<{ disabled: boolean }>`
-  width: 100%;
-  height: 52px;
+  width: 335px;
+  height: 45px;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   transition: all 0.2s;
-  margin-top: 16px;
+  margin-top: 80px;
   background-color: ${(props) => (props.disabled ? "#F0F0F0" : "#352F36")};
   color: ${(props) => (props.disabled ? "#B3B3B3" : "#FAFAFA")};
 

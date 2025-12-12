@@ -5,6 +5,7 @@ import { useOverlay } from "@components/common/OverlayContext";
 import DeleteModal from "./DeleteModal";
 import BlockCard from "@components/block/BlockCard";
 import { TeamProposalSheet } from "./TeamProposalSheet";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 import backIcon from "@assets/board/left.svg";
 import moreIcon from "@assets/board/more.svg";
@@ -110,11 +111,23 @@ export const BoardDetailPage: React.FC<BoardDetailPageProps> = ({
   };
 
   const handleDeleteSelected = () => {
-    // TODO: 선택된 카드들 삭제
-    console.log("선택된 카드:", selectedCards);
-    setIsSelectionMode(false);
-    setSelectedCards([]);
-  };
+  if (selectedCards.length === 0) return;
+
+  showOverlay(
+    <DeleteConfirmModal
+      title="삭제 확인"
+      desc1="해당 블록을 보드에서 삭제하시겠습니까?"
+      desc2="한 번 삭제한 블록은 복구할 수 없어요"
+      confirmText="삭제하기"
+      onConfirm={() => {
+        // 현재 삭제는 아직 X
+
+        setIsSelectionMode(false);
+        setSelectedCards([]);
+      }}
+    />
+  );
+};
 
   return (
     <div style={styles.root}>
@@ -147,7 +160,7 @@ export const BoardDetailPage: React.FC<BoardDetailPageProps> = ({
           </button>
 
           <h1 style={styles.topNavTitle}>
-            {isSelectionMode ? "선택 모드" : "보드 상세"}
+            {isSelectionMode ? "보드 상세" : "보드 상세"}
           </h1>
 
           {isSelectionMode ? (
