@@ -36,9 +36,16 @@ export const Header = styled.header`
   border-bottom: 1px solid #f0f0f0;
 `;
 
+export const HeaderSide = styled.div`
+  width: 16px;  
+  height: 16px;
+`;
+
 export const Title = styled.h2`
+  flex: 1;
+  text-align: center;
+
   font-size: 16px;
-  padding: 0 130px;
   font-weight: 600;
   color: #352f36;
   white-space: nowrap;

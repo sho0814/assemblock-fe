@@ -71,6 +71,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
       {/* 팀 제안 보내기 바텀시트 */}
       <S.BottomSheet isOpen={isOpen}>
         <S.Header>
+          <S.HeaderSide /> {/* 왼쪽 공간 맞추기용 */}
           <S.Title>팀 제안 보내기</S.Title>
           <S.CloseButton type="button" onClick={handleClose} aria-label="닫기">
             <S.CloseIcon src={closeIcon} alt="닫기" />

@@ -30,16 +30,21 @@ export const BottomSheet = styled.section<{ isOpen: boolean }>`
 
 export const Header = styled.header`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 24px 20px 16px 20px;
   border-bottom: 1px solid #f0f0f0;
 `;
 
+export const HeaderSide = styled.div`
+  width: 24px; 
+  height: 24px;
+`;
+
 export const Title = styled.h2`
+  flex: 1;
+  text-align: center;
   font-size: 16px;
   font-weight: 600;
-  padding: 0 130px;
   color: #352f36;
   margin: 0;
   white-space: nowrap;
