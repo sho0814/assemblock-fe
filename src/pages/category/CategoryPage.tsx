@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
-import { CATEGORY_TECH_FRONT_OPTIONS, CATEGORY_TECH_DESIGN_OPTIONS, CATEGORY_TECH_BACK_OPTIONS, CATEGORY_IDEA_OPTIONS } from "@components/block/DropdownOptions";
+import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@constants";
 
 import * as S from "./CategoryPage.styled";
 import backAi from '@assets/category/backAi.svg'
@@ -45,18 +45,18 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>프론트엔드</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_TECH_FRONT_OPTIONS.map((item, idx) => (
+            {CATEGORY_TECH_FRONT.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("frontend", item.label)}
               >
                 <S.ImagePlaceholder>
-                  {idx === 0 && <img src={frontDatavisualization} />}
-                  {idx === 1 && <img src={frontAPIIntegration} />}
-                  {idx === 2 && <img src={frontLayoutGrid} />}
-                  {idx === 3 && <img src={frontInteractionAnimation} />}
-                  {idx === 4 && <img src={frontStateManagement} />}
-                  {idx === 5 && <img src={frontPerformanceOptimization} />}
+                  {idx === 0 && <img src={frontAPIIntegration} />}
+                  {idx === 1 && <img src={frontDatavisualization} />}
+                  {idx === 2 && <img src={frontInteractionAnimation} />}
+                  {idx === 3 && <img src={frontLayoutGrid} />}
+                  {idx === 4 && <img src={frontPerformanceOptimization} />}
+                  {idx === 5 && <img src={frontStateManagement} />}
                 </S.ImagePlaceholder>
                 <S.CategoryLabel>{item.value}</S.CategoryLabel>
               </S.CategoryItem>
@@ -67,14 +67,14 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>백엔드</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_TECH_BACK_OPTIONS.map((item, idx) => (
+            {CATEGORY_TECH_BACK.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("backend", item.label)}
               >
                 <S.ImagePlaceholder>
-                  {idx === 0 && <img src={backBack} />}
-                  {idx === 1 && <img src={backAi} />}
+                  {idx === 0 && <img src={backAi} />}
+                  {idx === 1 && <img src={backBack} />}
                 </S.ImagePlaceholder>
                 <S.CategoryLabel>{item.value}</S.CategoryLabel>
               </S.CategoryItem>
@@ -85,7 +85,7 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>디자인</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_TECH_DESIGN_OPTIONS.map((item, idx) => (
+            {CATEGORY_TECH_DESIGN.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("design", item.label)}
@@ -107,20 +107,20 @@ export function CategoryPage() {
         <S.CategorySection>
           <S.CategoryTitle>아이디어</S.CategoryTitle>
           <S.CategoryItems>
-            {CATEGORY_IDEA_OPTIONS.map((item, idx) => (
+            {CATEGORY_IDEA.map((item, idx) => (
               <S.CategoryItem
                 key={item.value}
                 onClick={() => handleClick("idea", item.label)}
               >
                 <S.ImagePlaceholder>               
-                  {idx === 0 && <img src={ideaFinance} />}
-                  {idx === 1 && <img src={ideaEnvironment} />}
-                  {idx === 2 && <img src={ideaEducation} />}
-                  {idx === 3 && <img src={ideaHousing} />}
+                  {idx === 0 && <img src={ideaCulture} />}
+                  {idx === 1 && <img src={ideaEducation} />}
+                  {idx === 2 && <img src={ideaEnvironment} />}
+                  {idx === 3 && <img src={ideaFinance} />}
                   {idx === 4 && <img src={ideaHealth} />}
-                  {idx === 5 && <img src={ideaCulture} />}
-                  {idx === 6 && <img src={ideaRelationShips} />}
-                  {idx === 7 && <img src={ideaParenting} />}
+                  {idx === 5 && <img src={ideaHousing} />}
+                  {idx === 6 && <img src={ideaParenting} />}
+                  {idx === 7 && <img src={ideaRelationShips} />}
                   {idx === 8 && <img src={ideaSocialCommunity} />}
                   {idx === 9 && <img src={ideaTechnologyAI} />}
                   {idx === 10 && <img src={ideaEtc} />}

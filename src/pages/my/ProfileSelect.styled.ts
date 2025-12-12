@@ -1,10 +1,11 @@
 import styled from "styled-components";
 
 export const ProfileSelectContainer = styled.div`
-  min-width: 375px;
-  max-width: 400px;
-  width: 100%;
-  margin: 0 auto;
+  min-width: 375px;        
+  height: 100vh;
+  margin: 0 auto;          
+  padding: 0 20px 56px 20px;         
+  background: #FAFAFA;     
 `;
 
 export const HeaderBar = styled.div`
@@ -14,9 +15,6 @@ export const HeaderBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 20px;
-  padding-right: 20px;
-  margin: 0 auto;
   opacity: 1;
 `;
 
@@ -80,9 +78,14 @@ export const SubText = styled.div`
 
 export const ProfileGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  width: 375px;
+  height: 434px;
   padding: 0 20px;
+  row-gap: 12px;
+  column-gap: 4px;
+  flex-shrink: 0;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 `;
 
 export const ProfileItem = styled.button<{ $selected?: boolean }>`

@@ -14,10 +14,16 @@ export default defineConfig({
       { find: "@components", replacement: resolve(__dirname, "src/components") },
       { find: "@pages", replacement: resolve(__dirname, "src/pages") },
       { find: "@utils", replacement: resolve(__dirname, "src/utils") },
-      { find: "@apis", replacement: resolve(__dirname, "src/api")}
+      { find: "@api", replacement: resolve(__dirname, "src/api")},
+      { find: "@mocks", replacement: resolve(__dirname, "src/mocks")},
+      { find: "@stores", replacement: resolve(__dirname, "src/stores")}, 
+      { find: "@hooks", replacement: resolve(__dirname, "src/hooks")},
+      { find: "@types", replacement: resolve(__dirname, "src/types")},
+      { find: "@constants", replacement: resolve(__dirname, "src/constants")},
     ],
   },
   server: {
+    port: 8080,
     host: true
   }
 })

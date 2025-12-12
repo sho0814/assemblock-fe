@@ -1,33 +1,47 @@
 import { useState } from 'react';
 import { useOverlay } from '@components/common/OverlayContext'
-import useBoardList from './useBoardList';
+import { useBoards, useBlocks } from '@hooks';
 import cancelButton from '@assets/common/cancel-btn.svg'
 import * as S from './SelectBoard.styled'
 
 interface SelectBoardProps {
-  block_id: number;
+  blockId: number;
   setIsRegisterBlockActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function SelectBoard({ block_id, setIsRegisterBlockActive }: SelectBoardProps) {
+export default function SelectBoard({ blockId, setIsRegisterBlockActive }: SelectBoardProps) {
   const { closeOverlay } = useOverlay();
-  const boards = useBoardList();
-  const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null);  // 선택된 보드ID
-  const [newBoardName, setNewBoardName] = useState('');                         // 새 보드 입력상태
+  const [selectedBoardId, setSelectedBoardId] = useState<number>(0);
+  const [newBoardName, setNewBoardName] = useState('');
+  
+  const { boards, createNewBoard } = useBoards();
+  const { addToBoard } = useBlocks();
 
-  if (!boards.length) return <p>No Boards yet...</p>
-
-  const handleClick = () => {
+  const handleCloseButton = () => {
     closeOverlay();
     setIsRegisterBlockActive(true);
   };
+
+  const handleAddBoard = () => {
+    if (newBoardName.trim() === '') return;
+
+    createNewBoard(newBoardName);
+    setNewBoardName('');
+  }
+
+  const handleAddBlockToBoard = (boardId: number, blockId: number) => {
+    addToBoard(boardId, blockId);
+
+    closeOverlay();
+    setIsRegisterBlockActive(true);
+  }
 
   return (
     <S.Wrapper>
       <S.TopRow>
         <S.CloseBtn />
         <S.Title>보드 선택</S.Title>
-        <S.CloseBtn src={cancelButton} onClick={handleClick} aria-label="닫기" />
+        <S.CloseBtn src={cancelButton} onClick={handleCloseButton} aria-label="닫기" />
       </S.TopRow>
 
       <S.Divider />
@@ -35,12 +49,12 @@ export default function SelectBoard({ block_id, setIsRegisterBlockActive }: Sele
       <S.BoardList>
         {boards.map((board: any) => (
           <S.BoardItem
-            key={board.board_id}
-            selected={selectedBoardId === board.board_id}
-            onClick={() => setSelectedBoardId(board.board_id)}
+            key={board.boardId}
+            selected={selectedBoardId === board.boardId}
+            onClick={() => setSelectedBoardId(board.boardId)}
           >
-            <S.BoardName>{board.board_name}</S.BoardName>
-            {selectedBoardId === board.board_id && <span>✓</span>}
+            <S.BoardName>{board.boardName}</S.BoardName>
+            {selectedBoardId === board.boardId && <span>✓</span>}
           </S.BoardItem>
         ))}
       </S.BoardList>
@@ -48,14 +62,13 @@ export default function SelectBoard({ block_id, setIsRegisterBlockActive }: Sele
       <S.AddBoardBox>
         <S.AddBoardInput
           placeholder="새 보드 추가"
-          name={"board_name"}
           value={newBoardName}
           onChange={e => setNewBoardName(e.target.value)}
         />
-        <S.AddBoardBtn onClick={() => setNewBoardName('')}>＋</S.AddBoardBtn>
+        <S.AddBoardBtn onClick={handleAddBoard}>＋</S.AddBoardBtn>
       </S.AddBoardBox>
 
-      <S.BottomBtn onClick={handleClick}>보드에 담기</S.BottomBtn>
+      <S.BottomBtn onClick={() => handleAddBlockToBoard(selectedBoardId, blockId)}>보드에 담기</S.BottomBtn>
     </S.Wrapper>
   );
 }

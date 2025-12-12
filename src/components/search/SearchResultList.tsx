@@ -1,26 +1,40 @@
-import { useState, useEffect } from "react";
-import type { BlockType } from "@components/home/useCardList";
-import { categoryToSmallImageMap } from "./SmallBg";
+// src/components/search/SearchResultList.tsx
+import { useNavigate } from "react-router-dom";
+import { categoryToIconMap } from "@constants";
+import { useSearchBlocks } from "@hooks";
 import * as S from './SearchResultsList.styled'
 
-const SearchResultList: React.FC<{ searchQuery: string }> = () => {
-  const [blocks, setBlocks] = useState<BlockType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const getCategoryThumbnail = (category: string) => {
-    return categoryToSmallImageMap[category] ?? "/thumb_placeholder.png";
-  };
+interface SearchResultListProps {
+  keyword: string;
+}
 
-  useEffect(() => {
-    fetch('/dummyBlocks.json')
-      .then(res => res.json())
-      .then(data => {
-        setBlocks(data);
-        setLoading(false);
-      });
-  }, []);
+const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
+  const navigate = useNavigate();
+  const { blocks, loading, error } = useSearchBlocks(keyword);
+
+  // 에러 상태
+  if (error) {
+    return
+  }
+
+  if (loading) {
+    return (
+      <S.BlockListWrapper>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <S.BlockItem key={`skeleton-${index}`}>
+            <S.SkeletonThumbnail />
+            <div>
+              <S.SkeletonBlockTitle />
+              <S.SkeletonBlockSummary />
+            </div>
+          </S.BlockItem>
+        ))}
+      </S.BlockListWrapper>
+    );
+  }
 
   // 결과 없음 화면
-  if (!loading && blocks.length === 0) {
+  if (blocks.length === 0) {
     return (
       <S.EmptyResultWrapper>
         <S.EmptyMessage>검색 결과가 없어요.</S.EmptyMessage>
@@ -31,17 +45,25 @@ const SearchResultList: React.FC<{ searchQuery: string }> = () => {
     );
   }
 
+  const getCategoryThumbnail = (category: string) => {
+    return categoryToIconMap[category] ?? "/sample.png";
+  };
+
+  const handleClick = () => {
+    navigate('/OtherUser/BlockDetail');
+  }
+
   return (
     <S.BlockListWrapper>
       {blocks.map(block => (
-        <S.BlockItem key={block.block_id}>
+        <S.BlockItem key={block.blockId} onClick={handleClick}>
           <S.Thumbnail
-            src={getCategoryThumbnail(block.category_name)}
+            src={getCategoryThumbnail(block.categoryName)}
             alt="블록 썸네일"
           />
           <div>
-            <S.BlockTitle>{block.block_title}</S.BlockTitle>
-            <S.BlockSummary>{block.oneline_summary}</S.BlockSummary>
+            <S.BlockTitle>{block.blockTitle}</S.BlockTitle>
+            <S.BlockSummary>{block.oneLineSummary}</S.BlockSummary>
           </div>
         </S.BlockItem>
       ))}

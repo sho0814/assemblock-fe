@@ -1,0 +1,143 @@
+.onboarding__embla {
+  max-width: 48rem;
+  --slide-height: 19rem;
+  --slide-spacing: 1rem;
+  --slide-size: 100%;
+}
+
+.onboarding__embla__viewport {
+  overflow: hidden;
+}
+
+.onboarding__embla__container {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  margin-left: calc(var(--slide-spacing) * -1);
+}
+
+.onboarding__embla__slide {
+  transform: translate3d(0, 0, 0);
+  flex: 0 0 var(--slide-size);
+  min-width: 0;
+  padding-left: var(--slide-spacing);
+  margin-top: 40px;
+}
+
+.onboarding-slide-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.onboarding-slide-title {
+  font-size: 16px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.onboarding-slide-description {
+  font-size: 12px;
+  font-weight: 400;
+  color: #666666;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.onboarding-slide-image {
+  width: 335px;
+  margin: 0 auto 40px;
+  display: block;
+}
+
+.onboarding__embla__controls {
+  display: flex;
+  flex-direction: column;
+}
+
+.onboarding__embla__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 30px;
+  gap: 10px;
+}
+
+.onboarding__embla__dot {
+  -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.onboarding__embla__dot:after {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  background-color: #dddddd;
+  content: '';
+}
+
+.onboarding__embla__dot--selected:after {
+  background-color: #333333;
+}
+
+.onboarding__embla__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40px
+}
+
+.onboarding__embla__button {
+  width: 48%;
+  height: 45px;
+  border-radius: 16px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  background: #352F36;
+  color: #FAFAFA;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #4A434B;
+  }
+}
+
+.onboarding__embla__login-button {
+  width: 48%;
+  height: 45px;
+  background-color: #FEE500;
+  border-radius: 16px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000D9;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #FFEB00;
+  }
+  img {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+  }
+}

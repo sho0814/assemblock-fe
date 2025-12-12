@@ -1,36 +1,20 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/components/search/RecentSearches.tsx
+import { useRecentSearches } from '@hooks';
 import cancelButton from '@assets/common/cancel-btn.svg'
 import * as S from './RecentSearches.styled'
 
-type HistoryItem = {
-    historyId: number;
-    keyword: string;
-};
-
 export default function RecentSearches() {
-    const navigate = useNavigate();
-    const [histories, setHistories] = useState<HistoryItem[]>([]);
+    const {
+        histories,
+        loading,
+        error,
+        handleClick,
+        handleRemove,
+        handleRemoveAll,
+    } = useRecentSearches();
 
-    useEffect(() => {
-        fetch('/dummyHistories.json')
-            .then(res => res.json())
-            .then(data => {
-                setHistories(data || []);
-            });
-    }, []);
-
-    const handleClick = (keyword:string) => {
-        navigate(`/search/${encodeURIComponent(keyword)}`);
-    }
-
-    const handleRemove = (historyId: number) => {
-        setHistories(histories.filter(item => item.historyId !== historyId));
-    };
-
-    const handleRemoveAll = () => {
-        setHistories([]);
-    };
+    if (loading) return <S.Section>로딩 중...</S.Section>;
+    if (error) return <S.Section>오류 발생: {error}</S.Section>;
 
     return (
         <S.Section>
@@ -47,12 +31,17 @@ export default function RecentSearches() {
                     {histories.map(({ historyId, keyword }) => (
                         <S.Tag key={historyId} onClick={() => handleClick(keyword)}>
                             {keyword}
-                            <S.RemoveBtn src={cancelButton} onClick={() => handleRemove(historyId)} />
+                            <S.RemoveBtn
+                                src={cancelButton}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemove(historyId);
+                                }}
+                            />
                         </S.Tag>
                     ))}
                 </S.TagList>
-            )
-            }
+            )}
         </S.Section>
     );
 }

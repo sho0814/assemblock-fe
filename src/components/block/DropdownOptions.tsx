@@ -1,6 +1,6 @@
 // 카테고리 선택지
 // 아이디어
-export const CATEGORY_IDEA_OPTIONS = [
+export const CATEGORY_IDEA = [
   { label: 'culture', value: '문화/생활' },
   { label: 'education', value: '교육/학습' },
   { label: 'environment', value: '환경/지속가능성' },
@@ -15,7 +15,7 @@ export const CATEGORY_IDEA_OPTIONS = [
 ];
 
 // 기술 -> 디자인
-export const CATEGORY_TECH_DESIGN_OPTIONS = [
+export const CATEGORY_TECH_DESIGN = [
   { label: 'ui-ux', value: 'UI/UX디자인' },
   { label: 'visual-graphic', value: '비주얼 그래픽 디자인' },
   { label: 'brand', value: '브랜드 디자인' },
@@ -25,13 +25,13 @@ export const CATEGORY_TECH_DESIGN_OPTIONS = [
 ];
 
 // 기술 -> 백엔드
-export const CATEGORY_TECH_BACK_OPTIONS = [
+export const CATEGORY_TECH_BACK = [
   { label: 'ai', value: 'AI 기능 활용', },
   { label: 'backend', value: '백엔드' }
 ];
 
 // 기술 -> 프론트
-export const CATEGORY_TECH_FRONT_OPTIONS = [
+export const CATEGORY_TECH_FRONT = [
   { label: 'api-integration', value: 'API 연동' },
   { label: 'data-visualization', value: '데이터 시각화' },
   { label: 'interaction-animation', value: '인터렉션/애니메이션' },
@@ -42,7 +42,7 @@ export const CATEGORY_TECH_FRONT_OPTIONS = [
 
 // 사용 툴 및 언어 선택지
 // 디자인
-export const TOOLS_DESIGN_OPTIONS = [
+export const TOOLS_DESIGN = [
   { value: 'Figma' },
   { value: 'Illustrator' },
   { value: 'Photoshop' },
@@ -55,7 +55,7 @@ export const TOOLS_DESIGN_OPTIONS = [
 ];
 
 // 프론트
-export const TOOLS_FRONT_OPTIONS = [
+export const TOOLS_FRONT = [
   { value: 'React' },
   { value: 'Vue' },
   { value: 'Typescript' },
@@ -68,7 +68,7 @@ export const TOOLS_FRONT_OPTIONS = [
 ]
 
 // 백
-export const TOOLS_BACK_OPTIONS = [
+export const TOOLS_BACK = [
   { value: 'Spring' },
   { value: 'Django' },
   { value: 'Node.js' },

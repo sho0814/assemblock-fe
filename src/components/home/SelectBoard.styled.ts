@@ -30,9 +30,11 @@ export const CloseBtn = styled.img`
 `;
 
 export const BoardList = styled.ul`
+  height: 180px;
   padding: 0;
   list-style: none;
   gap: 4px;
+  overflow-y: auto;
 `;
 
 export const BoardItem = styled.li<{ selected: boolean }>`
@@ -96,6 +98,6 @@ export const BottomBtn = styled.button`
 
 export const Divider = styled.div`
   width: 100%;
-  height: 1px;
+  height: 2px;
   background: #f3f3f3;
 `;

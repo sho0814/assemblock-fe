@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDrag } from '@use-gesture/react'
 import { useSpring, animated } from '@react-spring/web'
-import { categoryBackground } from './CategoryBackground'
+
+import { cardBackgrounds } from '@constants'
 import { useOverlay } from '@components/common/OverlayContext'
 import SelectBoard from './SelectBoard'
 import * as S from './Card.styled'
@@ -11,25 +12,26 @@ import * as S from './Card.styled'
 const threshold = -70
 
 interface CardProps {
-  block_id: number
-  block_title: string
-  block_type: string
-  oneline_summary: string
-  user_id: number
-  tech_part: string
-  category_name: string
-  user_name: string
+  blockId: number;
+  blockTitle: string;
+  blockType: string;
+  oneLineSummary: string;
+  techPart: string;
+  categoryName: string;
+  writerId: number;
+  writerNickname: string;
+  contributionScore: number;
   isRegisterBlockActive: boolean;
   setIsRegisterBlockActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Card: React.FC<CardProps> = ({ block_id, block_title, oneline_summary, user_name, tech_part, category_name, isRegisterBlockActive, setIsRegisterBlockActive }: CardProps) => {
+const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writerNickname, techPart, categoryName, isRegisterBlockActive, setIsRegisterBlockActive }: CardProps) => {
   const navigate = useNavigate();
   const { showOverlay } = useOverlay();
   const [y, setY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const prevIsActive = useRef<boolean>(false);
-  const bgImage = categoryBackground[category_name];
+  const bgImage = cardBackgrounds[categoryName];
 
   useEffect(() => {
     if (!prevIsActive.current && isRegisterBlockActive) {
@@ -41,9 +43,9 @@ const Card: React.FC<CardProps> = ({ block_id, block_title, oneline_summary, use
 
 
   const getTechPartText = () => {
-    if (tech_part === 'design') return '디자인'
-    if (tech_part === 'frontend') return '프론트엔드'
-    if (tech_part === 'backend') return '백엔드'
+    if (techPart === 'design') return '디자인'
+    if (techPart === 'frontend') return '프론트엔드'
+    if (techPart === 'backend') return '백엔드'
     return null
   }
   const techPartText = getTechPartText();
@@ -52,7 +54,7 @@ const Card: React.FC<CardProps> = ({ block_id, block_title, oneline_summary, use
   const spring = useSpring({ y, config: { tension: 300, friction: 20 } })
 
   const bind = useDrag(({ movement: [, my], last, first }) => {
-    
+
     if (first) setIsDragging(true); // 드래그 시작
     const constrainedY = my > 0 ? 0 : my < threshold ? threshold : my;
     setY(constrainedY);
@@ -73,23 +75,23 @@ const Card: React.FC<CardProps> = ({ block_id, block_title, oneline_summary, use
 
   const handleBoardOverlay = () => {
     showOverlay(
-      <SelectBoard block_id={block_id} setIsRegisterBlockActive={setIsRegisterBlockActive} />,
+      <SelectBoard blockId={blockId} setIsRegisterBlockActive={setIsRegisterBlockActive} />,
       { contentStyle: { position: 'absolute', bottom: '0', width: '100%' } }
     );
   }
 
   const handleClick = () => {
     if (isDragging) return; // 드래그 중이면 클릭 무시
-    navigate('/Block/detail');
+    navigate('/OtherUser/BlockDetail');
   }
 
   return (
     <>
       <animated.div {...bind()} style={{ y: spring.y }}>
-        <S.Card key={block_id} bgImage={bgImage} onClick={handleClick}>
-          <S.Title>{block_title}</S.Title>
-          <S.Summary>{oneline_summary}</S.Summary>
-          <S.Username>{user_name} 님</S.Username>
+        <S.Card key={blockId} bgImage={bgImage} onClick={handleClick}>
+          <S.Title>{blockTitle}</S.Title>
+          <S.Summary>{oneLineSummary}</S.Summary>
+          <S.Username>{writerNickname} 님</S.Username>
           {techPartText && <S.TechPart>{techPartText}</S.TechPart>}
         </S.Card>
       </animated.div>
