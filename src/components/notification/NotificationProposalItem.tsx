@@ -1,13 +1,9 @@
 import styled from "styled-components";
 import arrowIcon from "@assets/project/arrow.svg";
 import { useNavigate } from "react-router-dom";
+import type { notification, ProfileType } from "@types";
 
-type Props = {
-  topNickname: string;
-  othersCount: number;
-  topProfileUrl?: string;
-  proposalId: number | string;
-};
+type Props = notification;
 
 const Item = styled.li`
   list-style: none;
@@ -17,9 +13,8 @@ const Item = styled.li`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   & + & {
-    border-top: 1.5px solid var(--GrayScale-GR10, #F0EFF1);
+    border-top: 1.5px solid var(--GrayScale-GR10, #f0eff1);
   }
 `;
 
@@ -35,11 +30,23 @@ const AvatarWrap = styled.div`
   height: 48px;
 `;
 
-const Avatar = styled.div<{ src?: string }>`
+// TODO: 타입에 따라 프로필 이미지 변경
+const getProfileColor = (profileType: ProfileType): string => {
+  const colors: Record<ProfileType, string> = {
+    Type_1: "#FF6B6B",
+    Type_2: "#4ECDC4",
+    Type_3: "#45B7D1",
+    Type_4: "#FFA07A",
+    Type_5: "#98D8C8",
+  };
+  return colors[profileType] || "#d9d9d9";
+};
+
+const Avatar = styled.div<{ profileType: ProfileType }>`
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: ${({ src }) => (src ? `url(${src}) center/cover` : "#d9d9d9")};
+  background: ${({ profileType }) => getProfileColor(profileType)};
 `;
 
 const Badge = styled.div`
@@ -50,7 +57,6 @@ const Badge = styled.div`
   height: 20px;
   border-radius: 50%;
   background: #352f36;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,9 +97,8 @@ const DetailButton = styled.button`
 `;
 
 export default function NotificationProposalItem({
-  topNickname,
-  othersCount,
-  topProfileUrl,
+  senderName,
+  senderProfileType,
   proposalId,
 }: Props) {
   const navigate = useNavigate();
@@ -106,20 +111,16 @@ export default function NotificationProposalItem({
     <Item>
       <Left>
         <AvatarWrap>
-          <Avatar src={topProfileUrl} />
+          <Avatar profileType={senderProfileType} />
           <Badge>
             <BadgeIcon src={arrowIcon} alt="" />
           </Badge>
         </AvatarWrap>
-
         <TextWrap>
           <Title>받은 제안</Title>
-          <Sub>
-            {topNickname} 님 외 {othersCount}인
-          </Sub>
+          <Sub>{senderName}</Sub>
         </TextWrap>
       </Left>
-
       <DetailButton onClick={handleClickDetail}>상세 보기</DetailButton>
     </Item>
   );

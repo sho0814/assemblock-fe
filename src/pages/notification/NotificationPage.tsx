@@ -1,79 +1,135 @@
 // src/pages/home/category/NotificationPage.tsx
+import { useState, useEffect } from "react";
 import SimpleHeader from "@components/shared/SimpleHeader";
 import NotificationProposalItem from "@components/notification/NotificationProposalItem";
 import styled from "styled-components";
-
-import {
-  MOCK_BLOCKS,
-  MOCK_PROPOSAL_TARGETS,
-  MOCK_PROPOSALS,
-  MOCK_USERS,
-  getMembersByProposalId,
-} from "@mocks/mockAssemblock";
+import { getNotifications } from "@api/notification";
+import type { notification } from "@types";
 
 const List = styled.ul`
   display: flex;
   flex-direction: column;
-  // gap: 16px;
-
   padding: 8px 0 8px 0;
-
   background: var(--GrayScale-WT, #fafafa);
   border-radius: 20px;
   outline: 1.5px solid var(--GrayScale-GR10, #f0eff1);
   outline-offset: -1px;
-
   width: 100%;
 `;
 
-// TODO: 로그인 유저 id와 연결
-const MY_USER_ID = 1;
+const LoadingMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 14px;
+`;
 
-const myBlockIds = MOCK_BLOCKS.filter((b) => b.user_id === MY_USER_ID).map(
-  (b) => b.block_id
-);
+const ErrorMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: #dc3545;
+  font-size: 14px;
+`;
 
-const receivedProposalIds = Array.from(
-  new Set(
-    MOCK_PROPOSAL_TARGETS.filter((t) =>
-      myBlockIds.includes(t.proposalblock_id)
-    ).map((t) => t.proposal_id)
-  )
-);
+const EmptyContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  gap: 10px;
+`;
 
-const receivedNotifications = receivedProposalIds
-  .map((proposalId) => {
-    const proposal = MOCK_PROPOSALS.find((p) => p.proposal_id === proposalId);
-    if (!proposal) return null;
+const EmptyTitle = styled.div`
+  color: black;
+  font-size: 16px;
+  font-family: Pretendard;
+  font-weight: 500;
+  line-height: 24px;
+  word-wrap: break-word;
+`;
 
-    const proposer = MOCK_USERS.find((u) => u.user_id === proposal.proposer_id);
-
-    const members = getMembersByProposalId(proposalId);
-    const othersCount = Math.max(members.length - 1, 0);
-
-    return {
-      proposalId,
-      topNickname: proposer?.nickname ?? "알 수 없음",
-      othersCount,
-    };
-  })
-  .filter(Boolean) as {
-  proposalId: number;
-  topNickname: string;
-  othersCount: number;
-}[];
+const EmptyDescription = styled.div`
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  font-family: Pretendard;
+  font-weight: 400;
+  line-height: 18px;
+  word-wrap: break-word;
+`;
 
 export function NotificationPage() {
+  const [notifications, setNotifications] = useState<notification[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getNotifications();
+        console.log("알림 목록:", data);
+        setNotifications(data);
+      } catch (e) {
+        console.error("알림 조회 실패:", e);
+        setError("알림을 불러오는 데 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <SimpleHeader title={"알림"} />
+        <LoadingMessage>알림을 불러오는 중입니다...</LoadingMessage>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <SimpleHeader title={"알림"} />
+        <ErrorMessage>{error}</ErrorMessage>
+      </>
+    );
+  }
+
+  if (notifications.length === 0) {
+    return (
+      <>
+        <SimpleHeader title={"알림"} />
+        <EmptyContainer>
+          <EmptyTitle>받은 제안이 없어요.</EmptyTitle>
+          <EmptyDescription>
+            내 블록을 보고 제안을 보내면 여기에 표시돼요.
+          </EmptyDescription>
+        </EmptyContainer>
+      </>
+    );
+  }
+
   return (
     <>
       <SimpleHeader title={"알림"} />
       <List>
-        {receivedNotifications.map((item) => (
+        {notifications.map((item, index) => (
           <NotificationProposalItem
-            key={item.proposalId}
-            topNickname={item.topNickname}
-            othersCount={item.othersCount}
+            key={`${item.proposalId}-${index}`}
+            senderName={item.senderName}
+            senderProfileType={item.senderProfileType}
             proposalId={item.proposalId}
+            // content={item.content}
           />
         ))}
       </List>
