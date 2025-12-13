@@ -11,8 +11,8 @@ import notificationIcon from "@assets/home/notification.svg";
 import searchIcon from "@assets/home/search.svg";
 import menuIcon from "@assets/home/menu.svg";
 
-import { getMyProjects } from "@api/project";
-import type { ApiProject } from "@types";
+import { getOngoingProjects, getCompleteProjects } from "@api/project";
+import type { ProjectListItem } from "@types";
 
 type TabValue = "ONGOING" | "DONE";
 
@@ -20,23 +20,33 @@ export function ProjectPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<TabValue>("ONGOING");
 
-  // TODO: 나중에 로그인된 userId로 교체
-  const myUserId = 2;
+  const myUserId = 1;
 
-  const [projects, setProjects] = useState<ApiProject[]>([]);
+  const [ongoingProjects, setOngoingProjects] = useState<ProjectListItem[]>([]);
+  const [completeProjects, setCompleteProjects] = useState<ProjectListItem[]>(
+    []
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 1) API 호출해서 내 프로젝트 목록 불러오기
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await getMyProjects();
-        console.log("getMyProjects 결과:", data);
-        setProjects(data);
+
+        const [ongoing, complete] = await Promise.all([
+          getOngoingProjects(),
+          getCompleteProjects(),
+        ]);
+
+        console.log("진행 중 프로젝트:", ongoing);
+        console.log("완료된 프로젝트:", complete);
+
+        setOngoingProjects(ongoing);
+        setCompleteProjects(complete);
       } catch (e) {
+        console.error("프로젝트 조회 실패:", e);
         setError("프로젝트 정보를 불러오는 데 실패했습니다.");
       } finally {
         setLoading(false);
@@ -46,38 +56,56 @@ export function ProjectPage() {
     fetchProjects();
   }, []);
 
-  // 2) ApiProject[] → ProposalListItem[] 로 매핑
-  const allItems: ProposalListItem[] = useMemo(() => {
+  // ProjectListItem[] → ProposalListItem[] 로 매핑
+  const convertToProposalListItems = (
+    projects: ProjectListItem[]
+  ): ProposalListItem[] => {
+    if (!myUserId) return [];
+
     return projects.map((proj) => {
-      // 내가 제안자면 보낸 제안, 아니면 받은 제안
-      const isSent = proj.proposer.id === myUserId;
+      // 내가 리더인지 확인 (보낸 제안인지 받은 제안인지 판단)
+      const myMember = proj.members.find((m) => m.userId === myUserId);
+      const isSent = myMember?.leader ?? false;
       const kind: ProposalListItem["kind"] = isSent ? "SENT" : "RECEIVED";
 
-      const members = proj.members;
-      const othersCount = Math.max(members.length - 1, 0);
+      // 리더 찾기 (topNickname으로 표시)
+      const leader = proj.members.find((m) => m.leader);
+      const topNickname = leader?.nickname ?? "알 수 없음";
+      const topProfileUrl = leader?.profileUrl;
 
+      // 나를 제외한 다른 멤버 수
+      const othersCount = Math.max(proj.members.length - 1, 0);
+
+      // 프로젝트 상태 (ONGOING 탭인지 DONE 탭인지)
       const state: ProposalListItem["state"] =
-        proj.projectStatus === "done" ? "DONE" : "ONGOING";
+        proj.status === "done" ? "DONE" : "ONGOING";
 
       return {
-        projectId: proj.id,
-        proposalId: proj.proposal.id,
+        projectId: proj.projectId,
+        proposalId: proj.projectId, // proposalId가 별도로 없다면 projectId 사용
         kind,
-        topNickname: proj.proposer.nickname ?? "알 수 없음",
+        topNickname,
         othersCount,
-        topProfileUrl: undefined, // 나중에 프로필 이미지 생기면 여기서 채우면 됨
+        topProfileUrl,
         state,
       };
     });
-  }, [projects, myUserId]);
+  };
 
-  // 3) 탭 필터링 (ONGOING / DONE)
-  const shownItems = useMemo(
-    () => allItems.filter((it) => it.state === tab),
-    [allItems, tab]
+  const ongoingItems = useMemo(
+    () => convertToProposalListItems(ongoingProjects),
+    [ongoingProjects, myUserId]
   );
 
-  // 4) 로딩/에러/빈 상태 처리 (필요에 따라 더 꾸며도 됨)
+  const completeItems = useMemo(
+    () => convertToProposalListItems(completeProjects),
+    [completeProjects, myUserId]
+  );
+
+  // 현재 탭에 따라 보여줄 아이템 선택
+  const shownItems = tab === "ONGOING" ? ongoingItems : completeItems;
+
+  // 로딩/에러 처리
   if (loading) {
     return (
       <>
@@ -132,10 +160,7 @@ export function ProjectPage() {
 
       <div>
         <S.TabContainer>
-          <S.Tab
-            active={tab === "ONGOING"}
-            onClick={() => setTab("ONGOING")}
-          >
+          <S.Tab active={tab === "ONGOING"} onClick={() => setTab("ONGOING")}>
             진행 중
           </S.Tab>
           <S.Tab active={tab === "DONE"} onClick={() => setTab("DONE")}>
