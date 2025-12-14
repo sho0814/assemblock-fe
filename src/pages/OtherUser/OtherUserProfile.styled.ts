@@ -148,12 +148,15 @@ export const ReviewTab = styled.div<{ $isActive?: boolean }>`
   transition: background 0.2s, color 0.2s;
 `;
 
-export const ReviewBlock = styled.div`
+export const ReviewBlock = styled.div<{ $hasReviews?: boolean; $patternImage?: string }>`
   width: 100%;
   min-height: 255px;
-  background: border-radius: 16px;
-  background: var(--GrayScale-GR10, #F0EFF1);
   border-radius: 16px;
+  background: ${props => props.$hasReviews && props.$patternImage
+    ? `url(${props.$patternImage}), var(--GrayScale-GR10, #F0EFF1)`
+    : 'var(--GrayScale-GR10, #F0EFF1)'};
+  background-repeat: ${props => props.$hasReviews ? 'repeat' : 'no-repeat'};
+  background-size: ${props => props.$hasReviews ? 'auto, cover' : 'cover'};
   display: flex;
   flex-direction: column;
   align-items: center;

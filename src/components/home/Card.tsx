@@ -82,7 +82,7 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
 
   const handleClick = () => {
     if (isDragging) return; // 드래그 중이면 클릭 무시
-    navigate('/OtherUser/BlockDetail');
+    navigate(`/OtherUser/BlockDetail?id=${blockId}&userId=${writerId}`);
   }
 
   return (
