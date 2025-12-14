@@ -97,7 +97,7 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
         {/* 상단 고정 영역 */}
         <div style={styles.headerFixed}>
           {/* 상태바 */}
-          <div style={styles.statusBar}>
+          {/*<div style={styles.statusBar}>
             <div style={styles.statusTimeBox}>
               <span style={styles.statusTime}>9:41</span>
             </div>
@@ -109,7 +109,7 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
                 style={styles.statusIconImg}
               />
             </div>
-          </div>
+          </div>*/}
 
           {/* 탑네비 */}
           <div style={styles.topNav}>

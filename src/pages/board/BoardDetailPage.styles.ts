@@ -40,46 +40,46 @@ export const boardDetailStyles: Styles = {
   },
 
   // 상태바
-  statusBar: {
-    display: "flex",
-    alignItems: "center",
-    height: 48,
-    width: "100%",
-    boxSizing: "border-box",
-    paddingTop: 21,
-  },
+  //statusBar: {
+    //display: "flex",
+    //alignItems: "center",
+    //height: 48,
+    //width: "100%",
+    //boxSizing: "border-box",
+    //paddingTop: 21,
+  //},
 
-  statusTimeBox: {
-    display: "flex",
-    padding: "0 6px 0 49px",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-    flexShrink: 0,
-  },
+  //statusTimeBox: {
+    //display: "flex",
+    //padding: "0 6px 0 49px",
+    //justifyContent: "center",
+    //alignItems: "center",
+    //gap: 10,
+    //flexShrink: 0,
+  //},
 
-  statusTime: {
-    color: "#000",
-    textAlign: "center",
-    fontFamily:
-      '"SF Pro", system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
-    fontSize: 17,
-    fontStyle: "normal",
-    fontWeight: 590,
-    lineHeight: "22px",
-  },
+  //statusTime: {
+    //color: "#000",
+   // textAlign: "center",
+    //fontFamily:
+    //  '"SF Pro", system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
+    //fontSize: 17,
+    //fontStyle: "normal",
+    //fontWeight: 590,
+    //lineHeight: "22px",
+  //},
 
-  statusIconImg: {
-    flexShrink: 0,
-    height: 13,
-  },
+  //statusIconImg: {
+    //flexShrink: 0,
+    //height: 13,
+  //},
 
-  statusSideRight: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
+  //statusSideRight: {
+    //flex: 1,
+    //display: "flex",
+    //justifyContent: "flex-end",
+    //alignItems: "center",
+  //},
 
   // 탑네비
   topNav: {
@@ -92,6 +92,7 @@ export const boardDetailStyles: Styles = {
     flexShrink: 0,
     boxSizing: "border-box",
     background: "var(--GrayScale-WT, #FAFAFA)",
+    marginTop: 48,
   },
   topNavLeft: {
     display: "flex",
@@ -162,7 +163,7 @@ export const boardDetailStyles: Styles = {
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 6,
-    marginBottom: 43,
+    marginBottom: 40,
   },
 
   blockCountText: {
