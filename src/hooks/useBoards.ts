@@ -9,7 +9,7 @@ export const useBoards = () => {
 
     const fetchAndCacheBoards = async () => {
         try {
-            const data:BoardListItem[] = await fetchBoards()
+            const data: BoardListItem[] = await fetchBoards()
             const minimalBoards: MinimalBoard[] = data.map((board: any) => ({
                 boardId: board.boardId,
                 boardName: board.boardName

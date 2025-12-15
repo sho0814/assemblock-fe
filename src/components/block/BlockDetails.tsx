@@ -1,5 +1,7 @@
 // src/components/block/BlockDetails.tsx
 import { useEffect, useState } from 'react';
+import axios, { AxiosError } from "axios";
+import toast from 'react-hot-toast';
 import { useOverlay } from '@components/common/OverlayContext';
 import { useBlocks } from '@hooks';
 import type { BlockType, TechPart } from '@types';
@@ -49,10 +51,26 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
 
         try {
             await createNewBlock(blockData);
-        } catch (e) {
-            console.error(e);
+
+            toast.success('블록 등록 완료!')
+            closeOverlay();
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                const err = e as AxiosError<{ error?: string }>;
+
+                if (err.response?.status === 400) {
+                    const msg = err.response.data?.error || "요청이 올바르지 않습니다.";
+                    toast.error(msg);
+                } else {
+                    console.error("Axios error:", err.message, err.response?.status);
+                    toast.error("요청 처리 중 오류가 발생했습니다.");
+                }
+            } else {
+                console.error("Unknown error:", e);
+                toast.error("알 수 없는 오류가 발생했습니다.");
+            }
         }
-    };
+    }
 
     // 필수 조건 검사
     useEffect(() => {

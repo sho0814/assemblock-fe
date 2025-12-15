@@ -10,7 +10,7 @@ import { useOverlay } from '@components/common/OverlayContext'
 import BoardSelector from './BoardSelector'
 import * as S from './Card.styled'
 
-const threshold = -70
+const threshold = -50
 
 interface CardProps extends BlockData {
   isRegisterBlockActive: boolean;
