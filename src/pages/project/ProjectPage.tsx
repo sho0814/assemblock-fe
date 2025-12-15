@@ -12,7 +12,12 @@ import searchIcon from "@assets/home/search.svg";
 import menuIcon from "@assets/home/menu.svg";
 
 import { getOngoingProjects, getCompleteProjects } from "@api/project";
+import { getUserMe } from "@api/user";
 import type { ProjectListItem } from "@types";
+
+// 데이터 들어오면 삭제
+import { projectsOngoingMock } from "@mocks/projectOngoing.mock.ts";
+import { projectsCompleteMock } from "@mocks/projectComplete.mock.ts";
 
 type TabValue = "ONGOING" | "DONE";
 
@@ -20,7 +25,7 @@ export function ProjectPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<TabValue>("ONGOING");
 
-  const myUserId = 1;
+  const [myUserId, setMyUserId] = useState<number | null>(null);
 
   const [ongoingProjects, setOngoingProjects] = useState<ProjectListItem[]>([]);
   const [completeProjects, setCompleteProjects] = useState<ProjectListItem[]>(
@@ -35,10 +40,18 @@ export function ProjectPage() {
         setLoading(true);
         setError(null);
 
-        const [ongoing, complete] = await Promise.all([
-          getOngoingProjects(),
-          getCompleteProjects(),
-        ]);
+        const userInfo = await getUserMe();
+        setMyUserId(userInfo.userId);
+
+        // TODO: 데이터 들어오면 주석 삭제
+        // const [ongoing, complete] = await Promise.all([
+        //   getOngoingProjects(),
+        //   getCompleteProjects(),
+        // ]);
+
+        // TODO: 데이터 들어오면 삭제
+        const ongoing = projectsOngoingMock as ProjectListItem[];
+        const complete = projectsCompleteMock as ProjectListItem[];
 
         console.log("진행 중 프로젝트:", ongoing);
         console.log("완료된 프로젝트:", complete);
@@ -68,7 +81,7 @@ export function ProjectPage() {
       const isSent = myMember?.leader ?? false;
       const kind: ProposalListItem["kind"] = isSent ? "SENT" : "RECEIVED";
 
-      // 리더 찾기 (topNickname으로 표시)
+      // 리더 찾기
       const leader = proj.members.find((m) => m.leader);
       const topNickname = leader?.nickname ?? "알 수 없음";
       const topProfileUrl = leader?.profileUrl;
@@ -102,10 +115,9 @@ export function ProjectPage() {
     [completeProjects, myUserId]
   );
 
-  // 현재 탭에 따라 보여줄 아이템 선택
   const shownItems = tab === "ONGOING" ? ongoingItems : completeItems;
 
-  // 로딩/에러 처리
+
   if (loading) {
     return (
       <>

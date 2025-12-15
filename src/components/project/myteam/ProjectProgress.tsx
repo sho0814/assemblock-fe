@@ -1,6 +1,6 @@
 // src/components/myTeam/ProjectProgress.tsx
 import styled from "styled-components";
-import type { ProjectStatus } from "./MyTeamTypes";
+import type { ProjectStatus } from "@types";
 
 type Props = {
   status: ProjectStatus;

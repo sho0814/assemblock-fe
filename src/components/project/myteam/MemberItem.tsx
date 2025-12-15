@@ -1,7 +1,7 @@
 // src/components/myTeam/MemberItem.tsx
 import styled from "styled-components";
 import type { ReactNode } from "react";
-import type { Member, ProjectStatus } from "./MyTeamTypes";
+import type { Member, ProjectStatus } from "@types";
 
 const Item = styled.li`
   list-style: none;
@@ -84,7 +84,7 @@ export const MemberItem = ({ status, member }: Props) => {
   let right: ReactNode = null;
 
   if (status === "recruiting") {
-    if (member.isLeader) {
+    if (member.leader) {
       right = <Chip variant="leader">팀장</Chip>;
     } else if (member.responseStatus === "pending") {
       right = <Chip variant="pending">대기 중</Chip>;
@@ -94,7 +94,7 @@ export const MemberItem = ({ status, member }: Props) => {
       right = <Chip variant="accepted">수락 완료</Chip>;
     }
   } else if (status === "ongoing") {
-    if (member.isLeader) {
+    if (member.leader) {
       right = <Chip variant="leader">팀장</Chip>;
     }
   }
@@ -105,9 +105,9 @@ export const MemberItem = ({ status, member }: Props) => {
         <Avatar />
         <NameRole>
           <span style={{ fontSize: 16, color: "#000000", fontWeight: 600 }}>
-            {member.name} 님
+            {member.nickname} 님
           </span>
-          <span style={{ fontSize: 12, color: "#5D595E" }}>{member.role}</span>
+          <span style={{ fontSize: 12, color: "#5D595E" }}>{member.part}</span>
         </NameRole>
       </Left>
       {right}

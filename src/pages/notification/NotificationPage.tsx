@@ -6,6 +6,8 @@ import styled from "styled-components";
 import { getNotifications } from "@api/notification";
 import type { notification } from "@types";
 
+import { notificationsMock } from "@mocks/notifications.mock";
+
 const List = styled.ul`
   display: flex;
   flex-direction: column;
@@ -73,7 +75,10 @@ export function NotificationPage() {
       try {
         setLoading(true);
         setError(null);
-        const data = await getNotifications();
+        // 추후 실제 API 연동 시 주석 해제
+        // const data = await getNotifications();
+
+        const data = notificationsMock;
         console.log("알림 목록:", data);
         setNotifications(data);
       } catch (e) {

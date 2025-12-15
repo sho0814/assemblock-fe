@@ -13,6 +13,7 @@ import AcceptButton from "@components/project/proposal/AcceptButton";
 import RejectButton from "@components/project/proposal/RejectButton";
 
 import { proposalApi } from "@api/proposal";
+import { getUserMe } from "@api/user";
 import type { ProposalDetailResponse } from "@types";
 
 import {
@@ -31,11 +32,13 @@ import {
   ProposerRole,
 } from "./ProposalDetailPage.styled";
 
-const MY_USER_ID = 1; // TODO: 실제 로그인한 사용자 ID로 교체
+import { proposalDetailMock } from "@mocks/proposalDetail.mock";
 
 export function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
+
+  const [myUserId, setMyUserId] = useState<number | null>(null);
 
   const [proposal, setProposal] = useState<ProposalDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +49,14 @@ export function ProposalDetailPage() {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await proposalApi.getProposalDetail(proposalIdNum);
+
+        const userInfo = await getUserMe();
+        setMyUserId(userInfo.userId);
+
+        // 데이터 들어오면 수정
+        // const data = await proposalApi.getProposalDetail(proposalIdNum);
+        const data = proposalDetailMock as ProposalDetailResponse;
+
         setProposal(data);
       } catch (err) {
         console.error("제안 상세 조회 실패:", err);
@@ -93,7 +103,7 @@ export function ProposalDetailPage() {
 
   // 받은 제안인지 판단 (내 블록이 포함되어 있고, 제안자가 나가 아닌 경우)
   // TODO: targetBlocks에 writerId가 있다면 그걸로 판단, 없다면 다른 방법 필요
-  const isProposerMe = proposal.proposerId === MY_USER_ID;
+  const isProposerMe = proposal.proposerId === myUserId;
   const isReceivedProposal = !isProposerMe; // 임시: 제안자가 아니면 받은 제안으로 간주
 
   // 마감 전인지 판단
