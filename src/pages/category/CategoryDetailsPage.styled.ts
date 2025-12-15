@@ -9,6 +9,7 @@ export const ScrollNav = styled.nav`
   padding: 0 4px;
   border-bottom: 1.5px solid #F0EFF1;
   background: none;
+  scroll-behavior: smooth;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -29,7 +30,10 @@ export const NavTab = styled.button<{ selected: boolean }>`
 `;
 
 export const CarouselWrapper = styled.div`
-  overflow-x: visible;
+  overflow-x: auto;
   flex-grow: 1;
   margin-top: 25%;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `

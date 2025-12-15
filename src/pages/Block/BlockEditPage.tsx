@@ -8,7 +8,7 @@ import Dropdown from '@components/block/DropDown';
 import {
     CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK,
     TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK
-} from '@components/block/DropdownOptions';
+} from '@constants';
 import { logFormData, submitFormData } from '@utils/formSubmit';
 import CommonButton from '@components/shared/CommonButton';
 

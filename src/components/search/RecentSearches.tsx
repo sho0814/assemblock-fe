@@ -13,8 +13,21 @@ export default function RecentSearches() {
         handleRemoveAll,
     } = useRecentSearches();
 
-    if (loading) return <S.Section>로딩 중...</S.Section>;
-    if (error) return <S.Section>오류 발생: {error}</S.Section>;
+    if (loading) {
+        return (
+            <S.Section>
+                <S.EmptyText>로딩 중...</S.EmptyText>
+            </S.Section>
+        );
+    }
+
+    if (error) {
+        return (
+            <S.Section>
+                <S.EmptyText>오류 발생: {error}</S.EmptyText>
+            </S.Section>
+        );
+    }
 
     return (
         <S.Section>
