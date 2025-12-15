@@ -46,7 +46,6 @@ export function ReviewConfirmModal({
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(17, 24, 39, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -56,6 +55,7 @@ const Overlay = styled.div`
 const Modal = styled.div`
   width: calc(100% - 48px);
   max-width: 360px;
+  height: 227px;
   background: #fff;
   border-radius: 16px;
   padding: 20px 18px 18px;
@@ -71,9 +71,9 @@ const Header = styled.div`
 `;
 
 const Title = styled.h3`
-  font-size: 18px;
-  font-weight: 800;
-  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+  color: #352f36;
 `;
 
 const CloseButton = styled.button`
@@ -93,9 +93,9 @@ const Body = styled.div`
 `;
 
 const Text = styled.p`
-  font-size: 15px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--Primary-BK, #352f36);
   line-height: 1.6;
 `;
 
@@ -105,12 +105,12 @@ const Footer = styled.div`
 `;
 
 const ConfirmButton = styled.button<{ disabled?: boolean }>`
-  width: 100%;
-  height: 52px;
+  width: 192px;
+  height: 45px;
   border: none;
-  border-radius: 999px;
-  font-size: 16px;
-  font-weight: 800;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
 
   background: ${({ disabled }) => (disabled ? "#E5E7EB" : "#2F2B33")};

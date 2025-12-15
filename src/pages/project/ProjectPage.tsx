@@ -1,96 +1,148 @@
 // src/pages/project/ProjectPage.tsx
-import { useState, useMemo } from "react";
-import ProjectHeader from "@components/project/project/ProjectHeader";
-import ProjectTabBar from "@components/project/project/ProjectTabBar";
+
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import * as S from "./ProjectPage.styled";
 import ProposalList, {
   type ProposalListItem,
 } from "@components/project/project/ProposalList";
 
-import {
-  MOCK_PROJECTS,
-  MOCK_PROJECT_MEMBERS,
-  MOCK_USERS,
-  MOCK_PROPOSALS,
-  MOCK_PROPOSAL_TARGETS,
-  MOCK_BLOCKS,
-} from "../../mocks/mockAssemblock";
+import notificationIcon from "@assets/home/notification.svg";
+import searchIcon from "@assets/home/search.svg";
+import menuIcon from "@assets/home/menu.svg";
+
+import { getMyProjects } from "@api/project";
+import type { ApiProject } from "@types";
+
+type TabValue = "ONGOING" | "DONE";
 
 export function ProjectPage() {
-  const [tab, setTab] = useState<"ONGOING" | "DONE">("ONGOING");
+  const navigate = useNavigate();
+  const [tab, setTab] = useState<TabValue>("ONGOING");
 
   // TODO: 나중에 로그인된 userId로 교체
-  const myUserId = 1;
+  const myUserId = 2;
 
-  // 1) 내가 속한 프로젝트 리스트 찾기
-  const myProjectIds = useMemo(() => {
-    return MOCK_PROJECT_MEMBERS.filter((m) => m.user_id === myUserId).map(
-      (m) => m.project_id
-    );
-  }, [myUserId]);
+  const [projects, setProjects] = useState<ApiProject[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // 2) projectId 기반으로 Project 객체 가져오기
-  const myProjects = useMemo(() => {
-    return MOCK_PROJECTS.filter((p) => myProjectIds.includes(p.project_id));
-  }, [myProjectIds]);
+  // 1) API 호출해서 내 프로젝트 목록 불러오기
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getMyProjects();
+        console.log("getMyProjects 결과:", data);
+        setProjects(data);
+      } catch (e) {
+        setError("프로젝트 정보를 불러오는 데 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // 3) Project → ProposalListItem 변환
-  const allItems: ProposalListItem[] = useMemo(() => {
-    return myProjects
-      .map((proj) => {
-        const proposal = MOCK_PROPOSALS.find(
-          (p) => p.proposal_id === proj.proposal_id
-        );
-
-        if (!proposal) return null;
-
-        const isSent = proposal.proposer_id === myUserId;
-
-        const myBlockParticipated = MOCK_PROPOSAL_TARGETS.some((pt) => {
-          if (pt.proposal_id !== proposal.proposal_id) return false;
-
-          const block = MOCK_BLOCKS.find(
-            (b) => b.block_id === pt.proposalblock_id
-          );
-          if (!block) return false;
-
-          return block.user_id === myUserId;
-        });
-
-        const kind = isSent
-          ? "SENT"
-          : myBlockParticipated
-            ? "RECEIVED"
-            : "NONE";
-
-        const members = MOCK_PROJECT_MEMBERS.filter(
-          (m) => m.project_id === proj.project_id
-        );
-        const leader = MOCK_USERS.find((u) => u.user_id === proj.proposer_id);
-
-        return {
-          projectId: proj.project_id,
-          proposalId: proj.proposal_id,
-          kind,
-          topNickname: leader?.nickname ?? "알 수 없음",
-          othersCount: members.length - 1,
-          topProfileUrl: undefined,
-          state: proj.project_status === "done" ? "DONE" : "ONGOING",
-        };
-      })
-      .filter(Boolean) as ProposalListItem[];
+    fetchProjects();
   }, []);
 
-  // 4) 탭 필터링
+  // 2) ApiProject[] → ProposalListItem[] 로 매핑
+  const allItems: ProposalListItem[] = useMemo(() => {
+    return projects.map((proj) => {
+      // 내가 제안자면 보낸 제안, 아니면 받은 제안
+      const isSent = proj.proposer.id === myUserId;
+      const kind: ProposalListItem["kind"] = isSent ? "SENT" : "RECEIVED";
+
+      const members = proj.members;
+      const othersCount = Math.max(members.length - 1, 0);
+
+      const state: ProposalListItem["state"] =
+        proj.projectStatus === "done" ? "DONE" : "ONGOING";
+
+      return {
+        projectId: proj.id,
+        proposalId: proj.proposal.id,
+        kind,
+        topNickname: proj.proposer.nickname ?? "알 수 없음",
+        othersCount,
+        topProfileUrl: undefined, // 나중에 프로필 이미지 생기면 여기서 채우면 됨
+        state,
+      };
+    });
+  }, [projects, myUserId]);
+
+  // 3) 탭 필터링 (ONGOING / DONE)
   const shownItems = useMemo(
     () => allItems.filter((it) => it.state === tab),
     [allItems, tab]
   );
 
+  // 4) 로딩/에러/빈 상태 처리 (필요에 따라 더 꾸며도 됨)
+  if (loading) {
+    return (
+      <>
+        <S.Header>
+          <S.Title>내 프로젝트</S.Title>
+          <S.IconWrapper>
+            <S.Icon
+              src={notificationIcon}
+              onClick={() => navigate("/Home/notification")}
+            />
+            <S.Icon src={searchIcon} onClick={() => navigate("/Home/search")} />
+            <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
+          </S.IconWrapper>
+        </S.Header>
+        <div>프로젝트를 불러오는 중입니다...</div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <S.Header>
+          <S.Title>내 프로젝트</S.Title>
+          <S.IconWrapper>
+            <S.Icon
+              src={notificationIcon}
+              onClick={() => navigate("/Home/notification")}
+            />
+            <S.Icon src={searchIcon} onClick={() => navigate("/Home/search")} />
+            <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
+          </S.IconWrapper>
+        </S.Header>
+        <div>{error}</div>
+      </>
+    );
+  }
+
   return (
     <>
-      <ProjectHeader />
+      <S.Header>
+        <S.Title>내 프로젝트</S.Title>
+        <S.IconWrapper>
+          <S.Icon
+            src={notificationIcon}
+            onClick={() => navigate("/Home/notification")}
+          />
+          <S.Icon src={searchIcon} onClick={() => navigate("/Home/search")} />
+          <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
+        </S.IconWrapper>
+      </S.Header>
+
       <div>
-        <ProjectTabBar value={tab} onChange={setTab} />
+        <S.TabContainer>
+          <S.Tab
+            active={tab === "ONGOING"}
+            onClick={() => setTab("ONGOING")}
+          >
+            진행 중
+          </S.Tab>
+          <S.Tab active={tab === "DONE"} onClick={() => setTab("DONE")}>
+            완료
+          </S.Tab>
+        </S.TabContainer>
+
         <div>
           <ProposalList items={shownItems} />
         </div>

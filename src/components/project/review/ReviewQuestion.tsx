@@ -39,12 +39,12 @@ const Wrapper = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 13px;
 `;
 
 const Title = styled.h2`
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   color: #111827;
 
   strong {
@@ -54,7 +54,7 @@ const Title = styled.h2`
 
 const Question = styled.p`
   margin-top: 6px;
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   color: #111827;
 `;

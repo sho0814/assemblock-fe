@@ -1,21 +1,28 @@
 // src/components/myTeam/ContactSection.tsx
 import { useState } from "react";
 import styled from "styled-components";
+import AlarmIcon from "@assets/project/Alarm.svg";
 
 const Box = styled.section`
-  margin-bottom: 16px;
-  padding: 10px 12px;
-  border-radius: 999px;
-  background: #f0f0f0;
+  height: 26px;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #f0eff1;
   font-size: 12px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
 `;
 
 const ContactText = styled.span`
   flex: 1;
+`;
+
+const Icon = styled.img`
+  width: 12px;
+  height: 12px;
 `;
 
 /* 모달 관련 스타일 */
@@ -85,7 +92,7 @@ export const ContactSection = ({ contact }: Props) => {
     <>
       {/* 칩 / 박스 */}
       <Box onClick={handleOpen}>
-        <span>💬</span>
+        <Icon src={AlarmIcon} alt="alarm" />
         <ContactText>전달받은 연락수단으로 소통해볼까요?</ContactText>
       </Box>
 

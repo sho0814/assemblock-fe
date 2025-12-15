@@ -14,8 +14,16 @@ import {
 const List = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  // gap: 16px;
+
+  padding: 8px 0 8px 0;
+
+  background: var(--GrayScale-WT, #fafafa);
+  border-radius: 20px;
+  outline: 1.5px solid var(--GrayScale-GR10, #f0eff1);
+  outline-offset: -1px;
+
+  width: 100%;
 `;
 
 // TODO: 로그인 유저 id와 연결
