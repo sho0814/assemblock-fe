@@ -1,5 +1,6 @@
 // src/components/project/review/MemberDropdown.tsx
 import styled from "styled-components";
+import downIcon from "@assets/project/down-md.svg";
 
 export interface MemberOption {
   id: number;
@@ -21,45 +22,44 @@ export function MemberDropdown({
     <SelectWrapper>
       <Select
         value={selectedId}
-        onChange={(e) => onChange(Number(e.target.value))}
-      >
+        onChange={(e) => onChange(Number(e.target.value))}>
         {members.map((m) => (
           <option key={m.id} value={m.id}>
             {m.name}
           </option>
         ))}
       </Select>
-      <Chevron>▾</Chevron>
+      <Chevron src={downIcon} />
     </SelectWrapper>
   );
 }
 
 const SelectWrapper = styled.div`
   position: relative;
-  width: 120px;
-  height: 40px;
+  width: 102px;
+  height: 36px;
 `;
 
 const Select = styled.select`
   width: 100%;
   height: 100%;
-  border-radius: 999px;
-  border: 1.5px solid #111827;
-  background: #fff;
-  padding: 0 36px 0 14px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #111827;
-  appearance: none; /* 기본 화살표 제거 */
+  padding: 0 16px 0 20px;
+  border-radius: 20px;
+  border: 1px solid var(--GrayScale-GR90, #49444a);
+  background: rgba(240, 239, 241, 0.5);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--GrayScale-GR90, #49444a);
+  appearance: none;
   cursor: pointer;
 `;
 
-const Chevron = styled.span`
+const Chevron = styled.img`
   position: absolute;
-  right: 12px;
+  right: 22px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  font-size: 14px;
-  color: #111827;
+  width: 10px;
+  height: 10px;
 `;

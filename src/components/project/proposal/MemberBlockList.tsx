@@ -34,7 +34,6 @@ export function MemberBlockList({ blocks }: MemberBlockListProps) {
 }
 
 const Wrap = styled.section`
-  margin-top: 14px;
   width: 100%;
 `;
 
@@ -42,18 +41,20 @@ const HeaderRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2px 8px 2px;
+  margin-bottom: 16px;
 `;
 
 const SectionTitle = styled.h3`
+  color: var(--Primary-BK, #352f36);
   font-size: 16px;
-  font-weight: 700;
-  color: #111;
+  font-family: Pretendard;
+  font-weight: 600;
+  line-height: 24px;
+  word-wrap: break-word;
 `;
-
 
 const List = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
 `;

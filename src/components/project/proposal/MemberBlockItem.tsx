@@ -25,17 +25,15 @@ export function MemberBlockItem({
 const Item = styled.li`
   display: flex;
   gap: 12px;
-  padding: 14px 12px;
-  background: #fff;
   border-radius: 14px;
-  border: 1px solid #eef0f2;
+  align-items: center;
 `;
 
 const Thumb = styled.img`
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 15px;
   flex-shrink: 0;
   background: #f2f4f6;
 `;
@@ -47,13 +45,19 @@ const Content = styled.div`
 `;
 
 const ItemTitle = styled.h4`
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
+  color: var(--Primary-BK, #352f36);
+  font-size: 14px;
+  font-family: Pretendard;
+  font-weight: 600;
+  line-height: 21px;
+  word-wrap: break-word;
 `;
 
 const ItemDesc = styled.p`
-  font-size: 13px;
-  color: #444;
-  line-height: 1.45;
+  color: var(--GrayScale-GR70, #726d72);
+  font-size: 12px;
+  font-family: Pretendard;
+  font-weight: 500;
+  line-height: 18px;
+  word-wrap: break-word;
 `;
