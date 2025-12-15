@@ -12,20 +12,21 @@ type Props = {
 const Item = styled.li`
   list-style: none;
   width: 100%;
-  padding: 16px;
-  background: #ffffff;
+  padding: 16px 18px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  & + & {
+    border-top: 1.5px solid var(--GrayScale-GR10, #F0EFF1);
+  }
 `;
 
 const Left = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 27px;
 `;
 
 const AvatarWrap = styled.div`

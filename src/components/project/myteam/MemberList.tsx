@@ -4,10 +4,18 @@ import type { Member, ProjectStatus } from "./MyTeamTypes";
 import { MemberItem } from "./MemberItem";
 
 const List = styled.ul`
-  margin-top: 8px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+
+  padding: 8px 0 8px 0;
+
+  background: var(--GrayScale-WT, #fafafa);
+  border-radius: 20px;
+  outline: 1.5px solid var(--GrayScale-GR10, #f0eff1);
+  outline-offset: -1px;
+
+  width: 100%;
+  box-shadow: 0px 0px 19.4px #e7e7e8;
 `;
 
 type Props = {

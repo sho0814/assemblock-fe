@@ -8,8 +8,8 @@ import ReviewDisappoint from "@assets/project/ReviewDisappoint.svg";
 export type ReviewBlockValue = "Good" | "Notbad" | "Disappoint";
 
 interface ReviewBlocksProps {
-  value: ReviewBlockValue | null; // ✅ 확정된 값
-  onSelect: (v: ReviewBlockValue) => void; // ✅ 클릭(임시 선택) 시 호출
+  value: ReviewBlockValue | null;
+  onSelect: (v: ReviewBlockValue) => void;
 }
 
 export function ReviewBlocks({ value, onSelect }: ReviewBlocksProps) {
@@ -18,8 +18,7 @@ export function ReviewBlocks({ value, onSelect }: ReviewBlocksProps) {
       <BlockButton
         aria-pressed={value === "Good"}
         selected={value === "Good"}
-        onClick={() => onSelect("Good")}
-      >
+        onClick={() => onSelect("Good")}>
         <Img src={ReviewGood} alt="즐거웠어요" selected={value === "Good"} />
         <Label>즐거웠어요</Label>
       </BlockButton>
@@ -27,8 +26,7 @@ export function ReviewBlocks({ value, onSelect }: ReviewBlocksProps) {
       <BlockButton
         aria-pressed={value === "Notbad"}
         selected={value === "Notbad"}
-        onClick={() => onSelect("Notbad")}
-      >
+        onClick={() => onSelect("Notbad")}>
         <Img
           src={ReviewNotbad}
           alt="괜찮았어요"
@@ -40,8 +38,7 @@ export function ReviewBlocks({ value, onSelect }: ReviewBlocksProps) {
       <BlockButton
         aria-pressed={value === "Disappoint"}
         selected={value === "Disappoint"}
-        onClick={() => onSelect("Disappoint")}
-      >
+        onClick={() => onSelect("Disappoint")}>
         <Img
           src={ReviewDisappoint}
           alt="아쉬웠어요"
@@ -55,10 +52,10 @@ export function ReviewBlocks({ value, onSelect }: ReviewBlocksProps) {
 
 const Wrapper = styled.div`
   width: 100%;
-  max-width: 360px;
+  // max-width: 320px;
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 6px;
 `;
 
 const BlockButton = styled.button<{ selected: boolean }>`
@@ -66,7 +63,7 @@ const BlockButton = styled.button<{ selected: boolean }>`
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px 0;
+  padding: 4px;
 
   display: flex;
   flex-direction: column;
@@ -81,8 +78,8 @@ const BlockButton = styled.button<{ selected: boolean }>`
 `;
 
 const Img = styled.img<{ selected: boolean }>`
-  width: 88px;
-  height: 72px;
+  width: 100px;
+  height: 100px;
   opacity: ${({ selected }) => (selected ? 1 : 0.6)};
   transition: 0.15s ease;
 `;
