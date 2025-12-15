@@ -65,10 +65,10 @@ export const UserInfo = styled.div`
 export const PartLabel = styled.span<{ $color?: string }>`
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
+  padding: 4px 8px;
   height: 23px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   background: ${props => props.$color || '#35CDFF'};
   color: #FAFAFA;
@@ -76,6 +76,7 @@ export const PartLabel = styled.span<{ $color?: string }>`
 `;
 
 export const UserIntroduction = styled.div`
+  margin-top: 2px;
   align-self: stretch;
   color: #5A565B;
   font-size: 12px;
@@ -164,7 +165,6 @@ export const ReviewBlock = styled.div<{ $hasReviews?: boolean; $patternImage?: s
   margin-top: 24px;
 `;
 
-// 리뷰 그리드 컨테이너 (5열 x 4행, 335x275 크기)
 export const ReviewGridContainer = styled.div<{ $hasReviews?: boolean; $patternImage?: string }>`
   width: 335px;
   height: 275px;
@@ -184,7 +184,6 @@ export const ReviewGridContainer = styled.div<{ $hasReviews?: boolean; $patternI
   position: relative;
 `;
 
-// 그리드 셀 (각 칸)
 export const ReviewGridCell = styled.div<{ $col: number; $row: number }>`
   width: 60px;
   height: 60px;

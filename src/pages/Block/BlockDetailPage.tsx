@@ -15,23 +15,16 @@ import folderIcon from '@assets/MyPage/folder.svg';
 import OptionMenu from '@components/block/OptionMenu';
 import CancelGuide from '@components/block/CancleGuide';
 import { useOverlay } from '@components/common/OverlayContext';
-import { getBlockDetail, deleteBlock, type BlockDetailResponse } from '@api/block';
+import { getBlockDetail, deleteBlock, type BlockDetailResponse } from '@api/blockId';
 
-// Tech_parts 매핑
-const TECH_PARTS_MAP: Record<number, { name: string; color: string }> = {
-  1: { name: '디자인', color: '#FF1BB3' },
-  2: { name: '프론트엔드', color: '#FF6017' },
-  3: { name: '백엔드', color: '#B8EB00' },
-};
-
-// 문자열 techPart를 숫자로 매핑 (API 응답용)
-const TECH_PART_STRING_TO_NUMBER: Record<string, number> = {
-  'DESIGN': 1,
-  'FRONTEND': 2,
-  'BACKEND': 3,
-  'Design': 1,
-  'FrontEnd': 2,
-  'BackEnd': 3,
+// Tech_parts 매핑 (API는 문자열을 반환)
+const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
+  'DESIGN': { name: '디자인', color: '#FF1BB3' },
+  'FRONTEND': { name: '프론트엔드', color: '#FF6017' },
+  'BACKEND': { name: '백엔드', color: '#B8EB00' },
+  'Design': { name: '디자인', color: '#FF1BB3' },
+  'FrontEnd': { name: '프론트엔드', color: '#FF6017' },
+  'BackEnd': { name: '백엔드', color: '#B8EB00' },
 };
 
 // 프로필 타입에 따른 이미지 매핑
@@ -89,6 +82,7 @@ export function BlockDetailPage() {
   const { showOverlay } = useOverlay();
   
   const [block, setBlock] = useState<BlockData | null>(null);
+  const [blockDetailResponse, setBlockDetailResponse] = useState<BlockDetailResponse | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const moreButtonRef = useRef<HTMLButtonElement>(null); 
@@ -114,7 +108,12 @@ export function BlockDetailPage() {
         // API에서 블록 상세 정보 가져오기
         const blockDetail = await getBlockDetail(blockIdNum);
         
+        // BlockDetailResponse 저장 (techPart 정보 보존)
+        setBlockDetailResponse(blockDetail);
+        
         // BlockDetailResponse를 BlockData 형식으로 변환
+        // techPart는 string | null 타입이므로 techparts는 빈 배열로 설정
+        // 실제 techPart는 blockDetailResponse에 저장하여 getCategoryPath에서 사용
         const convertedBlock: BlockData = {
           block_id: blockDetail.blockId,
           user_id: blockDetail.user.userId,
@@ -128,7 +127,7 @@ export function BlockDetailPage() {
           result_url: blockDetail.resultUrl || null,
           result_file: blockDetail.resultFile || null,
           created_at: '', // API 응답에 없으므로 빈 문자열
-          techparts: blockDetail.techPart ? [TECH_PART_STRING_TO_NUMBER[blockDetail.techPart] || 0] : [],
+          techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
         };
         
         setBlock(convertedBlock);
@@ -148,11 +147,12 @@ export function BlockDetailPage() {
         
         setUserProfile({
           nickname: blockDetail.user.nickname || '',
-          introduction: '', // API 응답에 없음
+          introduction: '', // BlockDetailResponse의 user에는 introduction이 없음
           selectedParts: convertedParts,
         });
         
-        // 프로필 이미지 설정 (user 객체에 profileType이 없으므로 기본값 사용)
+        // 프로필 이미지 설정 (BlockDetailResponse의 user에는 profileType이 없으므로 기본값 사용)
+        // 필요시 getUserProfile API를 별도로 호출하여 profileType을 가져올 수 있음
         setSelectedProfile(profileTypeToImage['Type_1']);
       } catch (error) {
         console.error('Failed to fetch block detail:', error);
@@ -218,26 +218,14 @@ export function BlockDetailPage() {
   // 이후 로직에서는 block 대신 safeBlock 사용
   const isTechnology = safeBlock.block_type === 'TECHNOLOGY' || safeBlock.block_type === 'technology';
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
-  const techParts = safeBlock.techparts || [];
 
   const getCategoryPath = () => {
-    if (isTechnology && techParts.length > 0) {
-      const techPartNum = techParts[0];
-      const techPart = TECH_PARTS_MAP[techPartNum];
+    // API 응답의 techPart는 string | null 타입이므로 직접 사용
+    if (isTechnology && blockDetailResponse?.techPart) {
+      const techPart = TECH_PARTS_MAP[blockDetailResponse.techPart];
       const partName = techPart ? techPart.name : '';
       return `기술 > ${partName} > ${safeBlock.category_name || ''}`;
-    } else if (isTechnology && block) {
-      // techParts가 없지만 기술 블록인 경우, API 응답의 techPart 문자열 사용
-      const blockDetail = block as any;
-      if (blockDetail.techPart) {
-        const techPartStr = blockDetail.techPart;
-        const techPartNum = TECH_PART_STRING_TO_NUMBER[techPartStr];
-        if (techPartNum) {
-          const techPart = TECH_PARTS_MAP[techPartNum];
-          const partName = techPart ? techPart.name : '';
-          return `기술 > ${partName} > ${safeBlock.category_name || ''}`;
-        }
-      }
+    } else if (isTechnology) {
       return `기술 > ${safeBlock.category_name || ''}`;
     } else if (isIdea) {
       return `아이디어 > ${safeBlock.category_name || ''}`;

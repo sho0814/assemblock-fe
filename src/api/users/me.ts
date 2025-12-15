@@ -15,7 +15,6 @@ export interface UserMeResponse {
 }
 
 // 내 프로필 정보 조회
-// GET /api/users/me
 export const getMyProfile = async (): Promise<UserMeResponse> => {
   const response = await authApi.get('/users/me');
   return response.data;

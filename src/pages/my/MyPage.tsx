@@ -44,28 +44,15 @@ import Img2 from '@assets/common/ProfileImg/Img2.svg';
 import Img3 from '@assets/common/ProfileImg/Img3.svg';
 import Img4 from '@assets/common/ProfileImg/Img4.svg';
 import Img5 from '@assets/common/ProfileImg/Img5.svg';
-// 리뷰 블록 이미지 import
-import backGood from '@assets/MyPage/reviewblockImg/backGood.svg';
-import backSoso from '@assets/MyPage/reviewblockImg/backSoso.svg';
-import backBad from '@assets/MyPage/reviewblockImg/backBad.svg';
-import designGood from '@assets/MyPage/reviewblockImg/designGood.svg';
-import designSoso from '@assets/MyPage/reviewblockImg/designSoso.svg';
-import designBad from '@assets/MyPage/reviewblockImg/designBad.svg';
-import frontGood from '@assets/MyPage/reviewblockImg/frontGood.svg';
-import frontSoso from '@assets/MyPage/reviewblockImg/frontSoso.svg';
-import frontBad from '@assets/MyPage/reviewblockImg/frontBad.svg';
-import planGood from '@assets/MyPage/reviewblockImg/planGood.svg';
-import planSoso from '@assets/MyPage/reviewblockImg/planSoso.svg';
-import planBad from '@assets/MyPage/reviewblockImg/planBad.svg';
-import pmGood from '@assets/MyPage/reviewblockImg/pmGood.svg';
-import pmSoso from '@assets/MyPage/reviewblockImg/pmSoso.svg';
-import pmBad from '@assets/MyPage/reviewblockImg/pmBad.svg';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
+import { getReviewImage } from '@components/my/ReviewBlockImgMap';
 import BlockList from '@components/block/MyBlockCard';
+import type { BlockData } from '@components/block/MyBlockCard';
 import { getMyProfile } from '@api/users/me';
 import { type ProfileInfo } from '@api/mypage/profile';
 import { getMyReviews, type MyReview } from '@api/mypage/reviews';
-import { getMyBlocks, type MyBlock as MyBlockType } from '@api/mypage/blocks';
+import { getMyBlocks, type MyBlock as MyBlockApi } from '@api/mypage/blocks';
+
 
 export function MyPage() {
     const [activeTab, setActiveTab] = useState<'all' | 'idea' | 'tech'>('all');
@@ -75,6 +62,7 @@ export function MyPage() {
     const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
     const [userProfile, setUserProfile] = useState<ProfileInfo | null>(null);
     const [hasBlocks, setHasBlocks] = useState(false);
+    const [blocks, setBlocks] = useState<BlockData[]>([]);
     const navigate = useNavigate();
 
     const parts = [
@@ -85,20 +73,6 @@ export function MyPage() {
       { id: 'pm', label: 'PM', color: '#6F35FF' },
     ];
 
-    // 리뷰 이미지 매핑 (역할 + rating 조합)
-    // 백엔드 역할을 mainRoles에서 받을 때 'BackEnd'로 오므로 이를 'backend'로 변환
-    const reviewImageMap: Record<string, Record<string, string>> = {
-      'BackEnd': { good: backGood, notbad: backSoso, disappoint: backBad },
-      'backend': { good: backGood, notbad: backSoso, disappoint: backBad },
-      'Design': { good: designGood, notbad: designSoso, disappoint: designBad },
-      'design': { good: designGood, notbad: designSoso, disappoint: designBad },
-      'FrontEnd': { good: frontGood, notbad: frontSoso, disappoint: frontBad },
-      'frontend': { good: frontGood, notbad: frontSoso, disappoint: frontBad },
-      'Plan': { good: planGood, notbad: planSoso, disappoint: planBad },
-      'planning': { good: planGood, notbad: planSoso, disappoint: planBad },
-      'PM': { good: pmGood, notbad: pmSoso, disappoint: pmBad },
-      'pm': { good: pmGood, notbad: pmSoso, disappoint: pmBad },
-    };
 
     // 프로필 타입에 따른 이미지 매핑
     const profileTypeToImage: Record<string, ProfileData> = {
@@ -266,19 +240,44 @@ export function MyPage() {
           // 블록 목록 API 호출
           try {
             const blockType = activeTab === 'all' ? 'ALL' : activeTab === 'idea' ? 'IDEA' : 'TECHNOLOGY';
-            const blocks = await getMyBlocks(blockType);
-            setHasBlocks(blocks && blocks.length > 0);
+            const myBlocks = await getMyBlocks(blockType);
+            
+            // MyBlock[]을 BlockData[]로 변환
+            const convertedBlocks: BlockData[] = myBlocks.map((block: MyBlockApi) => ({
+              block_id: block.blockId,
+              user_id: block.writerId,
+              category_name: block.categoryName,
+              block_title: block.blockTitle,
+              block_type: block.blockType,
+              contribution_score: block.contributionScore,
+              tools_text: block.toolsText || null,
+              oneline_summary: block.oneLineSummary,
+              improvement_point: block.improvementPoint || null,
+              result_url: block.resultUrl || null,
+              result_file: block.resultFile || null,
+              created_at: block.createdAt,
+              techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
+            }));
+            
+            setBlocks(convertedBlocks);
+            setHasBlocks(convertedBlocks.length > 0);
           } catch (error) {
             console.error('Failed to fetch blocks:', error);
             // API 실패 시 localStorage에서 가져오기 (fallback)
             const savedBlocks = localStorage.getItem('registeredBlocks');
             if (savedBlocks) {
               try {
-                const blocks = JSON.parse(savedBlocks);
-                setHasBlocks(blocks && blocks.length > 0);
+                const parsedBlocks = JSON.parse(savedBlocks) as BlockData[];
+                setBlocks(parsedBlocks);
+                setHasBlocks(parsedBlocks.length > 0);
               } catch (e) {
                 console.error('Failed to parse saved blocks:', e);
+                setBlocks([]);
+                setHasBlocks(false);
               }
+            } else {
+              setBlocks([]);
+              setHasBlocks(false);
             }
           }
           
@@ -336,37 +335,10 @@ export function MyPage() {
 
       // 각 리뷰에 대해 이미지 결정 및 배치
       receivedReviews.forEach((review) => {
-        // TODO: rating 필드가 API 응답에 포함되면 주석 해제
-        // rating이 없으면 스킵
-        // if (!review.rating) return;
-
-        // 받은 사용자(현재 사용자)의 첫 번째 mainRole 사용
-        // selectedParts는 ['planning', 'design', ...] 형식이므로
-        // 이를 mainRole 형식으로 변환 (planning -> Plan, frontend -> FrontEnd 등)
-        const partToMainRole: Record<string, string> = {
-          'planning': 'Plan',
-          'design': 'Design',
-          'frontend': 'FrontEnd',
-          'backend': 'BackEnd',
-          'pm': 'PM',
-        };
-        
-        const firstPart = userMainRoles[0];
-        const mainRole = partToMainRole[firstPart] || firstPart;
-        const roleKey = mainRole.toLowerCase();
-        // TODO: rating 필드가 API 응답에 포함되면 주석 해제
-        // const ratingKey = review.rating?.toLowerCase() || 'good';
-
-        // 이미지 찾기
-        const imageMap = reviewImageMap[mainRole] || reviewImageMap[roleKey];
-        if (!imageMap) return;
-
-        // TODO: rating 필드가 API 응답에 포함되면 주석 해제
-        // const imageSrc = imageMap[ratingKey];
-        // if (!imageSrc) return;
-        
-        // 임시: rating이 없을 때 기본 이미지 사용 (good으로 설정)
-        const imageSrc = imageMap['good'];
+        // API 응답의 targetUserMainRole 사용 (받은 사용자의 역할)
+        // targetUserMainRole은 'BackEnd', 'Design', 'FrontEnd', 'Plan', 'PM' 형식
+        // TODO: rating 필드가 API 응답에 포함되면 (review as any).rating 전달
+        const imageSrc = getReviewImage(review.targetUserMainRole);
         if (!imageSrc) return;
 
         // 배치할 위치 찾기 (아래에서 위로, 최하단 행부터)
@@ -537,7 +509,7 @@ export function MyPage() {
           )}
           <BlockListWrapper>
             {hasBlocks ? (
-              <BlockList activeTab={activeTab} />
+              <BlockList blocks={blocks} activeTab={activeTab} />
             ) : (
               <BlockContent>
                 <BlockContentImage src={AssemBlcokDefault} alt="Assem Block Default" />

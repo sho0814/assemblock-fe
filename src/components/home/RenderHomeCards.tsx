@@ -1,23 +1,48 @@
 // src/components/home/RenderHomeCards.tsx
+import { useEffect } from 'react'
 import { useFetchBlocks } from '@hooks'
+import type { BlockType } from '@types'
 import Card from '@components/home/Card'
 import EmblaCarousel from '@components/home/EmblaCarousel'
 import type { EmblaOptionsType } from 'embla-carousel'
 
 const OPTIONS: EmblaOptionsType = { loop: true }
+const TWO_CARD_OPTIONS: EmblaOptionsType = { loop: false }
 
 interface RenderHomeCardsProps {
-  isTech: boolean;
+  blockType: BlockType;
   setIsRegisterBlockActive: React.Dispatch<React.SetStateAction<boolean>>
   isRegisterBlockActive: boolean
 }
 
-export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBlockActive, isTech }: RenderHomeCardsProps) {
-  const cards = useFetchBlocks(isTech)
+export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBlockActive, blockType }: RenderHomeCardsProps) {
+  const { blocks, loading, error, fetchByType } = useFetchBlocks();
 
-  if (!cards.length) return <p style={{ position: 'absolute', left: '25%', top: '50%', fontSize: 16, fontWeight: 500, color: '#868286' }}>카드를 불러오는 중입니다...</p>
+  useEffect(() => {
+    fetchByType(blockType);
+  }, [blockType, fetchByType])
 
-  const slides = cards.map(card => (
+  if (error) {
+
+  }
+
+  if (loading) {
+    return (
+      <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: 16, fontWeight: 500, color: '#868286' }}>
+        카드 불러오는 중...
+      </p>
+    );
+  }
+
+  if (!blocks.length) {
+    return (
+      <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: 16, fontWeight: 500, color: '#868286' }}>
+        등록된 카드가 없습니다.
+      </p>
+    );
+  }
+
+  const SLIDES = blocks.map(card => (
     <Card
       key={card.blockId}
       isRegisterBlockActive={isRegisterBlockActive}
@@ -26,10 +51,18 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
     />
   ))
 
-  return (
-    <>
-      <EmblaCarousel slides={slides} options={OPTIONS} setIsRegisterBlockActive={setIsRegisterBlockActive} />
-    </>
-
-  )
+  if (blocks.length == 2) {
+    return (
+      <div style={{
+        position: "fixed",
+        top: "55%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+      }}>
+        {SLIDES}
+      </div>
+    )
+  } else {
+    return <EmblaCarousel slides={SLIDES} options={OPTIONS} setIsRegisterBlockActive={setIsRegisterBlockActive} />
+  }
 }

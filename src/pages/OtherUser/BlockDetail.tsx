@@ -76,7 +76,8 @@ const profileTypeToImage: Record<string, ProfileData> = {
 export function BlockDetail() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
+  const { showOverlay } = useOverlay();
   const [block, setBlock] = useState<BlockData | null>(null);
   const [foundBlockData, setFoundBlockData] = useState<{ techPart?: string } | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
@@ -85,6 +86,13 @@ export function BlockDetail() {
     introduction: string;
     selectedParts: string[];
   } | null>(null);
+
+  const handleBoardOverlay = (blockId: number) => {
+    showOverlay(
+      <BoardSelector blockId={blockId} />,
+      { contentStyle: { position: 'absolute', bottom: '0', width: '100%' } }
+    );
+  }
 
   useEffect(() => {
     const fetchBlockData = async () => {
@@ -221,7 +229,7 @@ export function BlockDetail() {
     result_file: '',
     tools_text: '',
     techparts: [],
-  } as unknown as BlockData; 
+  } as unknown as BlockData;
 
   const isTechnology = safeBlock.block_type === 'TECHNOLOGY' || safeBlock.block_type === 'technology';
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
@@ -246,7 +254,7 @@ export function BlockDetail() {
       <S.Container>
         <>
           <S.CategoryBreadcrumb>{getCategoryPath()}</S.CategoryBreadcrumb>
-          
+
           <S.BlockTitle>{safeBlock.block_title}</S.BlockTitle>
 
           <S.ProfileSection onClick={() => {
@@ -261,7 +269,7 @@ export function BlockDetail() {
               {selectedProfile ? (
                 <ProfileAct profile={selectedProfile} isSelected={true} size="small" />
               ) : (
-                <ProfileAct 
+                <ProfileAct
                   profile={{
                     id: 'img1',
                     src: Img1,
@@ -270,9 +278,9 @@ export function BlockDetail() {
                       '#C2C1C3': '#2E3B00',
                       '#F0EFF1': '#B8EB00'
                     }
-                  }} 
-                  isSelected={true} 
-                  size="small" 
+                  }}
+                  isSelected={true}
+                  size="small"
                 />
               )}
             </S.ProfileImg>
@@ -291,7 +299,7 @@ export function BlockDetail() {
             <S.ProjectCardDescription>
               {safeBlock.oneline_summary || "등록된 한 줄 소개가 없어요"}
             </S.ProjectCardDescription>
-            
+
             <S.ProjectCardDivider />
 
             {/* 아이디어 블록은 기술 스택 표시 안함 */}
@@ -308,7 +316,7 @@ export function BlockDetail() {
                   </S.TechStackContainer>
                 ) : (
                   <S.SectionValue style={{ marginTop: '8px' }}>
-                     아직 등록된 기술 스택이 없어요
+                    아직 등록된 기술 스택이 없어요
                   </S.SectionValue>
                 )}
               </S.TechStackSection>
@@ -343,17 +351,17 @@ export function BlockDetail() {
 
           <S.Section>
             <S.SectionLabel>{userProfile?.nickname || 'Username'}님의 포트폴리오</S.SectionLabel>
-            
+
             {!safeBlock.result_url && !safeBlock.result_file && (
               <S.SectionValue>아직 등록된 기존 프로젝트 결과물이 없어요</S.SectionValue>
             )}
 
             {safeBlock.result_url && (
-              <S.Link 
-                href={safeBlock.result_url} 
-                target="_blank" 
+              <S.Link
+                href={safeBlock.result_url}
+                target="_blank"
                 rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', marginBottom: safeBlock.result_file ? '8px' : '0' }} 
+                style={{ display: 'flex', alignItems: 'center', marginBottom: safeBlock.result_file ? '8px' : '0' }}
               >
                 <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', marginRight: '8px' }} ></img>
                 {safeBlock.result_url}
@@ -373,14 +381,11 @@ export function BlockDetail() {
             )}
           </S.Section>
 
-          <div style={{ marginTop: '36px'}}>
-            <CommonButton 
+          <div style={{ marginTop: '36px' }}>
+            <CommonButton
               content="보드에 담기"
               width="335px"
-              onClick={() => {
-                // 보드에 담기 로직 추가
-                console.log('보드에 담기');
-              }}
+              onClick={() => handleBoardOverlay(safeBlock.block_id)}
             />
           </div>
         </>

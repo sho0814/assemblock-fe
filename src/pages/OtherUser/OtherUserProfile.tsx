@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import SimpleHeader from '@components/shared/SimpleHeader';
 import {
   MyPageContainer, 
@@ -16,6 +16,9 @@ import {
   ReviewBlock,
   ReviewBlockImage,
   ReviewBlockText,
+  ReviewGridContainer,
+  ReviewGridCell,
+  ReviewGridBlock,
   MyBlock,
   MyBlockHeader,
   BlockdivTab,
@@ -37,6 +40,7 @@ import Img3 from '@assets/common/ProfileImg/Img3.svg';
 import Img4 from '@assets/common/ProfileImg/Img4.svg';
 import Img5 from '@assets/common/ProfileImg/Img5.svg';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
+import { getReviewImage } from '@components/my/ReviewBlockImgMap';
 import BlockList from '@components/block/MyBlockCard';
 import type { BlockData } from '@components/block/MyBlockCard';
 import { getUserProfile } from '@api/profiles/profile';
@@ -58,7 +62,6 @@ export function OtherUserProfile() {
     } | null>(null);
     const [hasBlocks, setHasBlocks] = useState(false);
     const [blocks, setBlocks] = useState<BlockData[]>([]);
-    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
     const parts = [
@@ -291,6 +294,58 @@ export function OtherUserProfile() {
 
       fetchBlocks();
     }, [searchParams, activeTab]);
+
+    // 블록 배치 로직: 아래에서 위로, 최하단 행부터 랜덤 배치
+    const placeReviewBlocks = (receivedReviews: UserReview[]): Array<{ col: number; row: number; review: UserReview; imageSrc: string } | null> => {
+      const grid: Array<{ col: number; row: number; review: UserReview; imageSrc: string } | null> = new Array(20).fill(null);
+      const occupied = new Set<string>(); // "col,row" 형식으로 저장
+
+      // 현재 사용자의 mainRoles 가져오기 (받은 사용자의 역할)
+      const userMainRoles = userProfile?.selectedParts || [];
+      if (userMainRoles.length === 0) {
+        return grid;
+      }
+
+      // 각 리뷰에 대해 이미지 결정 및 배치
+      receivedReviews.forEach((review) => {
+        // API 응답의 targetUserMainRole 사용 (받은 사용자의 역할)
+        // targetUserMainRole은 'BackEnd', 'Design', 'FrontEnd', 'Plan', 'PM' 형식
+        // TODO: rating 필드가 API 응답에 포함되면 (review as any).rating 전달
+        const imageSrc = getReviewImage(review.targetUserMainRole);
+        if (!imageSrc) return;
+
+        // 배치할 위치 찾기 (아래에서 위로, 최하단 행부터)
+        for (let row = 1; row <= 4; row++) {
+          // 해당 행의 빈 칸 찾기
+          const emptyCells: number[] = [];
+          for (let col = 1; col <= 5; col++) {
+            const key = `${col},${row}`;
+            if (!occupied.has(key)) {
+              emptyCells.push(col);
+            }
+          }
+
+          // 빈 칸이 있으면 랜덤으로 하나 선택
+          if (emptyCells.length > 0) {
+            const randomCol = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            const key = `${randomCol},${row}`;
+            occupied.add(key);
+            
+            // 그리드 인덱스 계산 (1-based to 0-based)
+            const gridIndex = (row - 1) * 5 + (randomCol - 1);
+            grid[gridIndex] = { col: randomCol, row, review, imageSrc };
+            break;
+          }
+        }
+
+        // 모든 행이 채워져 있어도 배치하지 못한 경우는 무시
+      });
+
+      return grid;
+    };
+
+    // 받은 후기만 그리드에 표시
+    const reviewGrid = placeReviewBlocks(reviews);
     
     return (
       <MyPageContainer>
@@ -379,13 +434,19 @@ export function OtherUserProfile() {
               <ReviewBlockText>아직 받은 후기 블록이 없어요</ReviewBlockText>
             </ReviewBlock>
           ) : (
-            <ReviewBlock $hasReviews={true} $patternImage={pattern}>
-              {reviews.length > 0 ? (
-                <ReviewBlockText>받은 후기 {reviews.length}개</ReviewBlockText>
-              ) : (
-                <ReviewBlockText>받은 후기</ReviewBlockText>
-              )}
-            </ReviewBlock>
+            <ReviewGridContainer $hasReviews={true} $patternImage={pattern}>
+              {reviewGrid.map((block, index) => {
+                const col = (index % 5) + 1;
+                const row = Math.floor(index / 5) + 1;
+                return (
+                  <ReviewGridCell key={index} $col={col} $row={row}>
+                    {block && (
+                      <ReviewGridBlock src={block.imageSrc} alt={`Review block ${block.review.reviewId}`} />
+                    )}
+                  </ReviewGridCell>
+                );
+              })}
+            </ReviewGridContainer>
           )}
         </Review>
 
