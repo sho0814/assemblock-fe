@@ -24,4 +24,9 @@ dist-ssr
 *.sw?
 
 #env files
-.envpnpm-workspace.yaml
+.env
+.env.*
+src/.env
+
+# pnpm
+pnpm-workspace.yaml
