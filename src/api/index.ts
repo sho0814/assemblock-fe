@@ -2,6 +2,7 @@ export * from './client';
 export * from './kakaoAuth';
 export * from './block';
 export * from './board';
+export * from "./project";
 export * from './users/me';
 export * from './mypage/profile';
 export * from './mypage/blocks';

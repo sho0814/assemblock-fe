@@ -6,11 +6,13 @@ import CancelGuide from '@components/block/CancleGuide';
 import SimpleHeader from '@components/shared/SimpleHeader';
 import Dropdown from '@components/block/DropDown';
 import {
-    CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK,
-    TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK
+    CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK
 } from '@components/block/DropdownOptions';
-import { logFormData, submitFormData } from '@utils/formSubmit';
+import { TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK } from '@constants/tools';
 import CommonButton from '@components/shared/CommonButton';
+import { getBlockDetail, updateBlock } from '@api/block';
+import { uploadFile } from '@api/mypage/upload';
+import type { NewBlockData, TechPart } from '@types';
 
 import * as S from './BlockEditPage.styled';
 
@@ -29,8 +31,13 @@ export function BlockEditPage() {
     const [selectedTools, setSelectedTools] = useState<string>('');                     // 사용 툴 및 언어
     const [onelineSummary, setOnelineSummary] = useState('');                           // 기존 프로젝트 한 줄 소개
     const [contributionRate, setContributionRate] = useState<number>(0);                // 기존 프로젝트 기여도
+    const [improvementPoint, setImprovementPoint] = useState<string>('');              // 개선하고 싶은 점
+    const [resultUrl, setResultUrl] = useState<string>('');                          // 결과물 URL
+    const [resultFile, setResultFile] = useState<File | null>(null);                   // 결과물 파일
+    const [resultFileUrl, setResultFileUrl] = useState<string | null>(null);          // 업로드된 파일 URL
     const [fileName, setFileName] = useState<string | null>(null);                      // 기존 프로젝트 결과물 PDF
     const [isFormValid, setIsFormValid] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const { showOverlay, closeOverlay } = useOverlay();
 
@@ -57,11 +64,59 @@ export function BlockEditPage() {
         );
     };
 
-    // blockId가 있을 경우 데이터를 불러오는 로직이 필요함
+    // blockId가 있을 경우 데이터를 불러오는 로직
     useEffect(() => {
-        if (blockId) {
-            console.log(`불러온 Block ID: ${blockId}`);
-        }
+        const fetchBlockData = async () => {
+            if (!blockId) return;
+
+            const blockIdNum = parseInt(blockId, 10);
+            if (isNaN(blockIdNum)) {
+                console.error('유효하지 않은 blockId');
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                const blockDetail = await getBlockDetail(blockIdNum);
+                
+                // API 응답을 state에 설정
+                setIsSkillState(blockDetail.blockType === 'TECHNOLOGY');
+                setBlockTitle(blockDetail.blockTitle);
+                
+                // techPart를 BlockPart 형식으로 변환
+                const techPartMap: Record<string, BlockPart> = {
+                    'DESIGN': 'design',
+                    'FRONTEND': 'frontend',
+                    'BACKEND': 'backend',
+                    'Design': 'design',
+                    'FrontEnd': 'frontend',
+                    'BackEnd': 'backend',
+                };
+                setSelectedTechPart(blockDetail.techPart ? (techPartMap[blockDetail.techPart] || null) : null);
+                
+                setSelectedCategory(blockDetail.categoryName);
+                setSelectedTools(blockDetail.toolsText || '');
+                setOnelineSummary(blockDetail.oneLineSummary);
+                setContributionRate(blockDetail.contributionScore);
+                setImprovementPoint(blockDetail.improvementPoint || '');
+                setResultUrl(blockDetail.resultUrl || '');
+                setResultFileUrl(blockDetail.resultFile || null);
+                
+                // 파일명 추출 (URL에서)
+                if (blockDetail.resultFile) {
+                    const urlParts = blockDetail.resultFile.split('/');
+                    const extractedFileName = urlParts[urlParts.length - 1];
+                    setFileName(extractedFileName || null);
+                }
+            } catch (error) {
+                console.error('Failed to fetch block detail:', error);
+                // 에러 발생 시 기본값 유지
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBlockData();
     }, [blockId]);
 
     // 필수 조건 검사
@@ -138,19 +193,66 @@ export function BlockEditPage() {
     // 폼 제출 관리 함수 (수정 로직)
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("수정 폼 제출 이벤트 발생");
+        
+        if (!blockId) {
+            console.error('blockId가 없습니다.');
+            return;
+        }
 
-        if (!formRef.current) return;
+        const blockIdNum = parseInt(blockId, 10);
+        if (isNaN(blockIdNum)) {
+            console.error('유효하지 않은 blockId');
+            return;
+        }
 
-        logFormData(formRef.current);
+        try {
+            setIsLoading(true);
 
-        // 수정 API 호출로 변경 필요
-        const response = await submitFormData(formRef.current);
+            // 파일이 새로 선택된 경우 업로드
+            let finalResultFileUrl = resultFileUrl || '';
+            if (resultFile) {
+                try {
+                    const uploadResult = await uploadFile(resultFile);
+                    finalResultFileUrl = uploadResult.fileUrl;
+                } catch (uploadError) {
+                    console.error('파일 업로드 실패:', uploadError);
+                    alert('파일 업로드에 실패했습니다. 파일 없이 진행할까요?');
+                    // 파일 업로드 실패해도 계속 진행
+                }
+            }
 
-        if (response.ok) {
-            console.log('수정 성공');
-        } else {
-            console.error('수정 실패');
+            // techPart를 API 형식으로 변환
+            const techPartToApi: Record<BlockPart, TechPart> = {
+                'design': 'DESIGN',
+                'frontend': 'FRONTEND',
+                'backend': 'BACKEND',
+            };
+            const apiTechPart: TechPart = selectedTechPart ? techPartToApi[selectedTechPart] : null;
+
+            // NewBlockData 형식으로 변환
+            const blockData: NewBlockData = {
+                blockType: isSkillState ? 'TECHNOLOGY' : 'IDEA',
+                blockTitle: blockTitle.trim(),
+                categoryName: selectedCategory,
+                techPart: apiTechPart,
+                contributionScore: contributionRate,
+                toolsText: isSkillState && selectedTools ? selectedTools : null,
+                oneLineSummary: onelineSummary.trim(),
+                improvementPoint: improvementPoint.trim(),
+                resultUrl: resultUrl.trim() || '',
+                resultFile: finalResultFileUrl,
+            };
+
+            // API 호출
+            await updateBlock(blockIdNum, blockData);
+            
+            // 성공 시 상세 페이지로 이동
+            navigate(`/Block/detail?id=${blockId}`);
+        } catch (error) {
+            console.error('블록 수정 실패:', error);
+            alert('블록 수정에 실패했습니다.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -170,9 +272,18 @@ export function BlockEditPage() {
     // 선택한 파일명 보여주는 함수
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && file.type === 'application/pdf') {
-            setFileName(file.name);
+        if (file) {
+            if (file.type === 'application/pdf') {
+                setResultFile(file);
+                setFileName(file.name);
+                setResultFileUrl(null); // 새 파일 선택 시 기존 URL 초기화
+            } else {
+                alert('PDF 파일만 업로드 가능합니다.');
+                setResultFile(null);
+                setFileName(null);
+            }
         } else {
+            setResultFile(null);
             setFileName(null);
         }
     };
@@ -268,14 +379,26 @@ export function BlockEditPage() {
 
                     <S.Row>
                         <S.Label>기존 프로젝트에서 개선하고 싶은 점</S.Label>
-                        <S.Input name="improvements_point" type="text" placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" />
+                        <S.Input 
+                            name="improvement_point" 
+                            type="text" 
+                            placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" 
+                            value={improvementPoint}
+                            onChange={(e) => setImprovementPoint(e.target.value)}
+                        />
                         <S.Desc>어셈블록에서 새로운 팀원들과 변경하거나 보완, 개선하고 싶은 부분이 있다면<br />
                             (N)자 내로 작성해 주세요</S.Desc>
                     </S.Row>
 
                     <S.Row>
                         <S.Label>기존 프로젝트 결과물 URL</S.Label>
-                        <S.Input name="result_url" type="text" placeholder="URL" />
+                        <S.Input 
+                            name="result_url" 
+                            type="text" 
+                            placeholder="URL" 
+                            value={resultUrl}
+                            onChange={(e) => setResultUrl(e.target.value)}
+                        />
                         <S.Desc>기존 프로젝트의 산출물 및 결과물을 URL 형식으로 첨부해 주세요</S.Desc>
                     </S.Row>
 
@@ -301,7 +424,7 @@ export function BlockEditPage() {
                         <CommonButton
                             type="submit"
                             content="블록 수정하기"
-                            disabled={!isFormValid}
+                            disabled={!isFormValid || isLoading}
                             width="335px"
                         />
                     </S.ButtonWrapper>
