@@ -9,7 +9,7 @@ export type ResponseStatus = "pending" | "accepted" | "rejected";
 export interface Member {
   userId: number;
   nickname: string;
-  profileUrl: ProfileType;
+  profileType: ProfileType;
   part: string;
   leader: boolean;
   responseStatus: ResponseStatus;

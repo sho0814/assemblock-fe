@@ -11,7 +11,7 @@ import { getProjectDetail, completeProject } from "@api/project";
 
 import type { Member, ProjectDetailResponse } from "@types";
 
-import { projectDetailsMock } from "@mocks/projectDetail.mock";
+import { projectDetailMock } from "@mocks/projectDetail.mock";
 
 import {
   Page,
@@ -58,9 +58,7 @@ export const MyTeamPage = () => {
         // const data = await getProjectDetail(proposalIdNum);
 
         // Mock 데이터 사용
-        const data =
-          (projectDetailsMock[proposalIdNum] as ProjectDetailResponse) ||
-          (projectDetailsMock[1] as ProjectDetailResponse);
+        const data = projectDetailMock as ProjectDetailResponse;
 
         console.log("프로젝트 상세:", data);
 
@@ -104,7 +102,7 @@ export const MyTeamPage = () => {
   const members: Member[] = project.members.map((m) => ({
     userId: m.userId,
     nickname: m.nickname,
-    profileUrl: m.profileUrl,
+    profileType: m.profileType,
     part: m.part,
     leader: m.leader,
     responseStatus: m.responseStatus,

@@ -1,41 +1,41 @@
 export const projectsCompleteMock = [
   {
-    projectId: 201,
+    projectId: 1,
     projectTitle: "어셈블록 서비스 고도화",
-    status: "recruiting",
+    status: "done",
     members: [
       {
         userId: 2,
         nickname: "짓수",
-        profileUrl: "",
+        profileType: "Type_1",
         part: "FRONTEND",
         leader: true,
       },
       {
         userId: 5,
         nickname: "안예영",
-        profileUrl: "",
+        profileType: "Type_1",
         part: "BACKEND",
         leader: false,
       },
     ],
   },
   {
-    projectId: 202,
+    projectId: 2,
     projectTitle: "AI 블록 추천 기능 개발",
-    status: "ongoing",
+    status: "done",
     members: [
       {
         userId: 1,
         nickname: "김현수",
-        profileUrl: "",
+        profileType: "Type_1",
         part: "BACKEND",
         leader: true,
       },
       {
         userId: 2,
         nickname: "짓수",
-        profileUrl: "",
+        profileType: "Type_1",
         part: "FRONTEND",
         leader: false,
       },

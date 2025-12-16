@@ -84,7 +84,7 @@ export function ProjectPage() {
       // 리더 찾기
       const leader = proj.members.find((m) => m.leader);
       const topNickname = leader?.nickname ?? "알 수 없음";
-      const topProfileUrl = leader?.profileUrl;
+      const topProfileType = leader?.profileType ?? "Type_1";
 
       // 나를 제외한 다른 멤버 수
       const othersCount = Math.max(proj.members.length - 1, 0);
@@ -99,7 +99,7 @@ export function ProjectPage() {
         kind,
         topNickname,
         othersCount,
-        topProfileUrl,
+        topProfileType,
         state,
       };
     });
@@ -116,7 +116,6 @@ export function ProjectPage() {
   );
 
   const shownItems = tab === "ONGOING" ? ongoingItems : completeItems;
-
 
   if (loading) {
     return (

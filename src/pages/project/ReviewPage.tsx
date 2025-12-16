@@ -9,10 +9,14 @@ import { ReviewBlocks } from "@components/project/review/ReviewBlocks";
 import type { ReviewBlockValue } from "@components/project/review/ReviewBlocks";
 import { ReviewConfirmModal } from "@components/project/review/ReviewConfirmModal";
 
-import { getProjectReviews, createReview } from "@api/review";
+// import { getProjectReviews, createReview } from "@api/review";
+import { createReview } from "@api/review";
 import { getProjectDetail } from "@api/project";
 import { getUserMe } from "@api/user";
 import type { ReviewRating, ProjectDetailResponse, Member } from "@types";
+
+// 목업 데이터 (백엔드 준비 후 삭제)
+import { reviewsMock } from "@mocks/review.mock";
 
 import pattern from "@assets/project/pattern.png";
 
@@ -62,17 +66,14 @@ export function ReviewPage() {
         setProjectMembers(otherMembers);
 
         // 4. 이미 작성한 리뷰 목록 조회
-        const reviews = await getProjectReviews(projectData.projectId);
+        // 목업 사용 (백엔드 준비 후 아래 주석 해제)
+        const reviews = reviewsMock[projectData.projectId] || [];
+        // const reviews = await getProjectReviews(projectData.projectId);
 
         // 5. 이미 리뷰를 작성한 사용자 ID 추출
-        // 백엔드 응답에 reviewedUserId가 있다고 가정
-        // 없다면 nickname으로 매칭 (임시 방법)
         const reviewedUserIds = reviews
           .map((r) => {
-            // 방법 1: API 응답에 reviewedUserId가 있는 경우 (권장)
-            // return r.reviewedUserId;
-
-            // 방법 2: nickname으로 매칭 (백엔드 수정 전 임시 방법)
+            // nickname으로 매칭
             return otherMembers.find((m) => m.nickname === r.targetUserNickname)
               ?.userId;
           })
@@ -158,9 +159,6 @@ export function ReviewPage() {
       setValue(null);
       setPendingValue(null);
       setIsModalOpen(false);
-
-      // 선택: 성공 알림
-      // alert("리뷰가 성공적으로 작성되었습니다.");
     } catch (err) {
       console.error("리뷰 작성 실패:", err);
       alert("리뷰 작성에 실패했습니다. 다시 시도해주세요.");

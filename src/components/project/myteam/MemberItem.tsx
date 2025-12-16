@@ -2,6 +2,7 @@
 import styled from "styled-components";
 import type { ReactNode } from "react";
 import type { Member, ProjectStatus } from "@types";
+import { getProfileImage } from "@constants";
 
 const Item = styled.li`
   list-style: none;
@@ -23,10 +24,11 @@ const Left = styled.div`
   gap: 20px;
 `;
 
-const Avatar = styled.div`
+const Avatar = styled.img`
   width: 48px;
   height: 48px;
   border-radius: 999px;
+  object-fit: cover;
   background: #ddd;
 `;
 
@@ -102,7 +104,7 @@ export const MemberItem = ({ status, member }: Props) => {
   return (
     <Item>
       <Left>
-        <Avatar />
+        <Avatar src={getProfileImage(member.profileType)} />
         <NameRole>
           <span style={{ fontSize: 16, color: "#000000", fontWeight: 600 }}>
             {member.nickname} 님
