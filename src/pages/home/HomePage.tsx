@@ -27,7 +27,7 @@ export function HomePage() {
         />
       </S.EmblaWrapper>
 
-      <S.RegisterButtonWrapper onClick={() => console.log('clicked!')}>
+      <S.RegisterButtonWrapper>
         {isRegisterBlockActive && (
           <S.RegisterButton to='/block/register' state={{ isTech: isTechType }}>
             <img src={RegisterIcon} />

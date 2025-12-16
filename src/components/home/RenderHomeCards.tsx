@@ -23,7 +23,7 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
 
   if (error) {
     return (
-      <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
+      <p style={{ position: 'fixed', left: '50%', top: '45%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
         {error}
       </p>
     );
@@ -31,7 +31,7 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
 
   if (loading) {
     return (
-      <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
+      <p style={{ position: 'fixed', left: '50%', top: '45%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
         블록 불러오는 중...
       </p>
     );
@@ -39,7 +39,7 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
 
   if (!blocks.length) {
     return (
-      <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
+      <p style={{ position: 'fixed', left: '50%', top: '45%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
         등록된 블록이 없습니다.
       </p>
     );
@@ -58,7 +58,7 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
     return (
       <div style={{
         position: "fixed",
-        top: "55%",
+        top: "48%",
         left: "50%",
         transform: "translate(-50%, -50%)",
       }}>

@@ -4,6 +4,8 @@ import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from '../block/BlockDetailPage.styled';
 import SimpleHeader from '@components/shared/SimpleHeader';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
+import { useOverlay } from '@components/common/OverlayContext';
+import BoardSelector from '@components/home/BoardSelector';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import Img2 from '@assets/common/ProfileImg/Img2.svg';
 import Img3 from '@assets/common/ProfileImg/Img3.svg';
@@ -98,7 +100,7 @@ export function BlockDetail() {
     const fetchBlockData = async () => {
       const blockId = searchParams.get('id');
       const userIdParam = searchParams.get('userId');
-      
+
       if (!blockId || !userIdParam) {
         console.error('blockId 또는 userId가 없습니다.');
         return;
@@ -106,7 +108,7 @@ export function BlockDetail() {
 
       const userId = parseInt(userIdParam, 10);
       const blockIdNum = parseInt(blockId, 10);
-      
+
       if (isNaN(userId) || isNaN(blockIdNum)) {
         console.error('유효하지 않은 userId 또는 blockId');
         return;
@@ -115,7 +117,7 @@ export function BlockDetail() {
       try {
         // 사용자 프로필 정보 가져오기
         const profileData = await getUserProfile(userId);
-        
+
         const roleToPartId: Record<string, string> = {
           'Plan': 'planning',
           'Design': 'design',
@@ -123,19 +125,19 @@ export function BlockDetail() {
           'BackEnd': 'backend',
           'PM': 'pm',
         };
-        
-        const convertedParts = profileData.mainRoles.length > 0 
+
+        const convertedParts = profileData.mainRoles.length > 0
           ? profileData.mainRoles.map((role: string) => roleToPartId[role] || role.toLowerCase())
           : [];
-        
+
         const convertedProfile = {
           nickname: profileData.nickname || '',
           introduction: profileData.introduction || '',
           selectedParts: convertedParts,
         };
-        
+
         setUserProfile(convertedProfile);
-        
+
         // 프로필 이미지 설정
         if (profileData.profileType && profileTypeToImage[profileData.profileType]) {
           setSelectedProfile(profileTypeToImage[profileData.profileType]);
@@ -145,10 +147,10 @@ export function BlockDetail() {
 
         // 사용자의 블록 목록 가져오기
         const blocks = await getUserBlocks(userId, 'ALL');
-        
+
         // 해당 blockId와 일치하는 블록 찾기
         const foundBlock = blocks.find((b) => b.blockId === blockIdNum);
-        
+
         if (foundBlock) {
           // API 응답을 BlockData 형식으로 변환
           // techPart는 문자열이지만 techparts는 number[] 타입이므로 빈 배열로 설정
@@ -168,7 +170,7 @@ export function BlockDetail() {
             created_at: foundBlock.createdAt,
             techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
           };
-          
+
           setBlock(convertedBlock);
           // techPart 정보를 별도로 저장 (getCategoryPath에서 사용)
           setFoundBlockData({ techPart: foundBlock.techPart });
@@ -192,7 +194,7 @@ export function BlockDetail() {
             console.error('블록 데이터 찾기 실패:', e);
           }
         }
-        
+
         const savedProfile = localStorage.getItem('selectedProfile');
         if (savedProfile) {
           try {
@@ -201,7 +203,7 @@ export function BlockDetail() {
             console.error('Failed to parse saved profile:', e);
           }
         }
-        
+
         const savedUserProfile = localStorage.getItem('userProfile');
         if (savedUserProfile) {
           try {

@@ -36,12 +36,12 @@ const RenderCategoryCards: React.FC<RenderCategoryCardsProps> = ({ category }) =
     }
 
     if (!blocks.length) {
-    return (
-      <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
-        해당 카테고리에 등록된 블록이 없습니다.
-      </p>
-    );
-  }
+        return (
+            <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
+                해당 카테고리에 등록된 블록이 없습니다.
+            </p>
+        );
+    }
 
     const SLIDES = blocks.map((card) => (
         <Card key={card.blockId}
