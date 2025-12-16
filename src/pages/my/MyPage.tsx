@@ -509,7 +509,7 @@ export function MyPage() {
           )}
           <BlockListWrapper>
             {hasBlocks ? (
-              <BlockList blocks={blocks} activeTab={activeTab} />
+              <BlockList blocks={blocks} activeTab={activeTab} isMyBlock={true} />
             ) : (
               <BlockContent>
                 <BlockContentImage src={AssemBlcokDefault} alt="Assem Block Default" />

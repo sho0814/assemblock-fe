@@ -66,7 +66,7 @@ function App() {
             <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
             <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
             <Route path="/OtherUser/Profile" element={<OtherUserProfile />} />
-            <Route path="/OtherUser/BlockDetail" element={<BlockDetail />} />
+            <Route path="/OtherUser/BlockDetail/:blockId" element={<BlockDetail />} />
             <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
             <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
             <Route path="/Onboarding" element={<OnboardingPage />} />
