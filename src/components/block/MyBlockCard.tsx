@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as S from './MyBlockCard.styled';
-
-// 추후 카드 이미지와 1:1 연결
-import mediumIdeaCulture from '@assets/common/medium Img/mediumIdeaCulture.svg';
+import { getMediumImage } from '@constants/mediumImageMap';
 
 export type Block = {
   block_id: number; 
@@ -26,31 +24,14 @@ export type BlockData = Block & {
 interface MyBlockProps {
   blocks?: BlockData[];
   activeTab?: 'all' | 'idea' | 'tech';
+  isMyBlock?: boolean; // 내 블록인지 타인의 블록인지 구분
 }
 
-export default function BlockList({ blocks, activeTab = 'all' }: MyBlockProps) {
-  const [blockList, setBlockList] = useState<BlockData[]>([]);
-
-  useEffect(() => {
-    // localStorage에서 저장된 블록 목록 읽기
-    const savedBlocks = localStorage.getItem('registeredBlocks');
-    if (savedBlocks) {
-      try {
-        const parsedBlocks = JSON.parse(savedBlocks) as BlockData[];
-        setBlockList(parsedBlocks);
-      } catch (e) {
-        console.error('Failed to parse saved blocks:', e);
-      }
-    }
-    
-    // props로 전달된 blocks가 있으면 사용
-    if (blocks && blocks.length > 0) {
-      setBlockList(blocks);
-    }
-  }, [blocks]);
+export default function BlockList({ blocks = [], activeTab = 'all', isMyBlock = false }: MyBlockProps) {
+  const navigate = useNavigate();
 
   // activeTab에 따라 블록 필터링
-  const filteredBlocks = blockList.filter((block) => {
+  const filteredBlocks = blocks.filter((block) => {
     if (activeTab === 'all') {
       return true;
     } else if (activeTab === 'idea') {
@@ -66,10 +47,18 @@ export default function BlockList({ blocks, activeTab = 'all' }: MyBlockProps) {
       {filteredBlocks.length > 0 && (
         <S.BlockListContainer>
           {filteredBlocks.map((block) => (
-            <S.BlockCard key={block.block_id}>
+            <S.BlockCard 
+              key={block.block_id}
+              onClick={() => {
+                // 내 블록이면 내 블록 상세 페이지로, 타인의 블록이면 타인 블록 상세 페이지로
+                const detailPath = isMyBlock 
+                  ? `/My/BlockDetail/${block.block_id}`
+                  : `/OtherUser/BlockDetail/${block.block_id}`;
+                navigate(detailPath);
+              }}
+            >
               <S.BlockIcon>
-                {/* 추후 카드 이미지와 1:1 연결 */}
-                <img src={mediumIdeaCulture} alt="Block Icon" />
+                <img src={getMediumImage(block.category_name)} alt="Block Icon" />
               </S.BlockIcon>
               <S.BlockContent>
                 <S.BlockTitle>{block.block_title}</S.BlockTitle>

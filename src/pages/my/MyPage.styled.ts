@@ -96,9 +96,10 @@ export const Portfolio = styled.div`
 
 export const PortfolioItem = styled.div<{ $isL500?: boolean }>`
   width: 100%;
-  height: 21px;
+  min-height: 21px;
   display: flex;
   align-items: center;
+  gap: 8px;
   ${props => props.$isL500 && `
     color: #868286;
   `}
@@ -107,6 +108,11 @@ export const PortfolioItem = styled.div<{ $isL500?: boolean }>`
 export const PortfolioFileLink = styled.span`
   color: inherit;
   cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   &:hover {
     text-decoration: underline;
   }
