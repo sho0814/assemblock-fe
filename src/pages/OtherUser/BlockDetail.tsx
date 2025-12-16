@@ -4,6 +4,8 @@ import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from '../block/BlockDetailPage.styled';
 import SimpleHeader from '@components/shared/SimpleHeader';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
+import { useOverlay } from '@components/common/OverlayContext';
+import BoardSelector from '@components/home/BoardSelector';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import Img2 from '@assets/common/ProfileImg/Img2.svg';
 import Img3 from '@assets/common/ProfileImg/Img3.svg';
@@ -96,7 +98,7 @@ export function BlockDetail() {
       }
 
       const blockIdNum = parseInt(blockId, 10);
-      
+
       if (isNaN(blockIdNum)) {
         console.error('유효하지 않은 blockId');
         navigate(-1);
@@ -149,6 +151,7 @@ export function BlockDetail() {
           selectedParts: convertedParts,
         });
 
+
         // 프로필 이미지 설정
         const profileType = profileData?.profileType;
         if (profileType && profileTypeToImage[profileType]) {
@@ -181,6 +184,7 @@ export function BlockDetail() {
         console.error('Failed to fetch block data:', error);
         // API 실패 시 이전 페이지로 이동
         navigate(-1);
+
       }
     };
 

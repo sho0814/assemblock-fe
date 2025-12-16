@@ -431,11 +431,13 @@ export function MyPage() {
         <Portfolio>
           <PortfolioItem className="l600">나의 포트폴리오</PortfolioItem>
           <PortfolioItem className="l500" $isL500>
-            <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', marginRight: '8px' }} />
-            {userProfile?.portfolioUrl || '아직 등록된 링크가 없어요'}
+            <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', flexShrink: 0 }} />
+            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {userProfile?.portfolioUrl || '아직 등록된 링크가 없어요'}
+            </span>
           </PortfolioItem>
           <PortfolioItem className="l500" $isL500>
-            <img src={folderIcon} alt="folder" style={{ width: '18px', height: '18px', marginRight: '8px' }} />
+            <img src={folderIcon} alt="folder" style={{ width: '18px', height: '18px', flexShrink: 0 }} />
             {userProfile?.portfolioPdfUrl ? (
               <PortfolioFileLink
                 onClick={() => {
@@ -448,7 +450,7 @@ export function MyPage() {
                 {userProfile.portfolioFileName || '포트폴리오 파일'}
               </PortfolioFileLink>
             ) : (
-              '아직 등록된 파일이 없어요'
+              <span style={{ flex: 1, minWidth: 0 }}>아직 등록된 파일이 없어요</span>
             )}
           </PortfolioItem>
         </Portfolio>

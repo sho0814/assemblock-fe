@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from './BlockDetailPage.styled';
 import backArrow from '@assets/common/back-arrow.svg';
@@ -77,6 +77,7 @@ const profileTypeToImage: Record<string, ProfileData> = {
 };
 
 export function BlockDetailPage() {
+  const { blockId: blockIdParam } = useParams<{ blockId?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { showOverlay } = useOverlay();
@@ -95,7 +96,8 @@ export function BlockDetailPage() {
 
   useEffect(() => {
     const fetchBlockData = async () => {
-      const blockId = searchParams.get('id');
+      // 라우트 파라미터 우선, 없으면 쿼리 파라미터 사용 (하위 호환성)
+      const blockId = blockIdParam || searchParams.get('id');
       if (!blockId) return;
 
       const blockIdNum = parseInt(blockId, 10);
@@ -175,7 +177,7 @@ export function BlockDetailPage() {
     };
 
     fetchBlockData();
-  }, [searchParams]);
+  }, [blockIdParam, searchParams]);
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('selectedProfile');
@@ -260,7 +262,7 @@ export function BlockDetailPage() {
 
   const handleEdit = () => {
     setIsMenuOpen(false);
-    const blockId = searchParams.get('id');
+    const blockId = blockIdParam || searchParams.get('id');
     if (blockId) {
       navigate(`/Block/edit?id=${blockId}`);
     }
@@ -279,7 +281,7 @@ export function BlockDetailPage() {
         }
         prevContent="삭제하기"
         onPrevClick={async () => {
-          const blockId = searchParams.get('id');
+          const blockId = blockIdParam || searchParams.get('id');
           if (!blockId) {
             navigate(-1);
             return;
