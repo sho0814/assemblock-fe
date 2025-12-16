@@ -22,8 +22,8 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
     return categoryToIconMap[category] ?? "/sample.png";
   };
 
-  const handleClick = () => {
-    navigate('/OtherUser/BlockDetail');
+  const handleClick = (blockId: number) => {
+    navigate(`/OtherUser/BlockDetail/${encodeURIComponent(blockId)}`);
   }
 
   if (error) {
@@ -68,7 +68,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
   return (
     <S.BlockListWrapper>
       {blocks.map(block => (
-        <S.BlockItem key={block.blockId} onClick={handleClick}>
+        <S.BlockItem key={block.blockId} onClick={() => handleClick(block.blockId)}>
           <S.Thumbnail
             src={getCategoryThumbnail(block.categoryName)}
             alt="블록 썸네일"
