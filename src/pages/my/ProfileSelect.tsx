@@ -2,10 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ProfileSelectContainer,
-  HeaderBar,
-  HeaderSlot,
-  CenterTextBox,
-  BackButton,
   TextSection,
   MainText,
   SubText,
@@ -15,6 +11,7 @@ import {
   ProfilePlaceholder,
   ConfirmBtn,
 } from './ProfileSelect.styled';
+import SimpleHeader from '@components/shared/SimpleHeader';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import Img2 from '@assets/common/ProfileImg/Img2.svg';
 import Img3 from '@assets/common/ProfileImg/Img3.svg';
@@ -86,6 +83,17 @@ export function ProfileSelect() {
           alt: profile.alt,
           colorMap: profile.colorMap
         }));
+        
+        // profileType도 함께 저장 (ProfileEdit에서 사용)
+        const profileIdToType: Record<string, string> = {
+          'img1': 'Type_1',
+          'img2': 'Type_2',
+          'img3': 'Type_3',
+          'img4': 'Type_4',
+          'img5': 'Type_5',
+        };
+        const profileType = profileIdToType[profile.id] || 'Type_1';
+        localStorage.setItem('selectedProfileType', profileType);
       }
     }
     
@@ -95,19 +103,10 @@ export function ProfileSelect() {
 
   return (
     <ProfileSelectContainer>
-      <HeaderBar>
-        <HeaderSlot>
-          <BackButton onClick={() => navigate('/My/ProfileEdit')}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M15 19L8 12L15 5" stroke="#352F36" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </BackButton>
-        </HeaderSlot>
-        <HeaderSlot>
-          <CenterTextBox>프로필 이미지 설정</CenterTextBox>
-        </HeaderSlot>
-        <HeaderSlot />
-      </HeaderBar>
+      <SimpleHeader 
+        title="프로필 이미지 설정"
+        onBackClick={() => navigate('/My/ProfileEdit')}
+      />
       <TextSection>
         <MainText>프로필 이미지를 선택해주세요</MainText>
         <SubText>단일 선택 가능</SubText>
