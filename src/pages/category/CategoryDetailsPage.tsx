@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
 import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@constants";
