@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from '../block/BlockDetailPage.styled';
 import SimpleHeader from '@components/shared/SimpleHeader';
@@ -14,7 +14,8 @@ import Img5 from '@assets/common/ProfileImg/Img5.svg';
 import linkIcon from '@assets/MyPage/link.svg';
 import folderIcon from '@assets/MyPage/folder.svg';
 import CommonButton from '@components/shared/CommonButton';
-import { getUserBlocks } from '@api/profiles/blocks';
+import { getBlockDetail } from '@api/blockId';
+import { getMyProfile } from '@api/users/me';
 import { getUserProfile } from '@api/profiles/profile';
 
 // Tech_parts 매핑
@@ -77,9 +78,8 @@ const profileTypeToImage: Record<string, ProfileData> = {
 
 export function BlockDetail() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  const { showOverlay } = useOverlay();
+  const { blockId } = useParams<{ blockId: string }>();
+  
   const [block, setBlock] = useState<BlockData | null>(null);
   const [foundBlockData, setFoundBlockData] = useState<{ techPart?: string } | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
@@ -89,35 +89,49 @@ export function BlockDetail() {
     selectedParts: string[];
   } | null>(null);
 
-  const handleBoardOverlay = (blockId: number) => {
-    showOverlay(
-      <BoardSelector blockId={blockId} />,
-      { contentStyle: { position: 'absolute', bottom: '0', width: '100%' } }
-    );
-  }
-
   useEffect(() => {
     const fetchBlockData = async () => {
-      const blockId = searchParams.get('id');
-      const userIdParam = searchParams.get('userId');
-
-      if (!blockId || !userIdParam) {
-        console.error('blockId 또는 userId가 없습니다.');
+      if (!blockId) {
+        console.error('blockId가 없습니다.');
+        navigate(-1);
         return;
       }
 
-      const userId = parseInt(userIdParam, 10);
       const blockIdNum = parseInt(blockId, 10);
 
-      if (isNaN(userId) || isNaN(blockIdNum)) {
-        console.error('유효하지 않은 userId 또는 blockId');
+      if (isNaN(blockIdNum)) {
+        console.error('유효하지 않은 blockId');
+        navigate(-1);
         return;
       }
 
       try {
-        // 사용자 프로필 정보 가져오기
-        const profileData = await getUserProfile(userId);
+        // 블록 상세 정보 가져오기 (블록 정보 + 작성자 정보 포함)
+        const blockDetail = await getBlockDetail(blockIdNum);
+        
+        // 현재 로그인한 사용자 정보 가져오기 (내 블록인지 확인용)
+        let myProfile;
+        try {
+          myProfile = await getMyProfile();
+          
+          // 내 블록이면 내 블록 상세 페이지로 리다이렉트
+          if (blockDetail.user.userId === myProfile.userId) {
+            navigate(`/My/BlockDetail?id=${blockIdNum}`);
+            return;
+          }
+        } catch (error) {
+          console.warn('Failed to fetch my profile:', error);
+        }
 
+        // 작성자 상세 프로필 정보 가져오기
+        let profileData;
+        try {
+          profileData = await getUserProfile(blockDetail.user.userId);
+        } catch (error) {
+          console.warn('Failed to fetch user profile:', error);
+        }
+
+        // 작성자 정보 설정
         const roleToPartId: Record<string, string> = {
           'Plan': 'planning',
           'Design': 'design',
@@ -125,98 +139,57 @@ export function BlockDetail() {
           'BackEnd': 'backend',
           'PM': 'pm',
         };
-
-        const convertedParts = profileData.mainRoles.length > 0
-          ? profileData.mainRoles.map((role: string) => roleToPartId[role] || role.toLowerCase())
+        
+        const roles = profileData?.mainRoles || blockDetail.user.roles || [];
+        const convertedParts = roles.length > 0 
+          ? roles.map((role: string) => roleToPartId[role] || role.toLowerCase())
           : [];
-
-        const convertedProfile = {
-          nickname: profileData.nickname || '',
-          introduction: profileData.introduction || '',
+        
+        setUserProfile({
+          nickname: blockDetail.user.nickname || '',
+          introduction: profileData?.introduction || '',
           selectedParts: convertedParts,
-        };
+        });
 
-        setUserProfile(convertedProfile);
 
         // 프로필 이미지 설정
-        if (profileData.profileType && profileTypeToImage[profileData.profileType]) {
-          setSelectedProfile(profileTypeToImage[profileData.profileType]);
+        const profileType = profileData?.profileType;
+        if (profileType && profileTypeToImage[profileType]) {
+          setSelectedProfile(profileTypeToImage[profileType]);
         } else {
           setSelectedProfile(profileTypeToImage['Type_1']);
         }
 
-        // 사용자의 블록 목록 가져오기
-        const blocks = await getUserBlocks(userId, 'ALL');
-
-        // 해당 blockId와 일치하는 블록 찾기
-        const foundBlock = blocks.find((b) => b.blockId === blockIdNum);
-
-        if (foundBlock) {
-          // API 응답을 BlockData 형식으로 변환
-          // techPart는 문자열이지만 techparts는 number[] 타입이므로 빈 배열로 설정
-          // 실제 techPart는 getCategoryPath에서 직접 사용
-          const convertedBlock: BlockData = {
-            block_id: foundBlock.blockId,
-            user_id: foundBlock.writerId,
-            category_name: foundBlock.categoryName,
-            block_title: foundBlock.blockTitle,
-            block_type: foundBlock.blockType,
-            contribution_score: foundBlock.contributionScore,
-            tools_text: foundBlock.toolsText || null,
-            oneline_summary: foundBlock.oneLineSummary,
-            improvement_point: foundBlock.improvementPoint || null,
-            result_url: foundBlock.resultUrl || null,
-            result_file: foundBlock.resultFile || null,
-            created_at: foundBlock.createdAt,
-            techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
-          };
-
-          setBlock(convertedBlock);
-          // techPart 정보를 별도로 저장 (getCategoryPath에서 사용)
-          setFoundBlockData({ techPart: foundBlock.techPart });
-        } else {
-          console.error('블록을 찾을 수 없습니다.');
-        }
+        // BlockDetailResponse를 BlockData 형식으로 변환
+        const convertedBlock: BlockData = {
+          block_id: blockDetail.blockId,
+          user_id: blockDetail.user.userId,
+          category_name: blockDetail.categoryName,
+          block_title: blockDetail.blockTitle,
+          block_type: blockDetail.blockType,
+          contribution_score: blockDetail.contributionScore,
+          tools_text: blockDetail.toolsText || null,
+          oneline_summary: blockDetail.oneLineSummary,
+          improvement_point: blockDetail.improvementPoint || null,
+          result_url: blockDetail.resultUrl || null,
+          result_file: blockDetail.resultFile || null,
+          created_at: new Date().toISOString(), // BlockDetailResponse에 createdAt이 없으므로 현재 시간 사용
+          techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
+        };
+        
+        setBlock(convertedBlock);
+        // techPart 정보를 별도로 저장 (getCategoryPath에서 사용)
+        setFoundBlockData({ techPart: blockDetail.techPart || undefined });
       } catch (error) {
         console.error('Failed to fetch block data:', error);
-        // API 실패 시 localStorage에서 가져오기 (fallback)
-        const savedBlocks = localStorage.getItem('registeredBlocks');
-        if (savedBlocks) {
-          try {
-            const blocks = JSON.parse(savedBlocks) as BlockData[];
-            const foundBlock = blocks.find(
-              (b) => b.block_id.toString() === blockId
-            );
-            if (foundBlock) {
-              setBlock(foundBlock);
-            }
-          } catch (e) {
-            console.error('블록 데이터 찾기 실패:', e);
-          }
-        }
+        // API 실패 시 이전 페이지로 이동
+        navigate(-1);
 
-        const savedProfile = localStorage.getItem('selectedProfile');
-        if (savedProfile) {
-          try {
-            setSelectedProfile(JSON.parse(savedProfile) as ProfileData);
-          } catch (e) {
-            console.error('Failed to parse saved profile:', e);
-          }
-        }
-
-        const savedUserProfile = localStorage.getItem('userProfile');
-        if (savedUserProfile) {
-          try {
-            setUserProfile(JSON.parse(savedUserProfile));
-          } catch (e) {
-            console.error('Failed to parse saved user profile:', e);
-          }
-        }
       }
     };
 
     fetchBlockData();
-  }, [searchParams]);
+  }, [blockId, navigate]);
 
   // 데이터가 없을 때 사용할 기본값
   const safeBlock: BlockData = block || {
@@ -231,7 +204,7 @@ export function BlockDetail() {
     result_file: '',
     tools_text: '',
     techparts: [],
-  } as unknown as BlockData;
+  } as unknown as BlockData; 
 
   const isTechnology = safeBlock.block_type === 'TECHNOLOGY' || safeBlock.block_type === 'technology';
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
@@ -256,13 +229,14 @@ export function BlockDetail() {
       <S.Container>
         <>
           <S.CategoryBreadcrumb>{getCategoryPath()}</S.CategoryBreadcrumb>
-
+          
           <S.BlockTitle>{safeBlock.block_title}</S.BlockTitle>
 
           <S.ProfileSection onClick={() => {
-            const userIdParam = searchParams.get('userId');
-            if (userIdParam) {
-              navigate(`/OtherUser/Profile?userId=${userIdParam}`);
+            // block에서 user_id를 가져와서 프로필 페이지로 이동
+            const userId = block?.user_id;
+            if (userId) {
+              navigate(`/OtherUser/Profile?userId=${userId}`);
             } else {
               navigate('/OtherUser/Profile');
             }
@@ -271,7 +245,7 @@ export function BlockDetail() {
               {selectedProfile ? (
                 <ProfileAct profile={selectedProfile} isSelected={true} size="small" />
               ) : (
-                <ProfileAct
+                <ProfileAct 
                   profile={{
                     id: 'img1',
                     src: Img1,
@@ -280,9 +254,9 @@ export function BlockDetail() {
                       '#C2C1C3': '#2E3B00',
                       '#F0EFF1': '#B8EB00'
                     }
-                  }}
-                  isSelected={true}
-                  size="small"
+                  }} 
+                  isSelected={true} 
+                  size="small" 
                 />
               )}
             </S.ProfileImg>
@@ -301,7 +275,7 @@ export function BlockDetail() {
             <S.ProjectCardDescription>
               {safeBlock.oneline_summary || "등록된 한 줄 소개가 없어요"}
             </S.ProjectCardDescription>
-
+            
             <S.ProjectCardDivider />
 
             {/* 아이디어 블록은 기술 스택 표시 안함 */}
@@ -318,7 +292,7 @@ export function BlockDetail() {
                   </S.TechStackContainer>
                 ) : (
                   <S.SectionValue style={{ marginTop: '8px' }}>
-                    아직 등록된 기술 스택이 없어요
+                     아직 등록된 기술 스택이 없어요
                   </S.SectionValue>
                 )}
               </S.TechStackSection>
@@ -353,17 +327,17 @@ export function BlockDetail() {
 
           <S.Section>
             <S.SectionLabel>{userProfile?.nickname || 'Username'}님의 포트폴리오</S.SectionLabel>
-
+            
             {!safeBlock.result_url && !safeBlock.result_file && (
               <S.SectionValue>아직 등록된 기존 프로젝트 결과물이 없어요</S.SectionValue>
             )}
 
             {safeBlock.result_url && (
-              <S.Link
-                href={safeBlock.result_url}
-                target="_blank"
+              <S.Link 
+                href={safeBlock.result_url} 
+                target="_blank" 
                 rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', marginBottom: safeBlock.result_file ? '8px' : '0' }}
+                style={{ display: 'flex', alignItems: 'center', marginBottom: safeBlock.result_file ? '8px' : '0' }} 
               >
                 <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', marginRight: '8px' }} ></img>
                 {safeBlock.result_url}
@@ -383,11 +357,14 @@ export function BlockDetail() {
             )}
           </S.Section>
 
-          <div style={{ marginTop: '36px' }}>
-            <CommonButton
+          <div style={{ marginTop: '36px'}}>
+            <CommonButton 
               content="보드에 담기"
               width="335px"
-              onClick={() => handleBoardOverlay(safeBlock.block_id)}
+              onClick={() => {
+                // 보드에 담기 로직 추가
+                console.log('보드에 담기');
+              }}
             />
           </div>
         </>
