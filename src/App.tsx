@@ -39,7 +39,7 @@ function App() {
   return (
     <>
       <Toaster
-        position="bottom-center" />
+        position="bottom-center" containerStyle={{top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
       <OverlayProvider>
         <Routes>
           <Route element={<MainLayout />}>
