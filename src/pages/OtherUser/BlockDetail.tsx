@@ -5,17 +5,72 @@ import * as S from '../block/BlockDetailPage.styled';
 import SimpleHeader from '@components/shared/SimpleHeader';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
+import Img2 from '@assets/common/ProfileImg/Img2.svg';
+import Img3 from '@assets/common/ProfileImg/Img3.svg';
+import Img4 from '@assets/common/ProfileImg/Img4.svg';
+import Img5 from '@assets/common/ProfileImg/Img5.svg';
 import linkIcon from '@assets/MyPage/link.svg';
 import folderIcon from '@assets/MyPage/folder.svg';
 import CommonButton from '@components/shared/CommonButton';
-import { useOverlay } from '@components/common/OverlayContext';
-import BoardSelector from '@components/home/BoardSelector';
+import { getUserBlocks } from '@api/profiles/blocks';
+import { getUserProfile } from '@api/profiles/profile';
 
 // Tech_parts 매핑
-const TECH_PARTS_MAP: Record<number, { name: string; color: string }> = {
-  1: { name: '디자인', color: '#FF1BB3' },
-  2: { name: '프론트엔드', color: '#FF6017' },
-  3: { name: '백엔드', color: '#B8EB00' },
+const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
+  'Design': { name: '디자인', color: '#FF1BB3' },
+  'FrontEnd': { name: '프론트엔드', color: '#FF6017' },
+  'BackEnd': { name: '백엔드', color: '#B8EB00' },
+  'Plan': { name: '기획', color: '#35CDFF' },
+  'PM': { name: 'PM', color: '#6F35FF' },
+};
+
+// 프로필 타입에 따른 이미지 매핑
+const profileTypeToImage: Record<string, ProfileData> = {
+  'Type_1': {
+    id: 'img1',
+    src: Img1,
+    alt: 'backend',
+    colorMap: {
+      '#C2C1C3': '#2E3B00',
+      '#F0EFF1': '#B8EB00'
+    }
+  },
+  'Type_2': {
+    id: 'img2',
+    src: Img2,
+    alt: 'design',
+    colorMap: {
+      '#C2C1C3': '#FF1BB3',
+      '#F0EFF1': '#4D0836'
+    }
+  },
+  'Type_3': {
+    id: 'img3',
+    src: Img3,
+    alt: 'frontend',
+    colorMap: {
+      '#C2C1C3': '#FF6017',
+      '#F0EFF1': '#4D1D07'
+    }
+  },
+  'Type_4': {
+    id: 'img4',
+    src: Img4,
+    alt: 'plan',
+    colorMap: {
+      '#C2C1C3': '#35CDFF',
+      '#F0EFF1': '#103E4D'
+    }
+  },
+  'Type_5': {
+    id: 'img5',
+    src: Img5,
+    alt: 'pm',
+    colorMap: {
+      '#C2C1C3': '#6F35FF',
+      '#F0EFF1': '#22104D'
+    }
+  },
 };
 
 export function BlockDetail() {
@@ -24,6 +79,7 @@ export function BlockDetail() {
 
   const { showOverlay } = useOverlay();
   const [block, setBlock] = useState<BlockData | null>(null);
+  const [foundBlockData, setFoundBlockData] = useState<{ techPart?: string } | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
   const [userProfile, setUserProfile] = useState<{
     nickname: string;
@@ -39,46 +95,126 @@ export function BlockDetail() {
   }
 
   useEffect(() => {
-    const blockId = searchParams.get('id');
-    if (!blockId) return;
+    const fetchBlockData = async () => {
+      const blockId = searchParams.get('id');
+      const userIdParam = searchParams.get('userId');
+      
+      if (!blockId || !userIdParam) {
+        console.error('blockId 또는 userId가 없습니다.');
+        return;
+      }
 
-    const savedBlocks = localStorage.getItem('registeredBlocks');
-    if (savedBlocks) {
+      const userId = parseInt(userIdParam, 10);
+      const blockIdNum = parseInt(blockId, 10);
+      
+      if (isNaN(userId) || isNaN(blockIdNum)) {
+        console.error('유효하지 않은 userId 또는 blockId');
+        return;
+      }
+
       try {
-        const blocks = JSON.parse(savedBlocks) as BlockData[];
-        const foundBlock = blocks.find(
-          (b) => b.block_id.toString() === blockId
-        );
-        if (foundBlock) {
-          setBlock(foundBlock);
+        // 사용자 프로필 정보 가져오기
+        const profileData = await getUserProfile(userId);
+        
+        const roleToPartId: Record<string, string> = {
+          'Plan': 'planning',
+          'Design': 'design',
+          'FrontEnd': 'frontend',
+          'BackEnd': 'backend',
+          'PM': 'pm',
+        };
+        
+        const convertedParts = profileData.mainRoles.length > 0 
+          ? profileData.mainRoles.map((role: string) => roleToPartId[role] || role.toLowerCase())
+          : [];
+        
+        const convertedProfile = {
+          nickname: profileData.nickname || '',
+          introduction: profileData.introduction || '',
+          selectedParts: convertedParts,
+        };
+        
+        setUserProfile(convertedProfile);
+        
+        // 프로필 이미지 설정
+        if (profileData.profileType && profileTypeToImage[profileData.profileType]) {
+          setSelectedProfile(profileTypeToImage[profileData.profileType]);
+        } else {
+          setSelectedProfile(profileTypeToImage['Type_1']);
         }
-      } catch (e) {
-        console.error('블록 데이터 찾기 실패:', e);
+
+        // 사용자의 블록 목록 가져오기
+        const blocks = await getUserBlocks(userId, 'ALL');
+        
+        // 해당 blockId와 일치하는 블록 찾기
+        const foundBlock = blocks.find((b) => b.blockId === blockIdNum);
+        
+        if (foundBlock) {
+          // API 응답을 BlockData 형식으로 변환
+          // techPart는 문자열이지만 techparts는 number[] 타입이므로 빈 배열로 설정
+          // 실제 techPart는 getCategoryPath에서 직접 사용
+          const convertedBlock: BlockData = {
+            block_id: foundBlock.blockId,
+            user_id: foundBlock.writerId,
+            category_name: foundBlock.categoryName,
+            block_title: foundBlock.blockTitle,
+            block_type: foundBlock.blockType,
+            contribution_score: foundBlock.contributionScore,
+            tools_text: foundBlock.toolsText || null,
+            oneline_summary: foundBlock.oneLineSummary,
+            improvement_point: foundBlock.improvementPoint || null,
+            result_url: foundBlock.resultUrl || null,
+            result_file: foundBlock.resultFile || null,
+            created_at: foundBlock.createdAt,
+            techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
+          };
+          
+          setBlock(convertedBlock);
+          // techPart 정보를 별도로 저장 (getCategoryPath에서 사용)
+          setFoundBlockData({ techPart: foundBlock.techPart });
+        } else {
+          console.error('블록을 찾을 수 없습니다.');
+        }
+      } catch (error) {
+        console.error('Failed to fetch block data:', error);
+        // API 실패 시 localStorage에서 가져오기 (fallback)
+        const savedBlocks = localStorage.getItem('registeredBlocks');
+        if (savedBlocks) {
+          try {
+            const blocks = JSON.parse(savedBlocks) as BlockData[];
+            const foundBlock = blocks.find(
+              (b) => b.block_id.toString() === blockId
+            );
+            if (foundBlock) {
+              setBlock(foundBlock);
+            }
+          } catch (e) {
+            console.error('블록 데이터 찾기 실패:', e);
+          }
+        }
+        
+        const savedProfile = localStorage.getItem('selectedProfile');
+        if (savedProfile) {
+          try {
+            setSelectedProfile(JSON.parse(savedProfile) as ProfileData);
+          } catch (e) {
+            console.error('Failed to parse saved profile:', e);
+          }
+        }
+        
+        const savedUserProfile = localStorage.getItem('userProfile');
+        if (savedUserProfile) {
+          try {
+            setUserProfile(JSON.parse(savedUserProfile));
+          } catch (e) {
+            console.error('Failed to parse saved user profile:', e);
+          }
+        }
       }
-    }
+    };
+
+    fetchBlockData();
   }, [searchParams]);
-
-  useEffect(() => {
-    const savedProfile = localStorage.getItem('selectedProfile');
-    if (savedProfile) {
-      try {
-        const profile = JSON.parse(savedProfile) as ProfileData;
-        setSelectedProfile(profile);
-      } catch (e) {
-        console.error('Failed to parse saved profile:', e);
-      }
-    }
-
-    const savedUserProfile = localStorage.getItem('userProfile');
-    if (savedUserProfile) {
-      try {
-        const profile = JSON.parse(savedUserProfile);
-        setUserProfile(profile);
-      } catch (e) {
-        console.error('Failed to parse saved user profile:', e);
-      }
-    }
-  }, []);
 
   // 데이터가 없을 때 사용할 기본값
   const safeBlock: BlockData = block || {
@@ -97,13 +233,15 @@ export function BlockDetail() {
 
   const isTechnology = safeBlock.block_type === 'TECHNOLOGY' || safeBlock.block_type === 'technology';
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
-  const techParts = safeBlock.techparts || [];
 
   const getCategoryPath = () => {
-    if (isTechnology && techParts.length > 0) {
-      const techPart = TECH_PARTS_MAP[techParts[0]];
+    if (isTechnology && foundBlockData?.techPart) {
+      // API에서 받은 techPart를 직접 사용
+      const techPart = TECH_PARTS_MAP[foundBlockData.techPart];
       const partName = techPart ? techPart.name : '';
       return `기술 > ${partName} > ${safeBlock.category_name || ''}`;
+    } else if (isTechnology) {
+      return `기술 > ${safeBlock.category_name || ''}`;
     } else if (isIdea) {
       return `아이디어 > ${safeBlock.category_name || ''}`;
     }
@@ -119,7 +257,14 @@ export function BlockDetail() {
 
           <S.BlockTitle>{safeBlock.block_title}</S.BlockTitle>
 
-          <S.ProfileSection onClick={() => navigate('/OtherUser/Profile')}>
+          <S.ProfileSection onClick={() => {
+            const userIdParam = searchParams.get('userId');
+            if (userIdParam) {
+              navigate(`/OtherUser/Profile?userId=${userIdParam}`);
+            } else {
+              navigate('/OtherUser/Profile');
+            }
+          }}>
             <S.ProfileImg>
               {selectedProfile ? (
                 <ProfileAct profile={selectedProfile} isSelected={true} size="small" />

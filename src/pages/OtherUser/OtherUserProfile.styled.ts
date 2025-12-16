@@ -65,10 +65,10 @@ export const UserInfo = styled.div`
 export const PartLabel = styled.span<{ $color?: string }>`
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
+  padding: 4px 8px;
   height: 23px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   background: ${props => props.$color || '#35CDFF'};
   color: #FAFAFA;
@@ -76,6 +76,7 @@ export const PartLabel = styled.span<{ $color?: string }>`
 `;
 
 export const UserIntroduction = styled.div`
+  margin-top: 2px;
   align-self: stretch;
   color: #5A565B;
   font-size: 12px;
@@ -148,17 +149,56 @@ export const ReviewTab = styled.div<{ $isActive?: boolean }>`
   transition: background 0.2s, color 0.2s;
 `;
 
-export const ReviewBlock = styled.div`
+export const ReviewBlock = styled.div<{ $hasReviews?: boolean; $patternImage?: string }>`
   width: 100%;
   min-height: 255px;
-  background: border-radius: 16px;
-  background: var(--GrayScale-GR10, #F0EFF1);
   border-radius: 16px;
+  background: ${props => props.$hasReviews && props.$patternImage
+    ? `url(${props.$patternImage}), var(--GrayScale-GR10, #F0EFF1)`
+    : 'var(--GrayScale-GR10, #F0EFF1)'};
+  background-repeat: ${props => props.$hasReviews ? 'repeat' : 'no-repeat'};
+  background-size: ${props => props.$hasReviews ? 'auto, cover' : 'cover'};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-top: 24px;
+`;
+
+
+export const ReviewGridContainer = styled.div<{ $hasReviews?: boolean; $patternImage?: string }>`
+  width: 335px;
+  height: 275px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 24px;
+  border-radius: 16px;
+  background: ${props => props.$hasReviews && props.$patternImage
+    ? `url(${props.$patternImage}), var(--GrayScale-GR10, #F0EFF1)`
+    : 'var(--GrayScale-GR10, #F0EFF1)'};
+  background-repeat: ${props => props.$hasReviews ? 'repeat' : 'no-repeat'};
+  background-size: ${props => props.$hasReviews ? 'auto, cover' : 'cover'};
+  padding: 8px;
+  box-sizing: border-box;
+  position: relative;
+`;
+
+export const ReviewGridCell = styled.div<{ $col: number; $row: number }>`
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+
+export const ReviewGridBlock = styled.img`
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
 `;
 
 export const ReviewBlockImage = styled.img`
