@@ -20,57 +20,28 @@ const RenderCategoryCards: React.FC<RenderCategoryCardsProps> = ({ category }) =
     }, [category, fetchByCategory])
 
     if (error) {
-        <p
-            style={{
-                position: "fixed",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                fontWeight: 500,
-                fontSize: "16px",
-                color: "#868286",
-            }}
-        >
-            {error}
-        </p>
+        return (
+            <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
+                {error}
+            </p>
+        );
     }
 
     if (loading) {
         return (
-            <p
-                style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    fontWeight: 500,
-                    fontSize: "16px",
-                    color: "#868286",
-                }}
-            >
-                블록을 불러오는 중입니다.
+            <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
+                블록 불러오는 중...
             </p>
         );
     }
 
     if (!blocks.length) {
-        return (
-            <p
-                style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    fontWeight: 500,
-                    fontSize: "16px",
-                    color: "#868286",
-                    whiteSpace: "nowrap",
-                }}
-            >
-                해당 카테고리에 등록된 블록이 없습니다.
-            </p>
-        );
-    }
+    return (
+      <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: "16px", fontWeight: "500", color: '#868286' }}>
+        해당 카테고리에 등록된 블록이 없습니다.
+      </p>
+    );
+  }
 
     const SLIDES = blocks.map((card) => (
         <Card key={card.blockId}
