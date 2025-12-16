@@ -29,7 +29,7 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
   if (loading) {
     return (
       <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: 16, fontWeight: 500, color: '#868286' }}>
-        카드 불러오는 중...
+        블록 불러오는 중...
       </p>
     );
   }
@@ -37,7 +37,7 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
   if (!blocks.length) {
     return (
       <p style={{ position: 'fixed', left: '50%', top: '50%', transform: "translate(-50%, -50%)", fontSize: 16, fontWeight: 500, color: '#868286' }}>
-        등록된 카드가 없습니다.
+        등록된 블록이 없습니다.
       </p>
     );
   }
@@ -51,7 +51,7 @@ export default function RenderHomeCards({ setIsRegisterBlockActive, isRegisterBl
     />
   ))
 
-  if (blocks.length == 2) {
+  if (blocks.length == 1) {
     return (
       <div style={{
         position: "fixed",
