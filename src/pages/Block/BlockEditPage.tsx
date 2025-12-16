@@ -9,8 +9,11 @@ import {
     CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK,
     TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK
 } from '@constants';
-import { logFormData, submitFormData } from '@utils/formSubmit';
+import { logFormData } from '@utils/formSubmit';
 import CommonButton from '@components/shared/CommonButton';
+import { getBlockDetail, updateBlock } from '@api/blockId';
+import { getCategoryLabel, getCategoryValue } from '@utils/getCategoryLabel';
+import type { NewBlockData } from '@types';
 
 import * as S from './BlockEditPage.styled';
 
@@ -31,6 +34,23 @@ export function BlockEditPage() {
     const [contributionRate, setContributionRate] = useState<number>(0);                // 기존 프로젝트 기여도
     const [fileName, setFileName] = useState<string | null>(null);                      // 기존 프로젝트 결과물 PDF
     const [isFormValid, setIsFormValid] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [improvementPoint, setImprovementPoint] = useState('');                      // 개선하고 싶은 점
+    const [resultUrl, setResultUrl] = useState('');                                   // 결과물 URL
+    
+    // 초기 데이터 저장 (변경사항 감지용)
+    const [initialData, setInitialData] = useState<{
+        blockTitle: string;
+        isSkillState: boolean;
+        selectedTechPart: BlockPart | null;
+        selectedCategory: string;
+        selectedTools: string;
+        onelineSummary: string;
+        contributionRate: number;
+        improvementPoint: string;
+        resultUrl: string;
+        fileName: string | null;
+    } | null>(null);
 
     const { showOverlay, closeOverlay } = useOverlay();
 
@@ -57,31 +77,211 @@ export function BlockEditPage() {
         );
     };
 
-    // blockId가 있을 경우 데이터를 불러오는 로직이 필요함
+    // blockId가 있을 경우 데이터를 불러오는 로직
     useEffect(() => {
-        if (blockId) {
-            console.log(`불러온 Block ID: ${blockId}`);
-        }
+        const fetchBlockData = async () => {
+            if (!blockId) return;
+            
+            const blockIdNum = parseInt(blockId, 10);
+            if (isNaN(blockIdNum)) {
+                console.error('유효하지 않은 blockId:', blockId);
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                const blockDetail = await getBlockDetail(blockIdNum);
+                
+                // 블록 타입 설정
+                const isTechnology = blockDetail.blockType === 'TECHNOLOGY';
+                setIsSkillState(isTechnology);
+                
+                // 블록 제목
+                setBlockTitle(blockDetail.blockTitle || '');
+                
+                // 기술 파트 설정 (API는 대문자, 폼은 소문자)
+                if (blockDetail.techPart) {
+                    const techPartLower = blockDetail.techPart.toLowerCase();
+                    if (techPartLower === 'frontend' || techPartLower === 'front_end') {
+                        setSelectedTechPart('frontend');
+                    } else if (techPartLower === 'backend' || techPartLower === 'back_end') {
+                        setSelectedTechPart('backend');
+                    } else if (techPartLower === 'design') {
+                        setSelectedTechPart('design');
+                    }
+                }
+                
+                // 카테고리 설정 (API는 value 형식, 폼은 label 형식)
+                const categoryLabel = getCategoryLabel(blockDetail.categoryName);
+                setSelectedCategory(categoryLabel);
+                
+                // 사용 툴 및 언어
+                setSelectedTools(blockDetail.toolsText || '');
+                
+                // 한 줄 소개
+                setOnelineSummary(blockDetail.oneLineSummary || '');
+                
+                // 기여도 - 명시적으로 숫자 변환
+                setContributionRate(Number(blockDetail.contributionScore) || 0);
+                
+                // 개선하고 싶은 점
+                setImprovementPoint(blockDetail.improvementPoint || '');
+                
+                // 결과물 URL
+                setResultUrl(blockDetail.resultUrl || '');
+                
+                // 결과물 파일명 (URL에서 파일명 추출 또는 파일명 그대로)
+                // API에서 받은 resultFile이 실제 파일 URL이면 파일명만 추출
+                // 더미 문자열이면 null로 처리
+                let fileNameValue: string | null = null;
+                if (blockDetail.resultFile && 
+                    blockDetail.resultFile !== 'dummy-pdf-base64-string-for-testing' &&
+                    blockDetail.resultFile.trim() !== '') {
+                    // 파일명이 URL인 경우 파일명만 추출
+                    const extractedName = blockDetail.resultFile.split('/').pop() || blockDetail.resultFile;
+                    fileNameValue = extractedName;
+                    setFileName(fileNameValue);
+                } else {
+                    // 파일이 없거나 더미 데이터면 null로 설정
+                    setFileName(null);
+                }
+                
+                // 기술 파트 값 저장
+                let techPartValue: BlockPart | null = null;
+                if (blockDetail.techPart) {
+                    const techPartLower = blockDetail.techPart.toLowerCase();
+                    if (techPartLower === 'frontend' || techPartLower === 'front_end') {
+                        techPartValue = 'frontend';
+                    } else if (techPartLower === 'backend' || techPartLower === 'back_end') {
+                        techPartValue = 'backend';
+                    } else if (techPartLower === 'design') {
+                        techPartValue = 'design';
+                    }
+                }
+                
+                // 초기 데이터 저장 (변경사항 감지용) - contributionRate를 명시적으로 숫자로 저장
+                setInitialData({
+                    blockTitle: blockDetail.blockTitle || '',
+                    isSkillState: isTechnology,
+                    selectedTechPart: techPartValue,
+                    selectedCategory: categoryLabel,
+                    selectedTools: blockDetail.toolsText || '',
+                    onelineSummary: blockDetail.oneLineSummary || '',
+                    contributionRate: Number(blockDetail.contributionScore) || 0,
+                    improvementPoint: blockDetail.improvementPoint || '',
+                    resultUrl: blockDetail.resultUrl || '',
+                    fileName: fileNameValue,
+                });
+                
+            } catch (error) {
+                console.error('블록 정보를 가져오는 중 오류 발생:', error);
+                alert('블록 정보를 불러오는데 실패했습니다.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBlockData();
     }, [blockId]);
 
-    // 필수 조건 검사
+    // 필수 조건 검사 및 변경사항 감지
     useEffect(() => {
         const isBlockTitleValid = blockTitle.trim() !== '';
-        const isPartsValid = isSkillState ? selectedTechPart !== null : false;
+        // 기술 블록이면 기술 파트가 필수, 아이디어 블록이면 필수 아님
+        const isPartsValid = isSkillState ? selectedTechPart !== null : true;
         const isCategoriesValid = selectedCategory.length > 0;
         const isToolsValid = isSkillState ? selectedTools.length > 0 : true;
         const isOnelineSummaryValid = onelineSummary.trim() !== '';
+        
+        // 디버깅: 폼 유효성 검사 상세
+        console.log('폼 유효성 검사:', {
+            isSkillState,
+            selectedTechPart,
+            isPartsValid,
+            isBlockTitleValid,
+            isCategoriesValid,
+            isToolsValid,
+            isOnelineSummaryValid,
+        });
 
-        setIsFormValid(isBlockTitleValid && isPartsValid && isCategoriesValid && isToolsValid && isOnelineSummaryValid);
-    }, [isSkillState, blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary]);
+        const formValid = isBlockTitleValid && isPartsValid && isCategoriesValid && isToolsValid && isOnelineSummaryValid;
+        
+        // 변경사항이 있는지 확인
+        let hasChanges = false;
+        
+        // blockId가 없으면 새 블록 생성이므로 항상 활성화 (폼 유효성만 체크)
+        if (!blockId) {
+            setIsFormValid(formValid);
+            return;
+        }
+        
+        // initialData가 아직 로드되지 않았으면 비활성화
+        if (!initialData) {
+            setIsFormValid(false);
+            return;
+        }
+        
+        // 초기 데이터와 비교하여 변경사항 확인 - contributionRate는 명시적으로 숫자 변환하여 비교
+        hasChanges = 
+            blockTitle !== initialData.blockTitle ||
+            isSkillState !== initialData.isSkillState ||
+            selectedTechPart !== initialData.selectedTechPart ||
+            selectedCategory !== initialData.selectedCategory ||
+            selectedTools !== initialData.selectedTools ||
+            onelineSummary !== initialData.onelineSummary ||
+            Number(contributionRate) !== Number(initialData.contributionRate) ||
+            improvementPoint !== initialData.improvementPoint ||
+            resultUrl !== initialData.resultUrl ||
+            fileName !== initialData.fileName;
+        
+        // 디버깅: 변경사항 확인
+        console.log('변경사항 체크:', {
+            blockTitle: blockTitle !== initialData.blockTitle,
+            contributionRate: Number(contributionRate) !== Number(initialData.contributionRate),
+            contributionRate_current: contributionRate,
+            contributionRate_current_type: typeof contributionRate,
+            contributionRate_initial: initialData.contributionRate,
+            contributionRate_initial_type: typeof initialData.contributionRate,
+            hasChanges,
+            formValid,
+            isFormValid: formValid && hasChanges,
+        });
+
+        // 폼이 유효하고 변경사항이 있을 때만 활성화
+        setIsFormValid(formValid && hasChanges);
+        
+        // 디버깅용 로그
+        if (formValid && !hasChanges) {
+            console.log('폼은 유효하지만 변경사항이 없음', {
+                blockTitle: { current: blockTitle, initial: initialData.blockTitle },
+                selectedCategory: { current: selectedCategory, initial: initialData.selectedCategory },
+                selectedTools: { current: selectedTools, initial: initialData.selectedTools },
+                contributionRate: { current: contributionRate, initial: initialData.contributionRate },
+            });
+        } else if (!formValid) {
+            console.log('폼이 유효하지 않음', {
+                isBlockTitleValid,
+                isPartsValid,
+                isCategoriesValid,
+                isToolsValid,
+                isOnelineSummaryValid,
+            });
+        } else {
+            console.log('버튼 활성화됨!', { formValid, hasChanges });
+        }
+    }, [isSkillState, blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary, contributionRate, improvementPoint, resultUrl, fileName, initialData, blockId]);
 
     // selectedTechPart가 변경되면 selectedCategories, selectedTools 초기화
+    // 단, initialData가 설정된 후에는 초기화하지 않음 (수정 모드에서는 유지)
     useEffect(() => {
-        if (isSkillState) {
+        // initialData가 없으면 새 블록 생성 모드이므로 초기화
+        // initialData가 있으면 수정 모드이므로 초기화하지 않음
+        if (isSkillState && !initialData && selectedTechPart) {
+            // 기술 파트가 변경되었을 때만 초기화 (새 블록 생성 시)
             setSelectedCategory('');
             setSelectedTools('');
         }
-    }, [selectedTechPart, isSkillState]);
+    }, [selectedTechPart, isSkillState, initialData]);
 
     // 블록 타입 변경
     const confirmSetIsSkillState = (newValue: boolean) => {
@@ -140,17 +340,123 @@ export function BlockEditPage() {
         e.preventDefault();
         console.log("수정 폼 제출 이벤트 발생");
 
-        if (!formRef.current) return;
+        if (!blockId) {
+            alert('블록 ID가 없습니다.');
+            return;
+        }
 
-        logFormData(formRef.current);
+        const blockIdNum = parseInt(blockId, 10);
+        if (isNaN(blockIdNum)) {
+            alert('유효하지 않은 블록 ID입니다.');
+            return;
+        }
 
-        // 수정 API 호출로 변경 필요
-        const response = await submitFormData(formRef.current);
+        // techPart 변환 (소문자 -> 대문자)
+        let techPartValue: 'FRONTEND' | 'BACKEND' | 'DESIGN' | null = null;
+        if (selectedTechPart === 'frontend') {
+            techPartValue = 'FRONTEND';
+        } else if (selectedTechPart === 'backend') {
+            techPartValue = 'BACKEND';
+        } else if (selectedTechPart === 'design') {
+            techPartValue = 'DESIGN';
+        }
 
-        if (response.ok) {
-            console.log('수정 성공');
-        } else {
-            console.error('수정 실패');
+        // 블록 생성 시와 동일한 형식으로 데이터 준비
+        // BlockDetails.tsx의 onSubmit과 동일한 형식 유지
+        // categoryName: 블록 생성 시에는 label 형식을 그대로 보내므로, 수정 시에도 label 형식 사용
+        // resultFile: 파일이 없으면 더미 문자열 사용 (블록 생성 시와 동일)
+        const resultFileForApi = fileName && fileName.trim() && fileName !== 'dummy-pdf-base64-string-for-testing'
+            ? fileName.trim()
+            : 'dummy-pdf-base64-string-for-testing';
+        
+        const blockData: any = {
+            blockType: (isSkillState ? 'TECHNOLOGY' : 'IDEA') as 'TECHNOLOGY' | 'IDEA',
+            blockTitle: blockTitle.trim(),
+            categoryName: selectedCategory, // 블록 생성 시와 동일하게 label 형식 사용
+            techPart: techPartValue, // null 허용 (아이디어 블록일 때)
+            contributionScore: Number(contributionRate),
+            toolsText: selectedTools && selectedTools.trim() ? selectedTools.trim() : null, // null 허용
+            oneLineSummary: onelineSummary.trim(),
+            improvementPoint: improvementPoint && improvementPoint.trim() ? improvementPoint.trim() : '', // 빈 문자열 허용
+            resultUrl: resultUrl && resultUrl.trim() ? resultUrl.trim() : '', // 빈 문자열 허용
+            resultFile: resultFileForApi, // 블록 생성 시와 동일하게 더미 문자열 사용
+        };
+        
+        // 데이터 검증
+        if (!blockData.blockTitle || blockData.blockTitle.trim() === '') {
+            alert('블록 제목을 입력해주세요.');
+            return;
+        }
+        if (!blockData.categoryName || blockData.categoryName.trim() === '') {
+            alert('카테고리를 선택해주세요.');
+            return;
+        }
+        if (!blockData.oneLineSummary || blockData.oneLineSummary.trim() === '') {
+            alert('한 줄 소개를 입력해주세요.');
+            return;
+        }
+        if (isSkillState && !blockData.techPart) {
+            alert('기술 파트를 선택해주세요.');
+            return;
+        }
+        if (isSkillState && (!blockData.toolsText || blockData.toolsText.trim() === '')) {
+            alert('사용 툴 및 언어를 선택해주세요.');
+            return;
+        }
+
+        console.log('수정할 블록 데이터:', JSON.stringify(blockData, null, 2));
+        console.log('블록 ID:', blockIdNum);
+        console.log('데이터 타입 확인:', {
+            blockType: typeof blockData.blockType,
+            blockTitle: typeof blockData.blockTitle,
+            categoryName: typeof blockData.categoryName,
+            techPart: typeof blockData.techPart,
+            contributionScore: typeof blockData.contributionScore,
+            toolsText: typeof blockData.toolsText,
+            oneLineSummary: typeof blockData.oneLineSummary,
+            improvementPoint: typeof blockData.improvementPoint,
+            resultUrl: typeof blockData.resultUrl,
+            resultFile: typeof blockData.resultFile,
+        });
+
+        try {
+            // API 호출 - updateBlock 사용
+            console.log('updateBlock API 호출 시작...');
+            await updateBlock(blockIdNum, blockData as NewBlockData);
+            console.log('블록 수정 API 호출 성공');
+
+            console.log('블록 수정 성공');
+            alert('블록이 성공적으로 수정되었습니다.');
+            
+            // 블록 상세 페이지로 이동
+            navigate(`/My/BlockDetail/${blockIdNum}`);
+        } catch (error: any) {
+            console.error('블록 수정 실패:', error);
+            console.error('에러 전체 객체:', error);
+            console.error('에러 응답:', error?.response);
+            console.error('요청한 블록 데이터:', blockData);
+            
+            let errorMessage = '블록 수정에 실패했습니다.';
+            const status = error?.response?.status;
+            
+            if (status === 403) {
+                errorMessage = '수정 권한이 없습니다.';
+            } else if (status === 404) {
+                errorMessage = '블록을 찾을 수 없습니다.';
+            } else if (status === 400) {
+                const serverMessage = error?.response?.data?.message || error?.response?.data?.error;
+                errorMessage = serverMessage || '요청 데이터가 올바르지 않습니다.';
+                console.error('400 에러 - 요청 데이터 문제:', blockData);
+                console.error('서버 응답:', error?.response?.data);
+            } else if (status === 500) {
+                errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            } else if (error?.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error?.message) {
+                errorMessage = `오류: ${error.message}`;
+            }
+            
+            alert(errorMessage);
         }
     };
 
@@ -158,12 +464,12 @@ export function BlockEditPage() {
         setSelectedTechPart(prev => (prev === part ? null : part));
     };
 
-    // 기여도 변경 함수
+    // 기여도 변경 함수 - 명시적으로 숫자 변환
     const changeRate = (delta: number) => {
         setContributionRate(prev => {
-            const newValue = prev + delta;
-            return newValue < 0 ? 0 :
-                newValue > 100 ? 100 : newValue;
+            const currentValue = Number(prev); // 명시적으로 숫자 변환
+            const newValue = currentValue + delta;
+            return newValue < 0 ? 0 : newValue > 100 ? 100 : newValue;
         });
     };
 
@@ -268,14 +574,26 @@ export function BlockEditPage() {
 
                     <S.Row>
                         <S.Label>기존 프로젝트에서 개선하고 싶은 점</S.Label>
-                        <S.Input name="improvements_point" type="text" placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" />
+                        <S.Input 
+                            name="improvements_point" 
+                            type="text" 
+                            placeholder="개선하고 싶은 점을 자유롭게 작성해 주세요" 
+                            value={improvementPoint}
+                            onChange={(e) => setImprovementPoint(e.target.value)}
+                        />
                         <S.Desc>어셈블록에서 새로운 팀원들과 변경하거나 보완, 개선하고 싶은 부분이 있다면<br />
                             (N)자 내로 작성해 주세요</S.Desc>
                     </S.Row>
 
                     <S.Row>
                         <S.Label>기존 프로젝트 결과물 URL</S.Label>
-                        <S.Input name="result_url" type="text" placeholder="URL" />
+                        <S.Input 
+                            name="result_url" 
+                            type="text" 
+                            placeholder="URL" 
+                            value={resultUrl}
+                            onChange={(e) => setResultUrl(e.target.value)}
+                        />
                         <S.Desc>기존 프로젝트의 산출물 및 결과물을 URL 형식으로 첨부해 주세요</S.Desc>
                     </S.Row>
 

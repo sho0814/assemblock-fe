@@ -63,6 +63,8 @@ export function MyPage() {
     const [userProfile, setUserProfile] = useState<ProfileInfo | null>(null);
     const [hasBlocks, setHasBlocks] = useState(false);
     const [blocks, setBlocks] = useState<BlockData[]>([]);
+    const [isLoadingBlocks, setIsLoadingBlocks] = useState(true);
+    const [isLoadingReviews, setIsLoadingReviews] = useState(true);
     const navigate = useNavigate();
 
     const parts = [
@@ -237,10 +239,10 @@ export function MyPage() {
             }
           }
           
-          // 블록 목록 API 호출
+          // 블록 목록 API 호출 - 항상 'ALL'로 호출하여 모든 블록 가져오기
           try {
-            const blockType = activeTab === 'all' ? 'ALL' : activeTab === 'idea' ? 'IDEA' : 'TECHNOLOGY';
-            const myBlocks = await getMyBlocks(blockType);
+            setIsLoadingBlocks(true);
+            const myBlocks = await getMyBlocks('ALL');
             
             // MyBlock[]을 BlockData[]로 변환
             const convertedBlocks: BlockData[] = myBlocks.map((block: MyBlockApi) => ({
@@ -279,10 +281,13 @@ export function MyPage() {
               setBlocks([]);
               setHasBlocks(false);
             }
+          } finally {
+            setIsLoadingBlocks(false);
           }
           
           // 후기 목록 API 호출
           try {
+            setIsLoadingReviews(true);
             // 받은 후기 또는 작성한 후기 조회
             // 'PARTICIPATION' (내가 받은 제안/리뷰)
             // 'SCOUTING' (내가 보낸 제안/리뷰)
@@ -308,6 +313,8 @@ export function MyPage() {
               setReviews([]);
               setHasReviews(false);
             }
+          } finally {
+            setIsLoadingReviews(false);
           }
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -315,7 +322,7 @@ export function MyPage() {
       };
 
       fetchData();
-    }, [activeTab, activeReviewTab]);
+    }, [activeReviewTab]); // activeTab 제거 - 블록은 항상 전체를 가져오고 프론트엔드에서 필터링
 
     // 블록 배치 로직: 아래에서 위로, 최하단 행부터 랜덤 배치
     const placeReviewBlocks = (receivedReviews: MyReview[]): Array<{ col: number; row: number; review: MyReview; imageSrc: string } | null> => {
@@ -433,12 +440,18 @@ export function MyPage() {
           <PortfolioItem className="l500" $isL500>
             <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', flexShrink: 0 }} />
             <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {userProfile?.portfolioUrl || '아직 등록된 링크가 없어요'}
+              {userProfile?.portfolioUrl && 
+               userProfile.portfolioUrl.trim() !== '' && 
+               userProfile.portfolioUrl !== 'string' 
+                ? userProfile.portfolioUrl 
+                : '아직 등록된 링크가 없어요'}
             </span>
           </PortfolioItem>
           <PortfolioItem className="l500" $isL500>
             <img src={folderIcon} alt="folder" style={{ width: '18px', height: '18px', flexShrink: 0 }} />
-            {userProfile?.portfolioPdfUrl ? (
+            {userProfile?.portfolioPdfUrl && 
+             userProfile.portfolioPdfUrl.trim() !== '' && 
+             userProfile.portfolioPdfUrl !== 'string' ? (
               <PortfolioFileLink
                 onClick={() => {
                   // PDF URL이 있으면 새 창에서 열기
@@ -472,7 +485,13 @@ export function MyPage() {
               </ReviewTab>
             </ReviewTabContainer>
           )}
-          {!hasReviews || activeReviewTab === 'sent' ? (
+          {isLoadingReviews ? (
+            <ReviewBlock $hasReviews={false}>
+              <ReviewBlockText style={{ color: '#868286' }}>
+                후기 불러오는 중...
+              </ReviewBlockText>
+            </ReviewBlock>
+          ) : !hasReviews || activeReviewTab === 'sent' ? (
             <ReviewBlock $hasReviews={false}>
               <ReviewBlockImage src={ReviewBlockDefault} alt="Review Block Default" />
               <ReviewBlockText>
@@ -509,9 +528,35 @@ export function MyPage() {
               <BlockTab $isActive={activeTab === 'tech'} onClick={() => setActiveTab('tech')}>기술 블록</BlockTab>
             </BlockdivTab>
           )}
-          <BlockListWrapper>
-            {hasBlocks ? (
-              <BlockList blocks={blocks} activeTab={activeTab} isMyBlock={true} />
+          <BlockListWrapper $hasManyBlocks={blocks.length > 4}>
+            {isLoadingBlocks ? (
+              <BlockContent>
+                <BlockContentText style={{ color: '#868286' }}>
+                  블록 불러오는 중...
+                </BlockContentText>
+              </BlockContent>
+            ) : hasBlocks ? (
+              <>
+                <BlockList blocks={blocks} activeTab={activeTab} isMyBlock={true} />
+                {/* 필터링된 블록이 없을 때 메시지 표시 */}
+                {(() => {
+                  const filteredBlocks = blocks.filter((block) => {
+                    if (activeTab === 'all') return true;
+                    if (activeTab === 'idea') return block.block_type === 'IDEA';
+                    if (activeTab === 'tech') return block.block_type === 'TECHNOLOGY';
+                    return true;
+                  });
+                  if (filteredBlocks.length === 0) {
+                    return (
+                      <BlockContent>
+                        <BlockContentImage src={AssemBlcokDefault} alt="Assem Block Default" />
+                        <BlockContentText>아직 등록한 어셈블록이 없어요</BlockContentText>
+                      </BlockContent>
+                    );
+                  }
+                  return null;
+                })()}
+              </>
             ) : (
               <BlockContent>
                 <BlockContentImage src={AssemBlcokDefault} alt="Assem Block Default" />
