@@ -18,22 +18,6 @@ export interface BlockData {
   writerNickname: string;
 }
 
-export interface SearchBlock {
-  blockId: number;
-  blockType: BlockType;
-  blockTitle: string;
-  categoryName: string;
-  techPart: string;
-  contributionScore: number;
-  toolsText: string;
-  oneLineSummary: string;
-  improvementPoint: string;
-  resultUrl: string;
-  resultFile: string;
-  writerId: number;
-  writerNickname: string;
-}
-
 export interface NewBlockData {
   blockType: BlockType;
   blockTitle: string;
@@ -45,11 +29,4 @@ export interface NewBlockData {
   improvementPoint: string;
   resultUrl: string;
   resultFile: string;
-}
-
-export interface SearchResultBlock {
-  blockId: number;
-  blockTitle: string;
-  oneLineSummary: string;
-  categoryName: string;
 }

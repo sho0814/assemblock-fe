@@ -5,9 +5,13 @@ import CommonButton from '@components/shared/CommonButton';
 import * as S from './ProfilePortfolio.styled';
 import closeIcon from '@assets/board/close.svg';
 import CloseStrokeIcon from '@assets/MyPage/CloseStroke.svg';
+import { signup, type SignupRequest } from '@api/kakaoAuth';
+import { uploadFile } from '@api/mypage/upload';
+import { useAuthStore } from '@stores';
 
 export function ProfilePortfolio() {
   const navigate = useNavigate();
+  const { setProfileComplete } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [portfolioUrl, setPortfolioUrl] = useState('');
@@ -15,6 +19,7 @@ export function ProfilePortfolio() {
   const [fileName, setFileName] = useState('');
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,39 +78,127 @@ export function ProfilePortfolio() {
   };
 
   const handleSave = async () => {
-    // localStorage에 포트폴리오 데이터 저장 추후 연결
-    const savedUserProfile = localStorage.getItem('userProfile');
-    let profileData = savedUserProfile ? JSON.parse(savedUserProfile) : {};
-    
-    let fileData = '';
-    if (portfolioFile) {
-      // 파일을 base64로 변환
-      const reader = new FileReader();
-      fileData = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new Error('Failed to convert file to base64'));
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(portfolioFile);
+    try {
+      setIsSubmitting(true);
+      
+      // localStorage에서 온보딩 데이터 수집
+      const savedUserProfile = localStorage.getItem('userProfile');
+      if (!savedUserProfile) {
+        alert('프로필 정보를 찾을 수 없습니다. 처음부터 다시 시작해주세요.');
+        navigate('/Onboarding/profileName');
+        return;
+      }
+      
+      const profileData = JSON.parse(savedUserProfile);
+      
+      // 필수 데이터 검증
+      if (!profileData.nickname) {
+        alert('닉네임이 필요합니다.');
+        navigate('/Onboarding/profileName');
+        return;
+      }
+      
+      if (!profileData.selectedParts || profileData.selectedParts.length === 0) {
+        alert('파트를 선택해주세요.');
+        navigate('/Onboarding/ProfilePart');
+        return;
+      }
+      
+      if (!profileData.introduction) {
+        alert('한 줄 소개를 입력해주세요.');
+        navigate('/Onboarding/ProfileIntro');
+        return;
+      }
+      
+      // 프론트엔드 part ID를 백엔드 roles 형식으로 변환
+      const partIdToRole: Record<string, string> = {
+        'planning': 'Plan',
+        'design': 'Design',
+        'frontend': 'FrontEnd',
+        'backend': 'BackEnd',
+        'pm': 'PM',
+      };
+      
+      const roles = profileData.selectedParts.map((partId: string) => {
+        return partIdToRole[partId] || partId;
       });
+      
+      // 프로필 이미지 ID를 userProfileType으로 변환 (img1 -> Type_1)
+      const selectedProfileData = localStorage.getItem('selectedProfile');
+      let userProfileType = 'Type_1'; // 기본값
+      
+      if (selectedProfileData) {
+        try {
+          const profile = JSON.parse(selectedProfileData);
+          const profileIdToType: Record<string, string> = {
+            'img1': 'Type_1',
+            'img2': 'Type_2',
+            'img3': 'Type_3',
+            'img4': 'Type_4',
+            'img5': 'Type_5',
+          };
+          userProfileType = profileIdToType[profile.id] || 'Type_1';
+        } catch (e) {
+          console.error('Failed to parse selected profile:', e);
+        }
+      }
+      
+      // 파일이 있으면 먼저 업로드
+      let portfolioPdfUrl = '';
+      if (portfolioFile) {
+        try {
+          // 파일 크기 체크 (5MB 제한)
+          const maxSize = 5 * 1024 * 1024; // 5MB
+          if (portfolioFile.size > maxSize) {
+            alert('파일 크기가 5MB를 초과합니다. 더 작은 파일을 선택해주세요.');
+            setIsSubmitting(false);
+            return;
+          }
+          
+          const uploadResult = await uploadFile(portfolioFile);
+          portfolioPdfUrl = uploadResult.fileUrl || '';
+        } catch (error) {
+          console.error('File upload failed:', error);
+          alert('파일 업로드에 실패했습니다. 파일 없이 진행할까요?');
+          // 파일 업로드 실패해도 계속 진행
+        }
+      }
+      
+      // 온보딩 완료 API 호출
+      const signupData: SignupRequest = {
+        nickname: profileData.nickname,
+        roles: roles,
+        userProfileType: userProfileType,
+        introduction: profileData.introduction,
+        portfolioUrl: portfolioUrl.trim() || undefined,
+        portfolioPdfUrl: portfolioPdfUrl || undefined,
+      };
+      
+      await signup(signupData);
+      
+      // 프로필 완성 상태 업데이트
+      setProfileComplete(true);
+      
+      // localStorage 정리 (선택사항)
+      // localStorage.removeItem('userProfile');
+      // localStorage.removeItem('selectedProfile');
+      
+      // 홈페이지로 이동
+      navigate('/Home');
+    } catch (error: any) {
+      console.error('Error completing signup:', error);
+      
+      if (error.response?.status === 400) {
+        alert('입력한 정보를 확인해주세요.');
+      } else if (error.response?.status === 401) {
+        alert('인증이 만료되었습니다. 다시 로그인해주세요.');
+        navigate('/');
+      } else {
+        alert('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    profileData = {
-      ...profileData,
-      portfolio_url: portfolioUrl.trim() || '', 
-      portfolio_pdf_url: fileData || '', 
-      fileName: fileName || '',
-      fileData: fileData || '',
-    };
-    
-    localStorage.setItem('userProfile', JSON.stringify(profileData));
-    
-    // 홈페이지로 이동
-    navigate('/');
   };
 
   const handleClearUrl = () => {
@@ -181,9 +274,10 @@ export function ProfilePortfolio() {
 
         <S.Footer>
           <CommonButton
-            content="저장하기"
+            content={isSubmitting ? '저장 중...' : '저장하기'}
             width="100%"
             onClick={handleSave}
+            disabled={isSubmitting}
           />
         </S.Footer>
       </S.Container>

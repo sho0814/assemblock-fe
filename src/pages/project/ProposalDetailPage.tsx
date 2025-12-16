@@ -1,6 +1,6 @@
 // src/pages/project/ProposalDetailPage.tsx
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
 
 import { ProjectProgress } from "@components/project/myteam/ProjectProgress";
@@ -36,6 +36,7 @@ const MY_USER_ID = 1; // TODO: 실제 로그인한 사용자 ID로 교체
 export function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
+  const navigate = useNavigate();
 
   const [proposal, setProposal] = useState<ProposalDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -123,7 +124,11 @@ export function ProposalDetailPage() {
           <ProjectTitle>{proposal.projectTitle}</ProjectTitle>
 
           {/* 제안자 프로필 */}
-          <ProposerProfile>
+          <ProposerProfile
+            onClick={() => {
+              navigate(`/OtherUser/Profile?userId=${proposal.proposerId}`);
+            }}
+          >
             <ProposerImage
               src={"/default-profile.png"}
               alt={proposal.proposerNickname}
