@@ -4,7 +4,14 @@ import { boardPageStyles as styles } from "./BoardPage.styles";
 import { useOverlay } from "@components/common/OverlayContext";
 import DeleteModal from "./DeleteModal";
 
-// 썸네일 아이콘
+// 훅
+import { useBoards, useBoardDetail } from "@hooks";
+import type { MinimalBoard } from "@types";
+
+// 썸네일 매핑 함수 (categoryName -> small svg)
+import { categoryToThumb } from "@constants/boardThumbMap";
+
+// 썸네일 기본 아이콘
 import basicBoard from "@assets/board/small/basic.svg";
 
 // 상단 아이콘
@@ -13,22 +20,77 @@ import alarmIcon from "@assets/board/nav/alarm.svg";
 import searchIcon from "@assets/board/nav/search.svg";
 import menuIcon from "@assets/board/nav/menu.svg";
 
-// 상태바 아이콘
-import statusIcons from "@assets/board/nav/status.svg";
-
 import closeIcon from "@assets/board/close.svg";
 
-export type Board = {
-  id: number;
-  title: string;
-  blocks: number;
-  icon: string;
-  memo?: string;
+type BoardPageProps = {};
+
+const normalizeCategory = (s?: string) => {
+  const raw = (s ?? "").trim();
+  const normalized = raw
+    .replace(/[,/]/g, "_")
+    .replace(/\s+/g, "_")
+    .replace(/-+/g, "_");
+  return normalized.replace(/_+/g, "_").trim();
 };
 
-type BoardPageProps = {
-  boards?: Board[];
-  setBoards?: React.Dispatch<React.SetStateAction<Board[]>>;
+// "카테고리 썸네일 먼저" + 부족한 칸은 basic으로 채워서 4칸 만들기
+const buildThumbs = (categories: string[] = [], basic: string) => {
+  const thumbs = categories
+    .filter(Boolean)
+    .slice(0, 4)
+    .map((c) => categoryToThumb(c));
+
+  const blanks = 4 - thumbs.length;
+  return blanks > 0 ? [...thumbs, ...Array(blanks).fill(basic)] : thumbs;
+};
+
+// 보드 카드 1개를 별도 컴포넌트로 분리 (여기서 boardDetail 호출)
+const BoardCardItem: React.FC<{ board: MinimalBoard }> = ({ board }) => {
+  const navigate = useNavigate();
+
+  // 보드 상세 조회해서 blocks에서 categoryName을 뽑아 “진짜 썸네일” 구성
+  const { data, loading } = useBoardDetail(board.boardId);
+
+  const blocks = data?.blocks ?? [];
+
+  const categoriesInOrder = blocks
+    .map((b: any) => normalizeCategory(b.categoryName ?? b.category_name))
+    .filter(Boolean);
+
+  const thumbs = buildThumbs(categoriesInOrder, basicBoard);
+  const blockCount = data?.blocks ? blocks.length : board.blockCount; // fallback
+
+
+  return (
+    <button
+      key={board.boardId}
+      style={styles.boardCard}
+      type="button"
+      onClick={() =>
+        navigate("/Board/detail", {
+          state: { boardId: board.boardId },
+        })
+      }
+    >
+      <div style={styles.boardIconGrid}>
+        {thumbs.map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            alt={`${board.boardName} 썸네일`}
+            style={styles.boardIconImg}
+          />
+        ))}
+      </div>
+
+      <div style={styles.boardInfo}>
+        <span style={styles.boardTitle}>{board.boardName}</span>
+        <span style={styles.boardSub}>
+          {loading ? "로딩..." : `${blockCount}블록`}
+        </span>
+      </div>
+    </button>
+  );
 };
 
 export const BoardPage: React.FC<BoardPageProps> = () => {
@@ -36,19 +98,16 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
   const { showOverlay } = useOverlay();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  const { boards, createNewBoard } = useBoards();
+
   // 바텀시트/폼 상태
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
   const [boardTitle, setBoardTitle] = useState("");
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [memo, setMemo] = useState("");
   const [isMemoFocused, setIsMemoFocused] = useState(false);
-  const [boards, setBoards] = useState<Board[]>([
-    { id: 1, title: "기본 보드", blocks: 0, icon: basicBoard, memo: "" },
-    { id: 2, title: "기본 보드", blocks: 0, icon: basicBoard, memo: "" },
-    { id: 3, title: "기본 보드", blocks: 0, icon: basicBoard, memo: "" },
-  ]);
 
-  const isCreateEnabled = boardTitle.trim().length > 0; // 1자 이상 입력 시 버튼 활성화
+  const isCreateEnabled = boardTitle.trim().length > 0;
 
   const rootStyle: CSSProperties = {
     ...styles.root,
@@ -61,13 +120,6 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
     setMemo("");
     setIsTitleFocused(false);
     setIsMemoFocused(false);
-  };
-
-  const handleDelete = () => {
-    // 첫 번째 보드 삭제 (예시)
-    if (boards.length > 0) {
-      setBoards((prev) => prev.slice(1));
-    }
   };
 
   const dimmedStyle: CSSProperties = {
@@ -94,41 +146,27 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
   return (
     <div style={rootStyle}>
       <div style={styles.pageInner}>
-        {/* 상단 고정 영역 */}
         <div style={styles.headerFixed}>
-          {/* 상태바 */}
-          {/*<div style={styles.statusBar}>
-            <div style={styles.statusTimeBox}>
-              <span style={styles.statusTime}>9:41</span>
-            </div>
-
-            <div style={{ marginLeft: "auto" }}>
-              <img
-                src={statusIcons}
-                alt="상태 아이콘"
-                style={styles.statusIconImg}
-              />
-            </div>
-          </div>*/}
-
-          {/* 탑네비 */}
           <div style={styles.topNav}>
             <div style={styles.topNavTitleBox}>
               <h1 className="h1" style={styles.topNavTitle}>
                 내 보드
               </h1>
             </div>
+
             <div style={styles.topNavIcons}>
-              <button style={styles.topNavBtn} 
-              type="button"
-              onClick={() => navigate("/notification")}
+              <button
+                style={styles.topNavBtn}
+                type="button"
+                onClick={() => navigate("/notification")}
               >
                 <img src={alarmIcon} alt="알림" style={styles.alarmIcon} />
               </button>
 
-              <button style={styles.topNavBtn} 
-              type="button"
-              onClick={() => navigate("/search")}
+              <button
+                style={styles.topNavBtn}
+                type="button"
+                onClick={() => navigate("/search")}
               >
                 <img src={searchIcon} alt="검색" style={styles.searchIcon} />
               </button>
@@ -145,43 +183,14 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
           </div>
         </div>
 
-        {/* 보드 리스트 */}
         <main style={styles.content}>
           <div style={styles.boardsGrid}>
-            {boards.map((board) => (
-              <button
-                key={board.id}
-                style={styles.boardCard}
-                type="button"
-                onClick={() =>
-                  navigate("/Board/detail", {
-                    state: { boardId: board.id, boards },
-                  })
-                }
-              >
-                {/* 썸네일 2×2 그리드 */}
-                <div style={styles.boardIconGrid}>
-                  {[0, 1, 2, 3].map((i) => (
-                    <img
-                      key={i}
-                      src={board.icon}
-                      alt={`${board.title} 썸네일`}
-                      style={styles.boardIconImg}
-                    />
-                  ))}
-                </div>
-
-                {/* 텍스트 블럭 */}
-                <div style={styles.boardInfo}>
-                  <span style={styles.boardTitle}>{board.title}</span>
-                  <span style={styles.boardSub}>{board.blocks}블록</span>
-                </div>
-              </button>
+            {boards.map((board: MinimalBoard) => (
+              <BoardCardItem key={board.boardId} board={board} />
             ))}
           </div>
         </main>
 
-        {/* 생성 버튼 */}
         <button
           type="button"
           style={styles.floatingAddBtn}
@@ -190,13 +199,10 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
           <img src={addIcon} alt="보드 추가" style={styles.floatingAddImg} />
         </button>
 
-        {/* 홈 인디케이터 */}
         <div style={styles.homeIndicator} />
 
-        {/* 바텀시트 배경 딤드 */}
         <div style={dimmedStyle} onClick={handleCloseSheet} />
 
-        {/* 새 보드 만들기 바텀시트 */}
         <section style={sheetStyle}>
           <header style={styles.bottomSheetHeader}>
             <h2 className="h2" style={styles.bottomSheetTitle}>
@@ -208,16 +214,11 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
               onClick={handleCloseSheet}
               aria-label="닫기"
             >
-              <img
-                src={closeIcon}
-                alt="닫기"
-                style={styles.bottomSheetCloseIcon}
-              />
+              <img src={closeIcon} alt="닫기" style={styles.bottomSheetCloseIcon} />
             </button>
           </header>
 
           <div style={styles.bottomSheetContent}>
-            {/* 보드 제목 박스 */}
             <div style={styles.boardTitleBox}>
               <p style={styles.boardTitleLabel}>보드 제목</p>
               <input
@@ -230,22 +231,21 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
                 onChange={(e) => {
                   const raw = e.target.value;
                   const filtered = raw.replace(
-                    /[^ㄱ-ㅎ가-힣a-zA-Z0-9\s~`!@#$%^&*()\-_=+[\]{}\\|;:'",.<>/?]/g,
+                    /[^ㄱ-ㅎ가-힣a-zA-Z0-9\s~`!@#$%^&*()\-_=+\[\]{}\\|;:'",.<>/?]/g,
                     ""
                   );
                   setBoardTitle(filtered.slice(0, 14));
                 }}
                 onFocus={() => setIsTitleFocused(true)}
                 onBlur={(e) => {
-                  if (!e.target.value.trim()) {
-                    setIsTitleFocused(false);
-                  }
+                  if (!e.target.value.trim()) setIsTitleFocused(false);
                 }}
               />
-              <p style={styles.boardTitleHelper}>영문/한글/숫자로 14자까지 입력 가능해요</p>
+              <p style={styles.boardTitleHelper}>
+                영문/한글/숫자로 14자까지 입력 가능해요
+              </p>
             </div>
 
-            {/* 메모 박스 */}
             <div style={styles.memoBox}>
               <p style={styles.memoLabel}>메모</p>
               <textarea
@@ -258,43 +258,28 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
                 onChange={(e) => {
                   const raw = e.target.value;
                   const filtered = raw.replace(
-                    /[^ㄱ-ㅎ가-힣a-zA-Z0-9\s~`!@#$%^&*()\-_=+[\]{}\\|;:'",.<>/?\n]/g,
+                    /[^ㄱ-ㅎ가-힣a-zA-Z0-9\s~`!@#$%^&*()\-_=+\[\]{}\\|;:'",.<>/?\n]/g,
                     ""
                   );
-                  setMemo(filtered.slice(0, 104));
+                  setMemo(filtered.slice(0, 300));
                 }}
                 onFocus={() => setIsMemoFocused(true)}
                 onBlur={(e) => {
-                  if (!e.target.value) {
-                    setIsMemoFocused(false);
-                  }
+                  if (!e.target.value) setIsMemoFocused(false);
                 }}
               />
-              <p style={styles.memoHelper}>한글/영문/숫자/특수문자로 최대 300자까지 입력할 수 있어요</p>
+              <p style={styles.memoHelper}>
+                한글/영문/숫자/특수문자로 최대 300자까지 입력할 수 있어요
+              </p>
             </div>
 
-            {/* 생성하기 버튼 */}
             <button
               type="button"
               style={createButtonStyle}
               disabled={!isCreateEnabled}
-              onClick={() => {
+              onClick={async () => {
                 if (!isCreateEnabled) return;
-
-                setBoards((prev) => {
-                  const nextId = prev.length ? prev[prev.length - 1].id + 1 : 1;
-
-                  const newBoard: Board = {
-                    id: nextId,
-                    title: boardTitle.trim(),
-                    blocks: 0,
-                    icon: basicBoard, // 기본 썸네일 4개
-                    memo: memo.trim(),
-                  };
-
-                  return [...prev, newBoard];
-                });
-
+                await createNewBoard(boardTitle.trim(), memo.trim());
                 handleCloseSheet();
               }}
             >
