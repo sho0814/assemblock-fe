@@ -1,4 +1,4 @@
 export interface HistoryItem {
-    historyId: number;
-    keyword: string;
+  historyId: number;
+  keyword: string;
 }

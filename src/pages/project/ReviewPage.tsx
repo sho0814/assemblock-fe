@@ -17,6 +17,7 @@ import type { ReviewRating, ProjectDetailResponse, Member } from "@types";
 
 // 목업 데이터 (백엔드 준비 후 삭제)
 import { reviewsMock } from "@mocks/review.mock";
+import { projectDetailMock } from "@mocks/projectDetail.mock";
 
 import pattern from "@assets/project/pattern.png";
 
@@ -24,8 +25,6 @@ export function ReviewPage() {
   const navigate = useNavigate();
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
-
-  const [myUserId, setMyUserId] = useState<number | null>(null);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [projectMembers, setProjectMembers] = useState<Member[]>([]);
   const [writtenReviewUserIds, setWrittenReviewUserIds] = useState<number[]>(
@@ -52,11 +51,11 @@ export function ReviewPage() {
         // 1. 내 userId 가져오기
         const userInfo = await getUserMe();
         const userId = userInfo.userId;
-        setMyUserId(userId);
 
         // 2. 프로젝트 상세 정보 가져오기
-        const projectData: ProjectDetailResponse =
-          await getProjectDetail(proposalIdNum);
+        // const projectData: ProjectDetailResponse =
+        //   await getProjectDetail(proposalIdNum);
+        const projectData = projectDetailMock as ProjectDetailResponse;
         setProjectId(projectData.projectId);
 
         // 3. 프로젝트 멤버 추출 (나를 제외한 팀원들)

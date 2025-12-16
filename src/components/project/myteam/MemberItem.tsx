@@ -1,7 +1,7 @@
 // src/components/myTeam/MemberItem.tsx
 import styled from "styled-components";
 import type { ReactNode } from "react";
-import type { Member, ProjectStatus } from "@types";
+import type { Member, ProjectStatus, MemberPart } from "@types";
 import { getProfileImage } from "@constants";
 
 const Item = styled.li`
@@ -77,6 +77,21 @@ const Chip = styled.span<{
   }};
 `;
 
+const getMemberPartLabel = (
+  part: MemberPart | string | null | undefined
+): string => {
+  const partMap: Record<string, string> = {
+    FRONTEND: "프론트엔드",
+    BACKEND: "백엔드",
+    DESIGN: "디자인",
+    PLAN: "기획",
+    PM: "PM",
+  };
+
+  if (!part) return "역할 미정";
+  return partMap[part] || "역할 미정";
+};
+
 type Props = {
   status: ProjectStatus;
   member: Member;
@@ -109,7 +124,9 @@ export const MemberItem = ({ status, member }: Props) => {
           <span style={{ fontSize: 16, color: "#000000", fontWeight: 600 }}>
             {member.nickname} 님
           </span>
-          <span style={{ fontSize: 12, color: "#5D595E" }}>{member.part}</span>
+          <span style={{ fontSize: 12, color: "#5D595E" }}>
+            {getMemberPartLabel(member.part)}
+          </span>
         </NameRole>
       </Left>
       {right}

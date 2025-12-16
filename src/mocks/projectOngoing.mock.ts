@@ -2,7 +2,7 @@ export const projectsOngoingMock = [
   {
     projectId: 3,
     projectTitle: "어셈블록 서비스 고도화",
-    status: "recruiting",
+    status: "done",
     members: [
       {
         userId: 2,

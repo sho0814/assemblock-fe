@@ -2,7 +2,6 @@
 import styled from "styled-components";
 import type { Member, ProjectStatus } from "@types";
 import { MemberItem } from "./MemberItem";
-import { getProfileImage } from "@constants";
 
 const List = styled.ul`
   display: flex;

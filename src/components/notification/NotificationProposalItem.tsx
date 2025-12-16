@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import arrowIcon from "@assets/project/arrow.svg";
 import { useNavigate } from "react-router-dom";
-import type { notification, ProfileType } from "@types";
+import type { notification } from "@types";
+import { getProfileImage } from "@constants";
 
 type Props = notification;
 
@@ -30,23 +31,12 @@ const AvatarWrap = styled.div`
   height: 48px;
 `;
 
-// TODO: 타입에 따라 프로필 이미지 변경
-const getProfileColor = (profileType: ProfileType): string => {
-  const colors: Record<ProfileType, string> = {
-    Type_1: "#FF6B6B",
-    Type_2: "#4ECDC4",
-    Type_3: "#45B7D1",
-    Type_4: "#FFA07A",
-    Type_5: "#98D8C8",
-  };
-  return colors[profileType] || "#d9d9d9";
-};
-
-const Avatar = styled.div<{ profileType: ProfileType }>`
+const Avatar = styled.img`
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  background: ${({ profileType }) => getProfileColor(profileType)};
+  border-radius: 999px;
+  object-fit: cover;
+  background: #ddd;
 `;
 
 const Badge = styled.div`
@@ -104,14 +94,16 @@ export default function NotificationProposalItem({
   const navigate = useNavigate();
 
   const handleClickDetail = () => {
-    navigate(`/Project/proposal/${proposalId}`);
+    navigate(`/Project/proposal/${proposalId}`, {
+      state: { from: "notification" },
+    });
   };
 
   return (
     <Item>
       <Left>
         <AvatarWrap>
-          <Avatar profileType={senderProfileType} />
+          <Avatar src={getProfileImage(senderProfileType)} />
           <Badge>
             <BadgeIcon src={arrowIcon} alt="" />
           </Badge>

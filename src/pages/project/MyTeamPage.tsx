@@ -6,6 +6,8 @@ import SimpleHeader from "@components/shared/SimpleHeader";
 import { ProjectProgress } from "@components/project/myteam/ProjectProgress";
 import { ContactSection } from "@components/project/myteam/ContactSection";
 import { MemberList } from "@components/project/myteam/MemberList";
+import { ConfirmModal } from "@components/project/myteam/ConfirmModal";
+import { CompleteModal } from "@components/project/myteam/CompleteModal";
 
 import { getProjectDetail, completeProject } from "@api/project";
 
@@ -48,6 +50,10 @@ export const MyTeamPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [alertType, setAlertType] = useState<"success" | "error">("success");
+
   useEffect(() => {
     const fetchProjectDetail = async () => {
       try {
@@ -75,6 +81,43 @@ export const MyTeamPage = () => {
       fetchProjectDetail();
     }
   }, [proposalIdNum]);
+
+  const handleProjectFinishClick = () => {
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleProjectFinishConfirm = async () => {
+    if (isCompleting || !project) return;
+
+    try {
+      setIsCompleting(true);
+      setIsConfirmModalOpen(false);
+
+      await completeProject(project.projectId);
+
+      setProject({
+        ...project,
+        status: "done",
+      });
+      setAlertType("success");
+      setIsAlertModalOpen(true);
+    } catch (err) {
+      console.error("프로젝트 완료 실패:", err);
+
+      setAlertType("error");
+      setIsAlertModalOpen(true);
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
+  const handleConfirmCancel = () => {
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleAlertClose = () => {
+    setIsAlertModalOpen(false);
+  };
 
   // 로딩 중
   if (isLoading) {
@@ -117,29 +160,6 @@ export const MyTeamPage = () => {
   // 헤더 카피
   const headerCopy = HEADER_COPY[project.status];
 
-  const handleProjectFinish = async () => {
-    if (isCompleting) return;
-
-    if (!window.confirm("프로젝트를 완료하시겠어요?")) {
-      return;
-    }
-
-    try {
-      setIsCompleting(true);
-
-      await completeProject(project.projectId);
-      setProject({
-        ...project,
-        status: "done",
-      });
-    } catch (err) {
-      console.error("프로젝트 완료 실패:", err);
-      alert("프로젝트 완료에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsCompleting(false);
-    }
-  };
-
   const handleReviewClick = () => {
     if (!proposalId) return;
     navigate(`/Project/team/${proposalId}/review`);
@@ -175,7 +195,9 @@ export const MyTeamPage = () => {
 
       {/* 5. 상태별 버튼 */}
       {project.status === "ongoing" && (
-        <ActionButton onClick={handleProjectFinish}>
+        <ActionButton
+          onClick={handleProjectFinishClick}
+          disabled={isCompleting}>
           프로젝트 완료하기
         </ActionButton>
       )}
@@ -185,6 +207,19 @@ export const MyTeamPage = () => {
           팀원 리뷰 남기러 가기
         </ActionButton>
       )}
+
+      {/* 모달들 */}
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onConfirm={handleProjectFinishConfirm}
+        onCancel={handleConfirmCancel}
+      />
+
+      <CompleteModal
+        isOpen={isAlertModalOpen}
+        type={alertType}
+        onClose={handleAlertClose}
+      />
     </Page>
   );
 };
