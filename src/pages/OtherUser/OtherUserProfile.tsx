@@ -394,11 +394,20 @@ export function OtherUserProfile() {
           <PortfolioItem className="l600">나의 포트폴리오</PortfolioItem>
           <PortfolioItem className="l500" $isL500>
             <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', marginRight: '8px' }} />
-            {userProfile?.portfolioUrl || '아직 등록된 링크가 없어요'}
+            {userProfile?.portfolioUrl && 
+             userProfile.portfolioUrl.trim() !== '' && 
+             userProfile.portfolioUrl !== 'string' 
+              ? userProfile.portfolioUrl 
+              : '아직 등록된 링크가 없어요'}
           </PortfolioItem>
           <PortfolioItem className="l500" $isL500>
             <img src={folderIcon} alt="folder" style={{ width: '18px', height: '18px', marginRight: '8px' }} />
-            {userProfile?.fileName ? (
+            {userProfile?.fileName && 
+             userProfile.fileName.trim() !== '' && 
+             userProfile.fileName !== 'string' &&
+             userProfile?.portfolioPdfUrl && 
+             userProfile.portfolioPdfUrl.trim() !== '' && 
+             userProfile.portfolioPdfUrl !== 'string' ? (
               <PortfolioFileLink
                 onClick={() => {
                   // 파일 다운로드 로직 (URL에서 직접 다운로드)
@@ -459,9 +468,9 @@ export function OtherUserProfile() {
               <BlockTab $isActive={activeTab === 'tech'} onClick={() => setActiveTab('tech')}>기술 블록</BlockTab>
             </BlockdivTab>
           )}
-          <BlockListWrapper>
+          <BlockListWrapper $hasManyBlocks={blocks.length > 4}>
             {hasBlocks ? (
-              <BlockList blocks={blocks} activeTab={activeTab} />
+              <BlockList blocks={blocks} activeTab={activeTab} isMyBlock={false} />
             ) : (
               <BlockContent>
                 <BlockContentImage src={AssemBlcokDefault} alt="Assem Block Default" />

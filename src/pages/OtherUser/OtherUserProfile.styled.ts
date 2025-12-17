@@ -4,8 +4,8 @@ export const MyPageContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
-  margin-bottom: 56px;
+  min-height: 100vh;
+  padding-bottom: 100px; /* 하단 네비게이션 바 아래까지 스크롤 가능하도록 여백 추가 */
 `;
 
 export const HeaderBar = styled.div`
@@ -221,6 +221,8 @@ export const MyBlock = styled.div`
   align-items: flex-start;
   gap: 8px;
   margin: 0 auto;
+  /* 스크롤 컨테이너가 제대로 작동하도록 */
+  min-height: 0;
 `;
 
 export const MyBlockHeader = styled.div`
@@ -249,10 +251,35 @@ export const BlockTab = styled.div<{ $isActive?: boolean }>`
   transition: background 0.2s, color 0.2s;
 `;
 
-export const BlockListWrapper = styled.div`
+export const BlockListWrapper = styled.div<{ $hasManyBlocks?: boolean }>`
   width: 100%;
   margin-top: 24px;
-  min-height: auto;
+  margin-bottom: 100px; /* 하단 네비게이션 바 아래까지 스크롤 가능하도록 여백 추가 */
+  
+  /* 블록이 4개 이상일 때만 스크롤 적용 */
+  ${props => props.$hasManyBlocks && `
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #F0EFF1;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #C2C1C3;
+      border-radius: 3px;
+      
+      &:hover {
+        background: #868286;
+      }
+    }
+  `}
 `;
 
 export const BlockContent = styled.div`

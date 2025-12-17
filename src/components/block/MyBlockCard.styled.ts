@@ -7,6 +7,12 @@ export const BlockListContainer = styled.div`
   width: 100%;
   max-width: 335px;
   margin: 0 auto;
+  min-height: min-content;
+`;
+
+export const BlockCardWrapper = styled.div`
+  position: relative;
+  width: 100%;
 `;
 
 export const BlockCard = styled.div`
@@ -17,6 +23,7 @@ export const BlockCard = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 12px;
 `;
 
 export const BlockIcon = styled.div`
@@ -71,5 +78,28 @@ export const PartLabel = styled.span<{ $color?: string }>`
   background: ${props => props.$color || '#35CDFF'};
   color: #FAFAFA;
   white-space: nowrap;
+`;
+
+export const BoardAddButton = styled.button`
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  padding: 8px 16px;
+  background: #352F36;
+  color: #FAFAFA;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 10;
+  
+  &:hover {
+    background: #4A444B;
+  }
+  
+  &:active {
+    background: #2A252B;
+  }
 `;
 

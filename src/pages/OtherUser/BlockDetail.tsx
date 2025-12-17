@@ -79,6 +79,7 @@ const profileTypeToImage: Record<string, ProfileData> = {
 export function BlockDetail() {
   const navigate = useNavigate();
   const { blockId } = useParams<{ blockId: string }>();
+  const { showOverlay } = useOverlay();
   
   const [block, setBlock] = useState<BlockData | null>(null);
   const [foundBlockData, setFoundBlockData] = useState<{ techPart?: string } | null>(null);
@@ -115,18 +116,25 @@ export function BlockDetail() {
           myProfile = await getMyProfile();
           
           // 내 블록이면 내 블록 상세 페이지로 리다이렉트
-          if (blockDetail.user.userId === myProfile.userId) {
-            navigate(`/My/BlockDetail?id=${blockIdNum}`);
+          if (myProfile && blockDetail.writerId === myProfile.userId) {
+            navigate(`/My/BlockDetail/${blockIdNum}`);
             return;
           }
-        } catch (error) {
-          console.warn('Failed to fetch my profile:', error);
+        } catch (error: any) {
+          // 내 프로필 정보를 가져오지 못하면 계속 진행 (에러 처리)
+          // 403 에러는 인증 문제일 수 있지만, 블록 정보는 표시 가능
+          if (error?.response?.status === 403) {
+            console.warn('인증이 필요합니다. 블록 정보는 표시하지만 내 블록인지 확인할 수 없습니다.');
+          } else {
+            console.warn('Failed to fetch my profile:', error);
+          }
+          // myProfile이 없으면 내 블록인지 확인할 수 없으므로 계속 진행
         }
 
         // 작성자 상세 프로필 정보 가져오기
         let profileData;
         try {
-          profileData = await getUserProfile(blockDetail.user.userId);
+          profileData = await getUserProfile(blockDetail.writerId);
         } catch (error) {
           console.warn('Failed to fetch user profile:', error);
         }
@@ -140,20 +148,19 @@ export function BlockDetail() {
           'PM': 'pm',
         };
         
-        const roles = profileData?.mainRoles || blockDetail.user.roles || [];
+        const roles = profileData?.mainRoles || [];
         const convertedParts = roles.length > 0 
           ? roles.map((role: string) => roleToPartId[role] || role.toLowerCase())
           : [];
         
         setUserProfile({
-          nickname: blockDetail.user.nickname || '',
+          nickname: blockDetail.writerNickname || '',
           introduction: profileData?.introduction || '',
           selectedParts: convertedParts,
         });
 
-
-        // 프로필 이미지 설정
-        const profileType = profileData?.profileType;
+        // 프로필 이미지 설정 (API 응답에 writerProfileType 포함)
+        const profileType = blockDetail.writerProfileType || profileData?.profileType;
         if (profileType && profileTypeToImage[profileType]) {
           setSelectedProfile(profileTypeToImage[profileType]);
         } else {
@@ -163,7 +170,7 @@ export function BlockDetail() {
         // BlockDetailResponse를 BlockData 형식으로 변환
         const convertedBlock: BlockData = {
           block_id: blockDetail.blockId,
-          user_id: blockDetail.user.userId,
+          user_id: blockDetail.writerId,
           category_name: blockDetail.categoryName,
           block_title: blockDetail.blockTitle,
           block_type: blockDetail.blockType,
@@ -173,7 +180,7 @@ export function BlockDetail() {
           improvement_point: blockDetail.improvementPoint || null,
           result_url: blockDetail.resultUrl || null,
           result_file: blockDetail.resultFile || null,
-          created_at: new Date().toISOString(), // BlockDetailResponse에 createdAt이 없으므로 현재 시간 사용
+          created_at: blockDetail.createdAt || '', // API 응답에 createdAt 포함
           techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
         };
         
@@ -328,23 +335,32 @@ export function BlockDetail() {
           <S.Section>
             <S.SectionLabel>{userProfile?.nickname || 'Username'}님의 포트폴리오</S.SectionLabel>
             
-            {!safeBlock.result_url && !safeBlock.result_file && (
+            {!safeBlock.result_url && 
+             (!safeBlock.result_file || 
+              safeBlock.result_file.trim() === '' || 
+              safeBlock.result_file === 'dummy-pdf-base64-string-for-testing') && (
               <S.SectionValue>아직 등록된 기존 프로젝트 결과물이 없어요</S.SectionValue>
             )}
 
-            {safeBlock.result_url && (
+            {safeBlock.result_url && 
+             safeBlock.result_url.trim() !== '' && 
+             safeBlock.result_url !== 'string' && (
               <S.Link 
                 href={safeBlock.result_url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', marginBottom: safeBlock.result_file ? '8px' : '0' }} 
+                style={{ display: 'flex', alignItems: 'center', marginBottom: (safeBlock.result_file && 
+                  safeBlock.result_file.trim() !== '' && 
+                  safeBlock.result_file !== 'dummy-pdf-base64-string-for-testing') ? '8px' : '0' }} 
               >
                 <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', marginRight: '8px' }} ></img>
                 {safeBlock.result_url}
               </S.Link>
             )}
 
-            {safeBlock.result_file && (
+            {safeBlock.result_file && 
+             safeBlock.result_file.trim() !== '' && 
+             safeBlock.result_file !== 'dummy-pdf-base64-string-for-testing' && (
               <S.FileLink
                 onClick={() => {
                   console.log('Download file:', safeBlock.result_file);
@@ -362,8 +378,19 @@ export function BlockDetail() {
               content="보드에 담기"
               width="335px"
               onClick={() => {
-                // 보드에 담기 로직 추가
-                console.log('보드에 담기');
+                if (!blockId) {
+                  console.error('blockId가 없습니다.');
+                  return;
+                }
+                const blockIdNum = parseInt(blockId, 10);
+                if (isNaN(blockIdNum)) {
+                  console.error('유효하지 않은 blockId');
+                  return;
+                }
+                showOverlay(
+                  <BoardSelector blockId={blockIdNum} />,
+                  { contentStyle: { position: 'absolute', bottom: '0', width: '100%' } }
+                );
               }}
             />
           </div>
