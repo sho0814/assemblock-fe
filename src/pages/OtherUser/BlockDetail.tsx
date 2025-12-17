@@ -16,7 +16,6 @@ import folderIcon from '@assets/MyPage/folder.svg';
 import CommonButton from '@components/shared/CommonButton';
 import { getBlockDetail } from '@api/blockId';
 import { getUserProfile } from '@api/profiles/profile';
-import { getMyProfile } from '@api/users/me';
 
 // Tech_parts 매핑
 const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
@@ -115,21 +114,6 @@ export function BlockDetail() {
         // 블록 상세 정보 가져오기 (블록 정보 + 작성자 정보 포함)
         const blockDetail = await getBlockDetail(blockIdNum);
         
-        // 내 블록인지 확인하여 내 블록이면 내 블록 상세 페이지로 리다이렉트
-        try {
-          const myProfile = await getMyProfile();
-          if (myProfile && blockDetail.writerId === myProfile.userId) {
-            navigate(`/My/BlockDetail/${blockIdNum}`);
-            return;
-          }
-        } catch (error: any) {
-          if (error?.response?.status === 403) {
-            console.warn('인증이 필요합니다. 블록 정보는 표시하지만 내 블록인지 확인할 수 없습니다.');
-          } else {
-            console.warn('Failed to fetch my profile:', error);
-          }
-        }
-
         // 작성자 상세 프로필 정보 가져오기
         let profileData;
         try {
