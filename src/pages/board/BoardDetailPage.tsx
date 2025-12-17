@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { boardDetailStyles as styles } from "./BoardDetailPage.styles";
 import { useOverlay } from "@components/common/OverlayContext";
@@ -6,6 +6,8 @@ import DeleteModal from "./DeleteModal";
 import BlockCard from "@components/block/BlockCard";
 import { TeamProposalSheet } from "./TeamProposalSheet";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+
+import { deleteBoard, removeBlockFromBoard, updateBoard } from "@api";
 
 import backIcon from "@assets/board/left.svg";
 import moreIcon from "@assets/board/more.svg";
@@ -16,6 +18,7 @@ import { useBoardDetail } from "@hooks";
 
 type LocationState = {
   boardId?: number;
+  refreshKey?: number; // ✅ 추가: BlockDetail에서 돌아올 때 refetch 트리거
 };
 
 // Helper function to filter special characters
@@ -30,35 +33,27 @@ const filterSpecialChars = (
   return text.replace(pattern, "").slice(0, maxLength);
 };
 
-/**
- * categoryName 포맷 정규화
- * - "문화,생활" / "문화 생활" / "문화-생활" -> "문화_생활"
- * - "API 연동" -> "API_연동"
- * - 이미 "데이터_시각화" 처럼 내려오면 그대로 유지
- */
 const normalizeCategory = (s?: string) => {
   const raw = (s ?? "").trim();
 
-  // 구분자(쉼표/공백/하이픈/슬래시)들을 전부 "_"로 통일
   const normalized = raw
     .replace(/[,/]/g, "_")
     .replace(/\s+/g, "_")
     .replace(/-+/g, "_");
 
-  // "_"가 여러 개 연속이면 하나로
   return normalized.replace(/_+/g, "_").trim();
 };
 
-export const BoardDetailPage: React.FC = () => {
+export const BoardDetailPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { showOverlay } = useOverlay();
 
   // boardId만 받기
-  const { boardId } = (location.state || {}) as LocationState;
+  const { boardId, refreshKey } = (location.state || {}) as LocationState;
 
   // API로 보드 상세 가져오기
-  const { data, loading } = useBoardDetail(boardId);
+  const { data, loading, refetch } = useBoardDetail(boardId);
 
   const [titleEditing, setTitleEditing] = useState(false);
   const [memoEditing, setMemoEditing] = useState(false);
@@ -71,21 +66,61 @@ export const BoardDetailPage: React.FC = () => {
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
 
+  // 저장 중 상태
+  const [saving, setSaving] = useState(false);
+
+  // ✅ 추가: BlockDetail에서 "보드에서 제거" 후 돌아오면 무조건 refetch
+  useEffect(() => {
+    if (!refreshKey) return;
+    refetch();
+  }, [refreshKey, refetch]);
+
+  // ✅ 블록 상세 (보드에서 왔다고 state 전달)
+  const handleOpenBlockDetail = (blockId: number) => {
+    if (isSelectionMode) return;
+
+    // boardId가 없으면 일반 상세로만 이동
+    if (!boardId) {
+      navigate(`/block/detail?id=${blockId}`);
+      return;
+    }
+
+    // ✅ 보드에서 들어왔다 표시 + boardId 전달
+    navigate(`/block/detail?id=${blockId}`, {
+      state: {
+        fromBoardDetail: true,
+        boardId,
+      },
+    });
+  };
+
   // data 들어오면 title/memo 초기값 동기화
   useEffect(() => {
     if (!data) return;
-    setTitle(data.boardName ?? "");
-    setMemo(data.boardMemo ?? "");
-  }, [data]);
+    if (!titleEditing) setTitle(data.boardName ?? "");
+    if (!memoEditing) setMemo(data.boardMemo ?? "");
+  }, [data, titleEditing, memoEditing]);
 
-  // ✅ blocks가 실제로 오는지 확인용(문제 해결되면 지워도 됨)
-  useEffect(() => {
-    if (!data) return;
-    console.log("[BoardDetail] boardId:", boardId);
-    console.log("[BoardDetail] blocks raw:", data.blocks);
-  }, [data, boardId]);
+  // 저장 함수
+  const saveBoard = async (nextName: string, nextMemo: string) => {
+    if (!boardId) return;
+    if (saving) return;
 
-  // boardId가 없으면 잘못된 진입
+    try {
+      setSaving(true);
+      await updateBoard(boardId, {
+        boardName: nextName,
+        boardMemo: nextMemo,
+      });
+      await refetch(); // 서버값으로 동기화
+    } catch (e) {
+      console.error(e);
+      alert("저장에 실패했어요.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (!boardId) {
     return (
       <div style={styles.root}>
@@ -126,9 +161,25 @@ export const BoardDetailPage: React.FC = () => {
     navigate(-1);
   };
 
+  // 보드 삭제
   const handleDelete = () => {
-    // TODO: 삭제 API 연결 시 구현
-    navigate(-1);
+    showOverlay(
+      <DeleteConfirmModal
+        title="삭제 확인"
+        desc1="보드를 정말 삭제하시겠습니까?"
+        desc2="한 번 삭제한 보드는 복구할 수 없어요"
+        confirmText="삭제하기"
+        onConfirm={async () => {
+          try {
+            await deleteBoard(boardId);
+            navigate("/Board");
+          } catch (e) {
+            console.error(e);
+            alert("보드 삭제에 실패했어요.");
+          }
+        }}
+      />
+    );
   };
 
   const handleSelect = () => {
@@ -158,10 +209,21 @@ export const BoardDetailPage: React.FC = () => {
         desc1="해당 블록을 보드에서 삭제하시겠습니까?"
         desc2="한 번 삭제한 블록은 복구할 수 없어요"
         confirmText="삭제하기"
-        onConfirm={() => {
-          // TODO: 선택한 블록 삭제 API 연결
-          setIsSelectionMode(false);
-          setSelectedCards([]);
+        onConfirm={async () => {
+          if (selectedCards.length === 0) return;
+
+          try {
+            for (const blockId of selectedCards) {
+              await removeBlockFromBoard(boardId, blockId);
+            }
+
+            setIsSelectionMode(false);
+            setSelectedCards([]);
+            await refetch();
+          } catch (e) {
+            console.error(e);
+            alert("블록 제거에 실패했어요.");
+          }
         }}
       />
     );
@@ -242,11 +304,18 @@ export const BoardDetailPage: React.FC = () => {
                 maxLength={14}
                 value={title}
                 onChange={(e) => setTitle(filterSpecialChars(e.target.value, 14))}
-                onBlur={() => setTitleEditing(false)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") setTitleEditing(false);
+                onBlur={async () => {
+                  setTitleEditing(false);
+                  await saveBoard(title, memo);
+                }}
+                onKeyDown={async (e) => {
+                  if (e.key === "Enter") {
+                    setTitleEditing(false);
+                    await saveBoard(title, memo);
+                  }
                 }}
                 autoFocus
+                disabled={saving}
               />
             ) : (
               <span style={styles.boardTitleText}>{title}</span>
@@ -257,6 +326,7 @@ export const BoardDetailPage: React.FC = () => {
               style={styles.iconBtn}
               onClick={() => setTitleEditing(true)}
               aria-label="제목 수정"
+              disabled={saving}
             >
               <img src={penIcon} alt="제목 수정" style={styles.titleEditIcon} />
             </button>
@@ -272,14 +342,19 @@ export const BoardDetailPage: React.FC = () => {
                 onChange={(e) =>
                   setMemo(filterSpecialChars(e.target.value, 104, true))
                 }
-                onBlur={() => setMemoEditing(false)}
-                onKeyDown={(e) => {
+                onBlur={async () => {
+                  setMemoEditing(false);
+                  await saveBoard(title, memo);
+                }}
+                onKeyDown={async (e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     setMemoEditing(false);
+                    await saveBoard(title, memo);
                   }
                 }}
                 autoFocus
+                disabled={saving}
               />
             ) : (
               <span style={styles.memoText}>
@@ -292,6 +367,7 @@ export const BoardDetailPage: React.FC = () => {
               style={styles.iconBtn}
               onClick={() => setMemoEditing(true)}
               aria-label="메모 수정"
+              disabled={saving}
             >
               <img src={penIcon} alt="메모 수정" style={styles.memoEditIcon} />
             </button>
@@ -302,9 +378,7 @@ export const BoardDetailPage: React.FC = () => {
         {blocks.length === 0 ? (
           <section style={styles.emptySection}>
             <p style={styles.emptyTitle}>아직 저장한 블록 없음</p>
-            <p style={styles.emptySub}>
-              이 보드에 저장한 블록이 여기에 표시됩니다.
-            </p>
+            <p style={styles.emptySub}>이 보드에 저장한 블록이 여기에 표시됩니다.</p>
           </section>
         ) : (
           <section style={styles.cardsGrid}>
@@ -312,52 +386,46 @@ export const BoardDetailPage: React.FC = () => {
               .map((b: any) => {
                 const rawId = b.blockId ?? b.id ?? b.block_id;
                 const blockId = Number(rawId);
-                if (!Number.isFinite(blockId)) {
-                  console.warn("[BoardDetail] invalid block id:", rawId, b);
-                  return null;
-                }
+                if (!Number.isFinite(blockId)) return null;
 
-                // Swagger 기준 필드명 blockTitle / categoryName / blockType / techPart 등 맞춰서 우선 사용
                 const blockTitle = b.blockTitle ?? b.title ?? b.block_title ?? "";
                 const oneLineSummary =
-                  b.oneLineSummary ?? b.onelineSummary ?? b.oneline_summary ?? "";
+                  b.oneLineSummary ??
+                  b.onelineSummary ??
+                  b.oneline_summary ??
+                  "";
                 const writerNickname =
                   b.writerNickname ?? b.userName ?? b.user_name ?? "";
                 const techPart = b.techPart ?? b.tech_part ?? "";
-
                 const categoryNameRaw = b.categoryName ?? b.category_name ?? "";
-                const categoryName = normalizeCategory(categoryNameRaw);
-
-                console.log("[BoardDetail] category mapping check", {
-                  blockId,
-                  blockTitle,
-                  categoryNameRaw,
-                  normalized: categoryName,
-                });
-
-                // 매칭 확인 로그 (문제 해결 후 삭제)
-                console.log("[BoardDetail] render block:", {
-                  blockId,
-                  blockTitle,
-                  blockType: b.blockType,
-                  techPart,
-                  categoryNameRaw,
-                  categoryName,
-                });
+                const categoryName = categoryNameRaw;
 
                 return (
-                  <BlockCard
+                  <div
                     key={blockId}
-                    block_id={blockId}
-                    block_title={blockTitle}
-                    oneline_summary={oneLineSummary}
-                    user_name={writerNickname}
-                    tech_part={techPart}
-                    category_name={categoryName} // ✅ 여기로 배경 매칭됨
-                    isSelectionMode={isSelectionMode}
-                    isSelected={selectedCards.includes(blockId)}
-                    onToggleSelect={handleCardToggle}
-                  />
+                    style={{ cursor: isSelectionMode ? "default" : "pointer" }}
+                    onClickCapture={(e) => {
+                      if (isSelectionMode) return;
+
+                      // BlockCard 내부에 Link가 있어도 그 이동을 막아버림
+                      e.preventDefault();
+                      e.stopPropagation();
+
+                      handleOpenBlockDetail(blockId);
+                    }}
+                  >
+                    <BlockCard
+                      block_id={blockId}
+                      block_title={blockTitle}
+                      oneline_summary={oneLineSummary}
+                      user_name={writerNickname}
+                      tech_part={techPart}
+                      category_name={categoryName}
+                      isSelectionMode={isSelectionMode}
+                      isSelected={selectedCards.includes(blockId)}
+                      onToggleSelect={handleCardToggle}
+                    />
+                  </div>
                 );
               })
               .filter(Boolean)}
@@ -378,6 +446,7 @@ export const BoardDetailPage: React.FC = () => {
           >
             선택한 블록 팀 제안 보내기
           </button>
+
           <button
             style={{
               ...styles.downBtn,
@@ -393,9 +462,20 @@ export const BoardDetailPage: React.FC = () => {
 
       <div style={styles.homeIndicator} />
 
+      {/* boardId! 로 넘겨서 TS 에러 방지 */}
       <TeamProposalSheet
         isOpen={isProposalSheetOpen}
         onClose={() => setIsProposalSheetOpen(false)}
+        boardId={boardId!}
+        selectedBlockIds={selectedCards}
+        onSuccess={(proposalId: number) => {
+          setIsProposalSheetOpen(false);
+          setIsSelectionMode(false);
+          setSelectedCards([]);
+
+          // MyTeamPage는 useParams로 proposalId를 받으므로 URL param으로 이동
+          navigate(`/Project/team/${proposalId}`);
+        }}
       />
     </div>
   );

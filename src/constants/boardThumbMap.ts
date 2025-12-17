@@ -51,7 +51,7 @@ export const categoryToThumb = (category?: string) => {
 
   const key = map[normalized];
   console.log("[ThumbMap] mapping", { category, normalized, key });
-  // ✅ 여기 핵심: 매핑 실패면 무조건 basic
+  // 매핑 실패면 무조건 basic
   if (!key) {
     console.warn("[ThumbMap] no match -> basic", { category, normalized });
     return getSmallSvg("basic");

@@ -1,16 +1,49 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import closeIcon from "@assets/board/close.svg";
 import * as S from "./TeamProposalSheet.styled";
 import { TeamProposalConfirmModal } from "./TeamProposalConfirmModal";
+import { createBoardProposal } from "@api/boardProposal";
 
 interface TeamProposalSheetProps {
   isOpen: boolean;
   onClose: () => void;
+
+  boardId: number;
+  onSuccess: (proposalId: number) => void;
+
+  // 서버로는 안 보냄 UI용
+  selectedBlockIds?: number[];
 }
+
+// "YYYY.MM.DD ~ YYYY.MM.DD" -> { start: "YYYY-MM-DD", end: "YYYY-MM-DD" }
+const parseRecruitmentPeriod = (input: string) => {
+  const raw = (input ?? "").trim();
+  const parts = raw.split("~").map((s) => s.trim());
+  if (parts.length !== 2) return null;
+
+  const normalize = (d: string) => {
+    const x = d.replace(/\s/g, "");
+    const m = x.match(/^(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})$/);
+    if (!m) return null;
+    const yyyy = m[1];
+    const mm = m[2].padStart(2, "0");
+    const dd = m[3].padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const start = normalize(parts[0]);
+  const end = normalize(parts[1]);
+  if (!start || !end) return null;
+
+  return { start, end };
+};
 
 export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
   isOpen,
   onClose,
+  boardId,
+  onSuccess,
+  selectedBlockIds, // (UI용: 지금은 미사용)
 }) => {
   const [projectTitle, setProjectTitle] = useState("");
   const [memo, setMemo] = useState("");
@@ -22,10 +55,14 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
   const [isPeriodFocused, setIsPeriodFocused] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  const isSendEnabled =
-    projectTitle.trim().length > 0 && recruitmentPeriod.trim().length > 0;
+  const [sending, setSending] = useState(false);
+  const [createdProposalId, setCreatedProposalId] = useState<number | null>(null);
 
-  const handleClose = () => {
+  const isSendEnabled = useMemo(() => {
+    return projectTitle.trim().length > 0 && recruitmentPeriod.trim().length > 0;
+  }, [projectTitle, recruitmentPeriod]);
+
+  const resetFields = () => {
     setProjectTitle("");
     setMemo("");
     setContact("");
@@ -34,33 +71,72 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
     setIsMemoFocused(false);
     setIsContactFocused(false);
     setIsPeriodFocused(false);
+  };
+
+  const handleClose = () => {
+    resetFields();
     onClose();
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!isSendEnabled) return;
+    if (sending) return;
 
-    // TODO: 팀 제안 전송 로직
-    console.log({
-      projectTitle,
-      memo,
-      contact,
-      recruitmentPeriod,
-    });
+    const parsed = parseRecruitmentPeriod(recruitmentPeriod);
+    if (!parsed) {
+      alert("팀 모집 기간 형식을 확인해주세요. (예: 2025.12.17 ~ 2025.12.20)");
+      return;
+    }
 
-    // 확인 모달 열기
-    setIsConfirmModalOpen(true);
-    handleClose();
+    try {
+      setSending(true);
+
+      const res = await createBoardProposal({
+        boardId,
+        discordId: contact,
+        recruitStartDate: parsed.start,
+        recruitEndDate: parsed.end,
+        projectTitle: projectTitle.trim(),
+        projectMemo: memo.trim(),
+      });
+
+      const proposalId = res?.proposalId;
+      if (typeof proposalId !== "number") {
+        throw new Error("proposalId가 응답에 없습니다.");
+      }
+
+      // ✅ 먼저 proposalId 확보
+      setCreatedProposalId(proposalId);
+
+      // ✅ 모달 열고, 시트 닫기(필드만 초기화)
+      setIsConfirmModalOpen(true);
+      resetFields();
+      onClose();
+    } catch (e) {
+      console.error(e);
+      alert("팀 제안 전송에 실패했어요.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleViewTeam = () => {
-    // TODO: 내 팀 보기 페이지로 이동
-    console.log("내 팀 보기");
+    if (createdProposalId === null) {
+      alert("제안 정보를 찾을 수 없어요. 다시 시도해주세요.");
+      return;
+    }
+
+    // ✅ 정리 먼저 하고 성공 콜백 호출
+    const id = createdProposalId;
     setIsConfirmModalOpen(false);
+    setCreatedProposalId(null);
+
+    onSuccess(id);
   };
 
   const handleConfirmClose = () => {
     setIsConfirmModalOpen(false);
+    setCreatedProposalId(null);
   };
 
   return (
@@ -71,7 +147,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
       {/* 팀 제안 보내기 바텀시트 */}
       <S.BottomSheet isOpen={isOpen}>
         <S.Header>
-          <S.HeaderSide /> {/* 왼쪽 공간 맞추기용 */}
+          <S.HeaderSide />
           <S.Title>팀 제안 보내기</S.Title>
           <S.CloseButton type="button" onClick={handleClose} aria-label="닫기">
             <S.CloseIcon src={closeIcon} alt="닫기" />
@@ -94,9 +170,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
               }}
               onFocus={() => setIsTitleFocused(true)}
               onBlur={(e) => {
-                if (!e.target.value.trim()) {
-                  setIsTitleFocused(false);
-                }
+                if (!e.target.value.trim()) setIsTitleFocused(false);
               }}
             />
             <S.HelperText>영문/한글/숫자로 14자까지 입력 가능해요</S.HelperText>
@@ -119,9 +193,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
               }}
               onFocus={() => setIsMemoFocused(true)}
               onBlur={(e) => {
-                if (!e.target.value) {
-                  setIsMemoFocused(false);
-                }
+                if (!e.target.value) setIsMemoFocused(false);
               }}
             />
             <S.HelperText>
@@ -147,9 +219,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
               }}
               onFocus={() => setIsContactFocused(true)}
               onBlur={(e) => {
-                if (!e.target.value.trim()) {
-                  setIsContactFocused(false);
-                }
+                if (!e.target.value.trim()) setIsContactFocused(false);
               }}
             />
             <S.HelperText>
@@ -175,9 +245,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
               }}
               onFocus={() => setIsPeriodFocused(true)}
               onBlur={(e) => {
-                if (!e.target.value.trim()) {
-                  setIsPeriodFocused(false);
-                }
+                if (!e.target.value.trim()) setIsPeriodFocused(false);
               }}
             />
             <S.HelperText>최소 1일 ~ 최대 14일 이내로 가능해요</S.HelperText>
@@ -186,10 +254,10 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
           {/* 전송하기 버튼 */}
           <S.SendButton
             type="button"
-            disabled={!isSendEnabled}
+            disabled={!isSendEnabled || sending}
             onClick={handleSend}
           >
-            전송하기
+            {sending ? "전송 중..." : "전송하기"}
           </S.SendButton>
         </S.Content>
       </S.BottomSheet>

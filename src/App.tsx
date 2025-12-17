@@ -59,7 +59,7 @@ function App() {
             <Route path="/Home/notification" element={<NotificationPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/search/:keyword" element={<SearchResultPage />} />
-            <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => { }} />} />
+            <Route path="/Board/detail" element={<BoardDetailPage />} />
             <Route path="/block/detail" element={<BlockDetailPage />} />
             <Route path="/My/BlockDetail/:blockId" element={<BlockDetailPage />} />
             <Route path="/block/edit" element={<BlockEditPage />} />

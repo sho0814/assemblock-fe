@@ -8,7 +8,7 @@ import DeleteModal from "./DeleteModal";
 import { useBoards, useBoardDetail } from "@hooks";
 import type { MinimalBoard } from "@types";
 
-// 썸네일 매핑 함수 (categoryName -> small svg)
+// 썸네일 매핑 함수
 import { categoryToThumb } from "@constants/boardThumbMap";
 
 // 썸네일 기본 아이콘
@@ -100,6 +100,8 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
 
   const { boards, createNewBoard } = useBoards();
 
+   const stableBoards = [...boards].sort((a, b) => b.boardId - a.boardId);
+
   // 바텀시트/폼 상태
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
   const [boardTitle, setBoardTitle] = useState("");
@@ -185,7 +187,7 @@ export const BoardPage: React.FC<BoardPageProps> = () => {
 
         <main style={styles.content}>
           <div style={styles.boardsGrid}>
-            {boards.map((board: MinimalBoard) => (
+            {stableBoards.map((board: MinimalBoard) => (
               <BoardCardItem key={board.boardId} board={board} />
             ))}
           </div>
