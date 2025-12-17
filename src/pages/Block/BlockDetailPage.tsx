@@ -17,7 +17,6 @@ import CancelGuide from '@components/block/CancleGuide';
 import { useOverlay } from '@components/common/OverlayContext';
 import { getBlockDetail, deleteBlock, type BlockDetailResponse } from '@api/blockId';
 import { getCategoryLabel } from '@utils/getCategoryLabel';
-import { getMyProfile } from '@api/users/me';
 import { getUserProfile } from '@api/profiles/profile';
 
 // Tech_parts 매핑 (API는 문자열을 반환)
@@ -96,16 +95,23 @@ export function BlockDetailPage() {
     introduction: string;
     selectedParts: string[];
   } | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태
 
   useEffect(() => {
     const fetchBlockData = async () => {
+      setIsLoading(true); // 로딩 시작
+      
       // 라우트 파라미터 우선, 없으면 쿼리 파라미터 사용 (하위 호환성)
       const blockId = blockIdParam || searchParams.get('id');
-      if (!blockId) return;
+      if (!blockId) {
+        setIsLoading(false);
+        return;
+      }
 
       const blockIdNum = parseInt(blockId, 10);
       if (isNaN(blockIdNum)) {
         console.error('유효하지 않은 blockId');
+        setIsLoading(false);
         return;
       }
 
@@ -123,26 +129,8 @@ export function BlockDetailPage() {
         // BlockDetailResponse 저장 (techPart 정보 보존)
         setBlockDetailResponse(blockDetail);
         
-        // 현재 로그인한 사용자 정보 가져오기 (내 블록인지 확인용)
-        let myProfile;
-        try {
-          myProfile = await getMyProfile();
-          
-          // 내 블록이 아니면 타인 블록 상세 페이지로 리다이렉트
-          if (myProfile && blockDetail.writerId !== myProfile.userId) {
-            navigate(`/OtherUser/BlockDetail/${blockIdNum}`);
-            return;
-          }
-        } catch (error: any) {
-          // 내 프로필 정보를 가져오지 못하면 계속 진행 (에러 처리)
-          // 403 에러는 인증 문제일 수 있지만, 블록 정보는 표시 가능
-          if (error?.response?.status === 403) {
-            console.warn('인증이 필요합니다. 블록 정보는 표시하지만 내 블록인지 확인할 수 없습니다.');
-          } else {
-            console.warn('Failed to fetch my profile:', error);
-          }
-          // myProfile이 없으면 내 블록인지 확인할 수 없으므로 계속 진행
-        }
+        // 마이페이지에서 들어온 경우이므로 리다이렉트 없이 계속 진행
+        // (홈페이지에서 들어온 경우는 이미 /OtherUser/BlockDetail로 라우팅됨)
         
         // 카테고리명을 label 형식으로 변환 (API는 value 형식으로 옴)
         const categoryLabel = getCategoryLabel(blockDetail.categoryName);
@@ -222,11 +210,14 @@ export function BlockDetailPage() {
             console.error('블록 데이터 찾기 실패:', e);
           }
         }
+      } finally {
+        setIsLoading(false); // 로딩 완료
       }
     };
 
     fetchBlockData();
-  }, [blockIdParam, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockIdParam]); // searchParams는 하위 호환성을 위해 사용하지만 dependency에는 포함하지 않음
 
   // 블록 상세 페이지에서는 API에서 가져온 작성자 프로필을 사용하므로
   // localStorage의 userProfile은 사용하지 않음
@@ -359,16 +350,17 @@ export function BlockDetailPage() {
             
             // 삭제 성공 후 마이페이지로 이동
             navigate('/My');
-          } catch (error: any) {
+          } catch (error: unknown) {
             console.error('블록 삭제 실패:', error);
-            console.error('에러 전체 객체:', error);
-            console.error('에러 응답:', error?.response);
+            const axiosError = error as { response?: { status?: number; data?: { path?: string; message?: string }; statusText?: string }; message?: string; config?: { url?: string } };
+            console.error('에러 전체 객체:', axiosError);
+            console.error('에러 응답:', axiosError?.response);
             console.error('에러 상세 정보:', {
-              status: error?.response?.status,
-              statusText: error?.response?.statusText,
-              data: error?.response?.data,
-              message: error?.message,
-              config: error?.config,
+              status: axiosError?.response?.status,
+              statusText: axiosError?.response?.statusText,
+              data: axiosError?.response?.data,
+              message: axiosError?.message,
+              config: axiosError?.config,
             });
             
             // 오버레이 닫기
@@ -376,8 +368,8 @@ export function BlockDetailPage() {
             
             // 에러 메시지 추출
             let errorMessage = '블록 삭제에 실패했습니다.';
-            const status = error?.response?.status;
-            const errorData = error?.response?.data;
+            const status = axiosError?.response?.status;
+            const errorData = axiosError?.response?.data;
             
             if (status === 403) {
               errorMessage = '삭제 권한이 없습니다.';
@@ -388,13 +380,11 @@ export function BlockDetailPage() {
               // 백엔드 로그에서 확인된 에러: 외래키 제약 조건 위반
               // "Cannot delete or update a parent row: a foreign key constraint fails"
               // board_block 테이블에서 block_id를 참조하고 있어서 삭제할 수 없음
-              const errorPath = errorData?.path || error?.config?.url;
+              const errorPath = errorData?.path || axiosError?.config?.url;
               console.error('500 에러 - 서버 응답 데이터:', errorData);
               console.error('500 에러 - 요청 경로:', errorPath);
               
-              // 외래키 제약 조건 위반 에러인 경우 (블록이 보드에 포함되어 있음)
-              // 백엔드에서 반환하는 에러 메시지나 응답 데이터를 확인하여 판단
-              // 일반적으로 500 에러가 발생하면 블록이 보드에 포함되어 있을 가능성이 높음
+          
               errorMessage = '블록을 삭제할 수 없습니다.\n\n' +
                 '이 블록이 보드에 포함되어 있어서 삭제할 수 없어요.\n\n' +
                 '삭제하려면:\n' +
@@ -403,8 +393,8 @@ export function BlockDetailPage() {
                 '3. 그 다음 블록을 삭제할 수 있어요';
             } else if (errorData?.message) {
               errorMessage = errorData.message;
-            } else if (error?.message) {
-              errorMessage = `오류: ${error.message}`;
+            } else if (axiosError?.message) {
+              errorMessage = `오류: ${axiosError.message}`;
             }
             
             alert(errorMessage);
@@ -414,6 +404,34 @@ export function BlockDetailPage() {
     );
   };
 
+
+  // 로딩 중일 때 로딩 메시지 표시
+  if (isLoading) {
+    return (
+      <>
+        <S.Header>
+          <S.BackButton onClick={() => navigate(-1)}>
+            <S.BackIcon src={backArrow} alt="뒤로가기" />
+          </S.BackButton>
+          <S.HeaderTitle>블록 상세</S.HeaderTitle>
+          <S.MoreButtonWrapper />
+        </S.Header>
+        <S.Container>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '50vh',
+            fontSize: '16px',
+            fontWeight: 500,
+            color: '#868286'
+          }}>
+            블록 상세 정보를 로딩 중입니다...
+          </div>
+        </S.Container>
+      </>
+    );
+  }
 
   return (
     <>

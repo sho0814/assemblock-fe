@@ -1,6 +1,7 @@
 // src/pages/block/BlockEditPage.tsx
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useOverlay } from '@components/common/OverlayContext';
 import CancelGuide from '@components/block/CancleGuide';
 import SimpleHeader from '@components/shared/SimpleHeader';
@@ -426,10 +427,9 @@ export function BlockEditPage() {
             console.log('블록 수정 API 호출 성공');
 
             console.log('블록 수정 성공');
-            alert('블록이 성공적으로 수정되었습니다.');
+            toast.success('블록이 성공적으로 수정되었습니다.');
             
-            // 블록 상세 페이지로 이동
-            navigate(`/My/BlockDetail/${blockIdNum}`);
+            navigate(-1);
         } catch (error: any) {
             console.error('블록 수정 실패:', error);
             console.error('에러 전체 객체:', error);
@@ -456,7 +456,7 @@ export function BlockEditPage() {
                 errorMessage = `오류: ${error.message}`;
             }
             
-            alert(errorMessage);
+            toast.error(errorMessage);
         }
     };
 
