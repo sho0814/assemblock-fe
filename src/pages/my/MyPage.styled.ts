@@ -10,7 +10,6 @@ export const MyPageContainer = styled.div`
 
 export const HeaderBar = styled.div`
   position: relative;
-  top: 0;
   min-height: 68px;
   display: flex;
   align-items: center;

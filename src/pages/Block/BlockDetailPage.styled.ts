@@ -6,11 +6,12 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   height: 68px;
-  padding: 16px 0;
   width: 100%;
-  max-width: 375px;
-  margin: 0;
+  max-width: 400px;
+  margin: 24px auto;
+  padding-top: 48px;
 `;
+
 
 export const BackButton = styled.button`
   display: flex;
@@ -89,7 +90,7 @@ export const Container = styled.div`
   width: 100%;
   max-width: 335px;
   margin: 0 auto;
-  padding: 24px 0 36px;
+  padding: 0 0 36px;
 `;
 
 
