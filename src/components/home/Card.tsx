@@ -71,15 +71,15 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
     );
   }
 
-  const handleClick = () => {
+  const handleClick = (blockId: number) => {
     if (isDragging) return;
-    navigate('/OtherUser/BlockDetail');
+    navigate(`/OtherUser/BlockDetail/${encodeURIComponent(blockId)}`);
   }
 
   return (
     <>
       <animated.div {...bind()} style={{ y: spring.y }}>
-        <S.Card key={blockId} bgImage={bgImage} onClick={handleClick}>
+        <S.Card key={blockId} bgImage={bgImage} onClick={() => handleClick(blockId)}>
           <S.Title>{blockTitle}</S.Title>
           <S.Summary>{oneLineSummary}</S.Summary>
           <S.Username>{writerNickname} 님</S.Username>

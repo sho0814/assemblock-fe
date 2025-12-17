@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from './BlockDetailPage.styled';
 import backArrow from '@assets/common/back-arrow.svg';
@@ -16,6 +16,9 @@ import OptionMenu from '@components/block/OptionMenu';
 import CancelGuide from '@components/block/CancleGuide';
 import { useOverlay } from '@components/common/OverlayContext';
 import { getBlockDetail, deleteBlock, type BlockDetailResponse } from '@api/blockId';
+import { getCategoryLabel } from '@utils/getCategoryLabel';
+import { getMyProfile } from '@api/users/me';
+import { getUserProfile } from '@api/profiles/profile';
 
 // Tech_parts 매핑 (API는 문자열을 반환)
 const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
@@ -77,9 +80,10 @@ const profileTypeToImage: Record<string, ProfileData> = {
 };
 
 export function BlockDetailPage() {
+  const { blockId: blockIdParam } = useParams<{ blockId?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { showOverlay } = useOverlay();
+  const { showOverlay, closeOverlay } = useOverlay();
   
   const [block, setBlock] = useState<BlockData | null>(null);
   const [blockDetailResponse, setBlockDetailResponse] = useState<BlockDetailResponse | null>(null);
@@ -95,7 +99,8 @@ export function BlockDetailPage() {
 
   useEffect(() => {
     const fetchBlockData = async () => {
-      const blockId = searchParams.get('id');
+      // 라우트 파라미터 우선, 없으면 쿼리 파라미터 사용 (하위 호환성)
+      const blockId = blockIdParam || searchParams.get('id');
       if (!blockId) return;
 
       const blockIdNum = parseInt(blockId, 10);
@@ -108,16 +113,47 @@ export function BlockDetailPage() {
         // API에서 블록 상세 정보 가져오기
         const blockDetail = await getBlockDetail(blockIdNum);
         
+        // API 응답 검증
+        if (!blockDetail) {
+          console.error('블록 상세 정보를 가져올 수 없습니다.');
+          navigate(-1);
+          return;
+        }
+        
         // BlockDetailResponse 저장 (techPart 정보 보존)
         setBlockDetailResponse(blockDetail);
+        
+        // 현재 로그인한 사용자 정보 가져오기 (내 블록인지 확인용)
+        let myProfile;
+        try {
+          myProfile = await getMyProfile();
+          
+          // 내 블록이 아니면 타인 블록 상세 페이지로 리다이렉트
+          if (myProfile && blockDetail.writerId !== myProfile.userId) {
+            navigate(`/OtherUser/BlockDetail/${blockIdNum}`);
+            return;
+          }
+        } catch (error: any) {
+          // 내 프로필 정보를 가져오지 못하면 계속 진행 (에러 처리)
+          // 403 에러는 인증 문제일 수 있지만, 블록 정보는 표시 가능
+          if (error?.response?.status === 403) {
+            console.warn('인증이 필요합니다. 블록 정보는 표시하지만 내 블록인지 확인할 수 없습니다.');
+          } else {
+            console.warn('Failed to fetch my profile:', error);
+          }
+          // myProfile이 없으면 내 블록인지 확인할 수 없으므로 계속 진행
+        }
+        
+        // 카테고리명을 label 형식으로 변환 (API는 value 형식으로 옴)
+        const categoryLabel = getCategoryLabel(blockDetail.categoryName);
         
         // BlockDetailResponse를 BlockData 형식으로 변환
         // techPart는 string | null 타입이므로 techparts는 빈 배열로 설정
         // 실제 techPart는 blockDetailResponse에 저장하여 getCategoryPath에서 사용
         const convertedBlock: BlockData = {
           block_id: blockDetail.blockId,
-          user_id: blockDetail.user.userId,
-          category_name: blockDetail.categoryName,
+          user_id: blockDetail.writerId,
+          category_name: categoryLabel, // label 형식으로 변환된 카테고리명 사용
           block_title: blockDetail.blockTitle,
           block_type: blockDetail.blockType,
           contribution_score: blockDetail.contributionScore,
@@ -126,11 +162,20 @@ export function BlockDetailPage() {
           improvement_point: blockDetail.improvementPoint || null,
           result_url: blockDetail.resultUrl || null,
           result_file: blockDetail.resultFile || null,
-          created_at: '', // API 응답에 없으므로 빈 문자열
+          created_at: blockDetail.createdAt || '', // API 응답에 createdAt 포함
           techparts: [], // techPart는 문자열이므로 techparts는 빈 배열로 설정
         };
         
         setBlock(convertedBlock);
+        
+        // 작성자 상세 프로필 정보 가져오기 (introduction, mainRoles 등)
+        let profileData;
+        try {
+          profileData = await getUserProfile(blockDetail.writerId);
+        } catch (error) {
+          console.warn('Failed to fetch user profile:', error);
+          // 프로필 정보를 가져오지 못해도 계속 진행
+        }
         
         // user 정보 설정
         const roleToPartId: Record<string, string> = {
@@ -141,19 +186,25 @@ export function BlockDetailPage() {
           'PM': 'pm',
         };
         
-        const convertedParts = blockDetail.user.roles.length > 0 
-          ? blockDetail.user.roles.map((role: string) => roleToPartId[role] || role.toLowerCase())
+        // profileData가 있으면 mainRoles 사용, 없으면 빈 배열
+        const roles = profileData?.mainRoles || [];
+        const convertedParts = roles.length > 0 
+          ? roles.map((role: string) => roleToPartId[role] || role.toLowerCase())
           : [];
         
         setUserProfile({
-          nickname: blockDetail.user.nickname || '',
-          introduction: '', // BlockDetailResponse의 user에는 introduction이 없음
+          nickname: blockDetail.writerNickname || '',
+          introduction: profileData?.introduction || '',
           selectedParts: convertedParts,
         });
         
-        // 프로필 이미지 설정 (BlockDetailResponse의 user에는 profileType이 없으므로 기본값 사용)
-        // 필요시 getUserProfile API를 별도로 호출하여 profileType을 가져올 수 있음
-        setSelectedProfile(profileTypeToImage['Type_1']);
+        // 프로필 이미지 설정 (API 응답에 writerProfileType 포함)
+        const profileType = blockDetail.writerProfileType || profileData?.profileType;
+        if (profileType && profileTypeToImage[profileType]) {
+          setSelectedProfile(profileTypeToImage[profileType]);
+        } else {
+          setSelectedProfile(profileTypeToImage['Type_1']);
+        }
       } catch (error) {
         console.error('Failed to fetch block detail:', error);
         // API 실패 시 localStorage에서 가져오기 (fallback)
@@ -175,29 +226,14 @@ export function BlockDetailPage() {
     };
 
     fetchBlockData();
-  }, [searchParams]);
+  }, [blockIdParam, searchParams]);
 
-  useEffect(() => {
-    const savedProfile = localStorage.getItem('selectedProfile');
-    if (savedProfile) {
-      try {
-        const profile = JSON.parse(savedProfile) as ProfileData;
-        setSelectedProfile(profile);
-      } catch (e) {
-        console.error('Failed to parse saved profile:', e);
-      }
-    }
-    
-    const savedUserProfile = localStorage.getItem('userProfile');
-    if (savedUserProfile) {
-      try {
-        const profile = JSON.parse(savedUserProfile);
-        setUserProfile(profile);
-      } catch (e) {
-        console.error('Failed to parse saved user profile:', e);
-      }
-    }
-  }, []);
+  // 블록 상세 페이지에서는 API에서 가져온 작성자 프로필을 사용하므로
+  // localStorage의 userProfile은 사용하지 않음
+  // (localStorage의 userProfile은 내 프로필 정보일 수 있음)
+  
+  // 프로필 이미지는 API에서 가져온 writerProfileType을 사용하므로
+  // localStorage의 selectedProfile도 사용하지 않음
 
   // 데이터가 없을 때 사용할 기본값
   // 타입을 'TECHNOLOGY'로 가정하고 빈 값 채움
@@ -260,7 +296,7 @@ export function BlockDetailPage() {
 
   const handleEdit = () => {
     setIsMenuOpen(false);
-    const blockId = searchParams.get('id');
+    const blockId = blockIdParam || searchParams.get('id');
     if (blockId) {
       navigate(`/Block/edit?id=${blockId}`);
     }
@@ -279,45 +315,99 @@ export function BlockDetailPage() {
         }
         prevContent="삭제하기"
         onPrevClick={async () => {
-          const blockId = searchParams.get('id');
+          // 라우트 파라미터에서 blockId 가져오기
+          const blockId = blockIdParam || searchParams.get('id');
           if (!blockId) {
-            navigate(-1);
+            console.error('blockId가 없습니다.');
+            alert('블록 ID를 찾을 수 없습니다.');
+            closeOverlay();
             return;
           }
 
           const blockIdNum = parseInt(blockId, 10);
           if (isNaN(blockIdNum)) {
-            console.error('유효하지 않은 blockId');
-            navigate(-1);
+            console.error('유효하지 않은 blockId:', blockId);
+            alert('유효하지 않은 블록 ID입니다.');
+            closeOverlay();
             return;
           }
 
           try {
             // API로 블록 삭제
+            console.log('블록 삭제 요청:', blockIdNum);
+            console.log('삭제 요청 URL:', `/api/blocks/${blockIdNum}`);
+            
             await deleteBlock(blockIdNum);
+            console.log('블록 삭제 성공:', blockIdNum);
+            
+            // 오버레이 닫기
+            closeOverlay();
             
             // localStorage에서도 삭제 (fallback)
-            if (block) {
+            try {
               const savedBlocks = localStorage.getItem('registeredBlocks');
               if (savedBlocks) {
-                try {
-                  const blocks = JSON.parse(savedBlocks) as BlockData[];
-                  const filteredBlocks = blocks.filter(
-                    (b) => b.block_id !== block.block_id
-                  );
-                  localStorage.setItem('registeredBlocks', JSON.stringify(filteredBlocks));
-                } catch (e) {
-                  console.error('localStorage 삭제 실패:', e);
-                }
+                const blocks = JSON.parse(savedBlocks) as BlockData[];
+                const filteredBlocks = blocks.filter(
+                  (b) => b.block_id !== blockIdNum
+                );
+                localStorage.setItem('registeredBlocks', JSON.stringify(filteredBlocks));
               }
+            } catch (e) {
+              console.warn('localStorage 삭제 실패 (무시 가능):', e);
             }
             
-            // 삭제 성공 후 이전 페이지로 이동
-            navigate(-1);
-          } catch (error) {
+            // 삭제 성공 후 마이페이지로 이동
+            navigate('/My');
+          } catch (error: any) {
             console.error('블록 삭제 실패:', error);
-            alert('블록 삭제에 실패했습니다.');
-            // 에러 발생 시에도 페이지에 머물기
+            console.error('에러 전체 객체:', error);
+            console.error('에러 응답:', error?.response);
+            console.error('에러 상세 정보:', {
+              status: error?.response?.status,
+              statusText: error?.response?.statusText,
+              data: error?.response?.data,
+              message: error?.message,
+              config: error?.config,
+            });
+            
+            // 오버레이 닫기
+            closeOverlay();
+            
+            // 에러 메시지 추출
+            let errorMessage = '블록 삭제에 실패했습니다.';
+            const status = error?.response?.status;
+            const errorData = error?.response?.data;
+            
+            if (status === 403) {
+              errorMessage = '삭제 권한이 없습니다.';
+            } else if (status === 404) {
+              errorMessage = '블록을 찾을 수 없습니다.';
+            } else if (status === 500) {
+              // 500 에러는 백엔드 서버 문제
+              // 백엔드 로그에서 확인된 에러: 외래키 제약 조건 위반
+              // "Cannot delete or update a parent row: a foreign key constraint fails"
+              // board_block 테이블에서 block_id를 참조하고 있어서 삭제할 수 없음
+              const errorPath = errorData?.path || error?.config?.url;
+              console.error('500 에러 - 서버 응답 데이터:', errorData);
+              console.error('500 에러 - 요청 경로:', errorPath);
+              
+              // 외래키 제약 조건 위반 에러인 경우 (블록이 보드에 포함되어 있음)
+              // 백엔드에서 반환하는 에러 메시지나 응답 데이터를 확인하여 판단
+              // 일반적으로 500 에러가 발생하면 블록이 보드에 포함되어 있을 가능성이 높음
+              errorMessage = '블록을 삭제할 수 없습니다.\n\n' +
+                '이 블록이 보드에 포함되어 있어서 삭제할 수 없어요.\n\n' +
+                '삭제하려면:\n' +
+                '1. 해당 블록이 포함된 보드를 열어주세요\n' +
+                '2. 보드에서 블록을 제거해주세요\n' +
+                '3. 그 다음 블록을 삭제할 수 있어요';
+            } else if (errorData?.message) {
+              errorMessage = errorData.message;
+            } else if (error?.message) {
+              errorMessage = `오류: ${error.message}`;
+            }
+            
+            alert(errorMessage);
           }
         }}
       />
@@ -439,23 +529,32 @@ export function BlockDetailPage() {
           <S.Section>
             <S.SectionLabel>{userProfile?.nickname || 'Username'}님의 포트폴리오</S.SectionLabel>
             
-            {!safeBlock.result_url && !safeBlock.result_file && (
+            {!safeBlock.result_url && 
+             (!safeBlock.result_file || 
+              safeBlock.result_file.trim() === '' || 
+              safeBlock.result_file === 'dummy-pdf-base64-string-for-testing') && (
               <S.SectionValue>아직 등록된 기존 프로젝트 결과물이 없어요</S.SectionValue>
             )}
 
-            {safeBlock.result_url && (
+            {safeBlock.result_url && 
+             safeBlock.result_url.trim() !== '' && 
+             safeBlock.result_url !== 'string' && (
               <S.Link 
                 href={safeBlock.result_url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', marginBottom: safeBlock.result_file ? '8px' : '0' }} 
+                style={{ display: 'flex', alignItems: 'center', marginBottom: (safeBlock.result_file && 
+                  safeBlock.result_file.trim() !== '' && 
+                  safeBlock.result_file !== 'dummy-pdf-base64-string-for-testing') ? '8px' : '0' }} 
               >
                 <img src={linkIcon} alt="link" style={{ width: '18px', height: '18px', marginRight: '8px' }} ></img>
                 {safeBlock.result_url}
               </S.Link>
             )}
 
-            {safeBlock.result_file && (
+            {safeBlock.result_file && 
+             safeBlock.result_file.trim() !== '' && 
+             safeBlock.result_file !== 'dummy-pdf-base64-string-for-testing' && (
               <S.FileLink
                 onClick={() => {
                   console.log('Download file:', safeBlock.result_file);

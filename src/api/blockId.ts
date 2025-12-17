@@ -12,7 +12,6 @@ export interface UserResponseDto {
 
 export interface BlockDetailResponse {
   blockId: number;
-  user: UserResponseDto;
   blockTitle: string;
   categoryName: string;
   techPart: string | null;
@@ -23,6 +22,11 @@ export interface BlockDetailResponse {
   improvementPoint: string | null;
   resultUrl: string | null;
   resultFile: string | null;
+  writerId: number;
+  writerNickname: string;
+  writerProfileType: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 
