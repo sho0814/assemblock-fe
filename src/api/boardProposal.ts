@@ -19,6 +19,9 @@ export type CreateBoardProposalResponse = {
 export const createBoardProposal = async (
   body: CreateBoardProposalRequest
 ): Promise<CreateBoardProposalResponse> => {
-  const res = await authApi.post<CreateBoardProposalResponse>("/proposals", body);
+  const res = await authApi.post<CreateBoardProposalResponse>(
+    "/proposals",
+    body
+  );
   return res.data;
 };

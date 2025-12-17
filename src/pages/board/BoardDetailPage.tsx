@@ -18,7 +18,7 @@ import { useBoardDetail } from "@hooks";
 
 type LocationState = {
   boardId?: number;
-  refreshKey?: number; // ✅ 추가: BlockDetail에서 돌아올 때 refetch 트리거
+  refreshKey?: number; // 추가: BlockDetail에서 돌아올 때 refetch 트리거
 };
 
 // Helper function to filter special characters
@@ -69,13 +69,13 @@ export const BoardDetailPage = () => {
   // 저장 중 상태
   const [saving, setSaving] = useState(false);
 
-  // ✅ 추가: BlockDetail에서 "보드에서 제거" 후 돌아오면 무조건 refetch
+  // 추가: BlockDetail에서 "보드에서 제거" 후 돌아오면 무조건 refetch
   useEffect(() => {
     if (!refreshKey) return;
     refetch();
   }, [refreshKey, refetch]);
 
-  // ✅ 블록 상세 (보드에서 왔다고 state 전달)
+  // 블록 상세 (보드에서 왔다고 state 전달)
   const handleOpenBlockDetail = (blockId: number) => {
     if (isSelectionMode) return;
 
@@ -85,7 +85,7 @@ export const BoardDetailPage = () => {
       return;
     }
 
-    // ✅ 보드에서 들어왔다 표시 + boardId 전달
+    // 보드에서 들어왔다 표시 + boardId 전달
     navigate(`/block/detail?id=${blockId}`, {
       state: {
         fromBoardDetail: true,

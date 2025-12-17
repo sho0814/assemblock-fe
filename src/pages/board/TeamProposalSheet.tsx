@@ -58,9 +58,14 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
   const [sending, setSending] = useState(false);
   const [createdProposalId, setCreatedProposalId] = useState<number | null>(null);
 
+  // 수정: contact(=discordId)도 필수로 체크
   const isSendEnabled = useMemo(() => {
-    return projectTitle.trim().length > 0 && recruitmentPeriod.trim().length > 0;
-  }, [projectTitle, recruitmentPeriod]);
+    return (
+      projectTitle.trim().length > 0 &&
+      contact.trim().length > 0 &&
+      recruitmentPeriod.trim().length > 0
+    );
+  }, [projectTitle, contact, recruitmentPeriod]);
 
   const resetFields = () => {
     setProjectTitle("");
@@ -82,6 +87,12 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
     if (!isSendEnabled) return;
     if (sending) return;
 
+    // 추가 안전장치
+    if (!contact.trim()) {
+      alert("연락 수단(디스코드 ID)을 입력해주세요.");
+      return;
+    }
+
     const parsed = parseRecruitmentPeriod(recruitmentPeriod);
     if (!parsed) {
       alert("팀 모집 기간 형식을 확인해주세요. (예: 2025.12.17 ~ 2025.12.20)");
@@ -93,7 +104,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
 
       const res = await createBoardProposal({
         boardId,
-        discordId: contact,
+        discordId: contact.trim(), // trim해서 전달
         recruitStartDate: parsed.start,
         recruitEndDate: parsed.end,
         projectTitle: projectTitle.trim(),
@@ -105,10 +116,10 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
         throw new Error("proposalId가 응답에 없습니다.");
       }
 
-      // ✅ 먼저 proposalId 확보
+      // 먼저 proposalId 확보
       setCreatedProposalId(proposalId);
 
-      // ✅ 모달 열고, 시트 닫기(필드만 초기화)
+      // 모달 열고, 시트 닫기(필드만 초기화)
       setIsConfirmModalOpen(true);
       resetFields();
       onClose();
@@ -126,7 +137,7 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
       return;
     }
 
-    // ✅ 정리 먼저 하고 성공 콜백 호출
+    // 정리 먼저 하고 성공 콜백 호출
     const id = createdProposalId;
     setIsConfirmModalOpen(false);
     setCreatedProposalId(null);
