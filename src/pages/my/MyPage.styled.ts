@@ -5,7 +5,7 @@ export const MyPageContainer = styled.div`
   flex-direction: column;
   width: 100%;
   min-height: 100vh;
-  padding-bottom: 100px; /* 하단 네비게이션 바 아래까지 스크롤 가능하도록 여백 추가 */
+  padding-bottom: 100px;
 `;
 
 export const HeaderBar = styled.div`

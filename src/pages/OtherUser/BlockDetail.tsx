@@ -15,8 +15,8 @@ import linkIcon from '@assets/MyPage/link.svg';
 import folderIcon from '@assets/MyPage/folder.svg';
 import CommonButton from '@components/shared/CommonButton';
 import { getBlockDetail } from '@api/blockId';
-import { getMyProfile } from '@api/users/me';
 import { getUserProfile } from '@api/profiles/profile';
+import { getMyProfile } from '@api/users/me';
 
 // Tech_parts 매핑
 const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
@@ -89,12 +89,16 @@ export function BlockDetail() {
     introduction: string;
     selectedParts: string[];
   } | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태
 
   useEffect(() => {
     const fetchBlockData = async () => {
+      setIsLoading(true); // 로딩 시작
+      
       if (!blockId) {
         console.error('blockId가 없습니다.');
         navigate(-1);
+        setIsLoading(false);
         return;
       }
 
@@ -103,6 +107,7 @@ export function BlockDetail() {
       if (isNaN(blockIdNum)) {
         console.error('유효하지 않은 blockId');
         navigate(-1);
+        setIsLoading(false);
         return;
       }
 
@@ -110,25 +115,19 @@ export function BlockDetail() {
         // 블록 상세 정보 가져오기 (블록 정보 + 작성자 정보 포함)
         const blockDetail = await getBlockDetail(blockIdNum);
         
-        // 현재 로그인한 사용자 정보 가져오기 (내 블록인지 확인용)
-        let myProfile;
+        // 내 블록인지 확인하여 내 블록이면 내 블록 상세 페이지로 리다이렉트
         try {
-          myProfile = await getMyProfile();
-          
-          // 내 블록이면 내 블록 상세 페이지로 리다이렉트
+          const myProfile = await getMyProfile();
           if (myProfile && blockDetail.writerId === myProfile.userId) {
             navigate(`/My/BlockDetail/${blockIdNum}`);
             return;
           }
         } catch (error: any) {
-          // 내 프로필 정보를 가져오지 못하면 계속 진행 (에러 처리)
-          // 403 에러는 인증 문제일 수 있지만, 블록 정보는 표시 가능
           if (error?.response?.status === 403) {
             console.warn('인증이 필요합니다. 블록 정보는 표시하지만 내 블록인지 확인할 수 없습니다.');
           } else {
             console.warn('Failed to fetch my profile:', error);
           }
-          // myProfile이 없으면 내 블록인지 확인할 수 없으므로 계속 진행
         }
 
         // 작성자 상세 프로필 정보 가져오기
@@ -191,7 +190,8 @@ export function BlockDetail() {
         console.error('Failed to fetch block data:', error);
         // API 실패 시 이전 페이지로 이동
         navigate(-1);
-
+      } finally {
+        setIsLoading(false); // 로딩 완료
       }
     };
 
@@ -229,6 +229,28 @@ export function BlockDetail() {
     }
     return safeBlock.category_name || '';
   };
+
+  // 로딩 중일 때 로딩 메시지 표시
+  if (isLoading) {
+    return (
+      <>
+        <SimpleHeader title="블록 상세" />
+        <S.Container>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '50vh',
+            fontSize: '16px',
+            fontWeight: 500,
+            color: '#868286'
+          }}>
+            블록 상세 정보를 로딩 중입니다...
+          </div>
+        </S.Container>
+      </>
+    );
+  }
 
   return (
     <>

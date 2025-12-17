@@ -63,8 +63,7 @@ export function MyPage() {
     const [userProfile, setUserProfile] = useState<ProfileInfo | null>(null);
     const [hasBlocks, setHasBlocks] = useState(false);
     const [blocks, setBlocks] = useState<BlockData[]>([]);
-    const [isLoadingBlocks, setIsLoadingBlocks] = useState(true);
-    const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+    const [isInitialLoading, setIsInitialLoading] = useState(true); // 초기 로딩 상태
     const navigate = useNavigate();
 
     const parts = [
@@ -127,6 +126,7 @@ export function MyPage() {
 
     useEffect(() => {
       const fetchData = async () => {
+        setIsInitialLoading(true); // 초기 로딩 시작
         try {
           // 프로필 정보 API 호출
           try {
@@ -241,7 +241,6 @@ export function MyPage() {
           
           // 블록 목록 API 호출 - 항상 'ALL'로 호출하여 모든 블록 가져오기
           try {
-            setIsLoadingBlocks(true);
             const myBlocks = await getMyBlocks('ALL');
             
             // MyBlock[]을 BlockData[]로 변환
@@ -281,13 +280,10 @@ export function MyPage() {
               setBlocks([]);
               setHasBlocks(false);
             }
-          } finally {
-            setIsLoadingBlocks(false);
           }
           
           // 후기 목록 API 호출
           try {
-            setIsLoadingReviews(true);
             // 받은 후기 또는 작성한 후기 조회
             // 'PARTICIPATION' (내가 받은 제안/리뷰)
             // 'SCOUTING' (내가 보낸 제안/리뷰)
@@ -313,11 +309,11 @@ export function MyPage() {
               setReviews([]);
               setHasReviews(false);
             }
-          } finally {
-            setIsLoadingReviews(false);
           }
         } catch (error) {
           console.error('Error fetching data:', error);
+        } finally {
+          setIsInitialLoading(false); // 모든 데이터 로딩 완료
         }
       };
 
@@ -381,6 +377,25 @@ export function MyPage() {
     // 받은 후기만 그리드에 표시
     const receivedReviews = activeReviewTab === 'received' ? reviews : [];
     const reviewGrid = placeReviewBlocks(receivedReviews);
+    
+    // 초기 로딩 중일 때 로딩 메시지 표시
+    if (isInitialLoading) {
+      return (
+        <MyPageContainer>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+            fontSize: '16px',
+            fontWeight: 500,
+            color: '#868286'
+          }}>
+            마이페이지 정보 로딩 중입니다...
+          </div>
+        </MyPageContainer>
+      );
+    }
     
     return (
       <MyPageContainer>
@@ -485,13 +500,7 @@ export function MyPage() {
               </ReviewTab>
             </ReviewTabContainer>
           )}
-          {isLoadingReviews ? (
-            <ReviewBlock $hasReviews={false}>
-              <ReviewBlockText style={{ color: '#868286' }}>
-                후기 불러오는 중...
-              </ReviewBlockText>
-            </ReviewBlock>
-          ) : !hasReviews || activeReviewTab === 'sent' ? (
+          {!hasReviews || activeReviewTab === 'sent' ? (
             <ReviewBlock $hasReviews={false}>
               <ReviewBlockImage src={ReviewBlockDefault} alt="Review Block Default" />
               <ReviewBlockText>
@@ -529,13 +538,7 @@ export function MyPage() {
             </BlockdivTab>
           )}
           <BlockListWrapper $hasManyBlocks={blocks.length > 4}>
-            {isLoadingBlocks ? (
-              <BlockContent>
-                <BlockContentText style={{ color: '#868286' }}>
-                  블록 불러오는 중...
-                </BlockContentText>
-              </BlockContent>
-            ) : hasBlocks ? (
+            {hasBlocks ? (
               <>
                 <BlockList blocks={blocks} activeTab={activeTab} isMyBlock={true} />
                 {/* 필터링된 블록이 없을 때 메시지 표시 */}
