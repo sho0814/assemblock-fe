@@ -62,3 +62,13 @@ export const Tab = styled.button<{ active: boolean }>`
     opacity: 0.9;
   }
 `;
+
+export const EmptyMessage = styled.div`
+  margin-top: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+`;

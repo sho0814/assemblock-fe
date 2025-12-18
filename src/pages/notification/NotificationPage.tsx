@@ -6,8 +6,6 @@ import styled from "styled-components";
 import { getNotifications } from "@api/notification";
 import type { notification } from "@types";
 
-import { notificationsMock } from "@mocks/notifications.mock";
-
 const List = styled.ul`
   display: flex;
   flex-direction: column;
@@ -20,12 +18,13 @@ const List = styled.ul`
 `;
 
 const LoadingMessage = styled.div`
+  margin-top: 240px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
-  color: #666;
-  font-size: 14px;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
 `;
 
 const ErrorMessage = styled.div`
@@ -75,10 +74,8 @@ export function NotificationPage() {
       try {
         setLoading(true);
         setError(null);
-        // 추후 실제 API 연동 시 주석 해제
-        // const data = await getNotifications();
+        const data = await getNotifications();
 
-        const data = notificationsMock;
         console.log("알림 목록:", data);
         setNotifications(data);
       } catch (e) {
@@ -96,7 +93,7 @@ export function NotificationPage() {
     return (
       <>
         <SimpleHeader title={"알림"} />
-        <LoadingMessage>알림을 불러오는 중입니다...</LoadingMessage>
+        <LoadingMessage>알림 불러오는 중...</LoadingMessage>
       </>
     );
   }

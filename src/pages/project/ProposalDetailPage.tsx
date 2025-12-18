@@ -33,8 +33,6 @@ import {
   ProposerRole,
 } from "./ProposalDetailPage.styled";
 
-import { proposalDetailMock } from "@mocks/proposalDetail.mock";
-
 const getMemberPartLabel = (
   part: MemberPart | string | null | undefined
 ): string => {
@@ -53,7 +51,6 @@ const getMemberPartLabel = (
 export function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
-  const navigate = useNavigate();
 
   const [myUserId, setMyUserId] = useState<number | null>(null);
 
@@ -74,9 +71,7 @@ export function ProposalDetailPage() {
         const userInfo = await getUserMe();
         setMyUserId(userInfo.userId);
 
-        // 데이터 들어오면 수정
-        // const data = await proposalApi.getProposalDetail(proposalIdNum);
-        const data = proposalDetailMock as ProposalDetailResponse;
+        const data = await proposalApi.getProposalDetail(proposalIdNum);
 
         setProposal(data);
       } catch (err) {

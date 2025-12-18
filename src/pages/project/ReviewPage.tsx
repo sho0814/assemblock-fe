@@ -9,15 +9,10 @@ import { ReviewBlocks } from "@components/project/review/ReviewBlocks";
 import type { ReviewBlockValue } from "@components/project/review/ReviewBlocks";
 import { ReviewConfirmModal } from "@components/project/review/ReviewConfirmModal";
 
-// import { getProjectReviews, createReview } from "@api/review";
-import { createReview } from "@api/review";
+import { getProjectReviews, createReview } from "@api/review";
 import { getProjectDetail } from "@api/project";
 import { getUserMe } from "@api/user";
 import type { ReviewRating, ProjectDetailResponse, Member } from "@types";
-
-// 목업 데이터 (백엔드 준비 후 삭제)
-import { reviewsMock } from "@mocks/review.mock";
-import { projectDetailMock } from "@mocks/projectDetail.mock";
 
 import pattern from "@assets/project/pattern.png";
 
@@ -53,9 +48,8 @@ export function ReviewPage() {
         const userId = userInfo.userId;
 
         // 2. 프로젝트 상세 정보 가져오기
-        // const projectData: ProjectDetailResponse =
-        //   await getProjectDetail(proposalIdNum);
-        const projectData = projectDetailMock as ProjectDetailResponse;
+        const projectData: ProjectDetailResponse =
+          await getProjectDetail(proposalIdNum);
         setProjectId(projectData.projectId);
 
         // 3. 프로젝트 멤버 추출 (나를 제외한 팀원들)
@@ -65,9 +59,7 @@ export function ReviewPage() {
         setProjectMembers(otherMembers);
 
         // 4. 이미 작성한 리뷰 목록 조회
-        // 목업 사용 (백엔드 준비 후 아래 주석 해제)
-        const reviews = reviewsMock[projectData.projectId] || [];
-        // const reviews = await getProjectReviews(projectData.projectId);
+        const reviews = await getProjectReviews(projectData.projectId);
 
         // 5. 이미 리뷰를 작성한 사용자 ID 추출
         const reviewedUserIds = reviews

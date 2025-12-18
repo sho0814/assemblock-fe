@@ -15,10 +15,6 @@ import { getOngoingProjects, getCompleteProjects } from "@api/project";
 import { getUserMe } from "@api/user";
 import type { ProjectListItem } from "@types";
 
-// 데이터 들어오면 삭제
-import { projectsOngoingMock } from "@mocks/projectOngoing.mock.ts";
-import { projectsCompleteMock } from "@mocks/projectComplete.mock.ts";
-
 type TabValue = "ONGOING" | "DONE";
 
 export function ProjectPage() {
@@ -43,15 +39,10 @@ export function ProjectPage() {
         const userInfo = await getUserMe();
         setMyUserId(userInfo.userId);
 
-        // TODO: 데이터 들어오면 주석 삭제
-        // const [ongoing, complete] = await Promise.all([
-        //   getOngoingProjects(),
-        //   getCompleteProjects(),
-        // ]);
-
-        // TODO: 데이터 들어오면 삭제
-        const ongoing = projectsOngoingMock as ProjectListItem[];
-        const complete = projectsCompleteMock as ProjectListItem[];
+        const [ongoing, complete] = await Promise.all([
+          getOngoingProjects(),
+          getCompleteProjects(),
+        ]);
 
         console.log("진행 중 프로젝트:", ongoing);
         console.log("완료된 프로젝트:", complete);
@@ -131,7 +122,7 @@ export function ProjectPage() {
             <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
           </S.IconWrapper>
         </S.Header>
-        <div>프로젝트를 불러오는 중입니다...</div>
+        <S.EmptyMessage>프로젝트 불러오는 중...</S.EmptyMessage>
       </>
     );
   }
@@ -180,7 +171,11 @@ export function ProjectPage() {
         </S.TabContainer>
 
         <div>
-          <ProposalList items={shownItems} />
+          {shownItems.length === 0 ? (
+            <S.EmptyMessage>아직 프로젝트가 없어요</S.EmptyMessage>
+          ) : (
+            <ProposalList items={shownItems} />
+          )}
         </div>
       </div>
     </>

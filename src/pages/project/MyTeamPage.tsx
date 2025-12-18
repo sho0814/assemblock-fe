@@ -13,8 +13,6 @@ import { getProjectDetail, completeProject } from "@api/project";
 
 import type { Member, ProjectDetailResponse } from "@types";
 
-import { projectDetailMock } from "@mocks/projectDetail.mock";
-
 import {
   Page,
   HeaderWrapper,
@@ -60,11 +58,7 @@ export const MyTeamPage = () => {
         setIsLoading(true);
         setError(null);
 
-        // 데이터 들어오면 수정
-        // const data = await getProjectDetail(proposalIdNum);
-
-        // Mock 데이터 사용
-        const data = projectDetailMock as ProjectDetailResponse;
+        const data = await getProjectDetail(proposalIdNum);
 
         console.log("프로젝트 상세:", data);
 
