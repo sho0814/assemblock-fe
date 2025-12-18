@@ -148,7 +148,6 @@ export default function ProposalItem({
   topNickname,
   othersCount,
   topProfileType,
-  projectId,
   proposalId,
 }: Props) {
   const navigate = useNavigate();

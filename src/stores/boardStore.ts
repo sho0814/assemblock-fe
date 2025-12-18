@@ -1,12 +1,12 @@
 // stores/boardStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StorageBoard } from '@types'
+import type { MinimalBoard } from '@types'
 
 interface BoardState {
-  boards: StorageBoard[]
-  loadBoards: (freshData?: StorageBoard[]) => void
-  addBoard: (board: StorageBoard) => void
+  boards: MinimalBoard[]
+  loadBoards: (freshData?: MinimalBoard[]) => void
+  addBoard: (board: MinimalBoard) => void
 }
 
 export const useBoardStore = create<BoardState>()(
@@ -14,7 +14,7 @@ export const useBoardStore = create<BoardState>()(
     (set, get) => ({
       boards: [],
       
-      loadBoards: (freshData?: StorageBoard[]) => {
+      loadBoards: (freshData?: MinimalBoard[]) => {
         if (freshData) { // 서버에서 새 데이터 있으면 로컬에 덮어쓰기
           set({ boards: freshData })
         } else { // 최초 진입시 로컬 데이터만 로드
@@ -25,7 +25,7 @@ export const useBoardStore = create<BoardState>()(
         }
       },
       
-      addBoard: (board: StorageBoard) => {
+      addBoard: (board: MinimalBoard) => {
         set((state) => ({
           boards: [...state.boards, board]
         }))

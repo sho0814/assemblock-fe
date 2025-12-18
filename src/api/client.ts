@@ -38,7 +38,7 @@ let failedQueue: {
 }[] = [];
 
 // queue 처리 유틸
-const processQueue = (error: AxiosError | null, token: string | null = null) => {
+const processQueue = (error: AxiosError | null) => {
     failedQueue.forEach((prom) => {
         if (error) {
             prom.reject(error);
@@ -110,12 +110,12 @@ authApi.interceptors.response.use(
                 originalRequest.headers = { Authorization: `Bearer ${newAccessToken}` };
             }
 
-            processQueue(null, newAccessToken);
+            processQueue(null);
 
             return authApi(originalRequest);
         } catch (refreshError) {
             // refresh 실패 → queue 실패 처리 및 카카오 로그인 페이지로 리다이렉트
-            processQueue(refreshError as AxiosError, null);
+            processQueue(refreshError as AxiosError);
             window.location.href = getKakaoLoginUrl();
             return Promise.reject(refreshError);
         } finally {

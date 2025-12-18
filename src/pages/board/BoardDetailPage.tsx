@@ -33,17 +33,6 @@ const filterSpecialChars = (
   return text.replace(pattern, "").slice(0, maxLength);
 };
 
-const normalizeCategory = (s?: string) => {
-  const raw = (s ?? "").trim();
-
-  const normalized = raw
-    .replace(/[,/]/g, "_")
-    .replace(/\s+/g, "_")
-    .replace(/-+/g, "_");
-
-  return normalized.replace(/_+/g, "_").trim();
-};
-
 export const BoardDetailPage = () => {
   const navigate = useNavigate();
   const location = useLocation();

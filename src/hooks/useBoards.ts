@@ -2,7 +2,7 @@
 import { useEffect } from "react"
 import { fetchBoards, createBoard } from "@api"
 import { useBoardStore } from "@stores"
-import type { BoardListItem, StorageBoard } from "@types"
+import type { BoardListItem, MinimalBoard } from "@types"
 
 export const useBoards = () => {
     const { boards, loadBoards, addBoard } = useBoardStore()
@@ -10,7 +10,7 @@ export const useBoards = () => {
     const fetchAndCacheBoards = async () => {
         try {
             const data: BoardListItem[] = await fetchBoards()
-            const minimalBoards: StorageBoard[] = data.map((board: any) => ({
+            const minimalBoards: MinimalBoard[] = data.map((board: any) => ({
                 boardId: board.boardId,
                 boardName: board.boardName
             }))
@@ -23,7 +23,7 @@ export const useBoards = () => {
     const createNewBoard = async (boardName: string, boardMemo?: string) => {
         try {
             const newBoard = await createBoard(boardName, boardMemo || "") // 백엔드에 보드 추가, 보드 정보 반환
-            const minimalNewBoard: StorageBoard = { // 스토어에 저장할 보드 정보
+            const minimalNewBoard: MinimalBoard = { // 스토어에 저장할 보드 정보
                 boardId: newBoard.boardId,
                 boardName: newBoard.boardName
             }

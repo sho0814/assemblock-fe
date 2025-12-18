@@ -22,9 +22,6 @@ export function ReviewPage() {
   const proposalIdNum = Number(proposalId);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [projectMembers, setProjectMembers] = useState<Member[]>([]);
-  const [writtenReviewUserIds, setWrittenReviewUserIds] = useState<number[]>(
-    []
-  );
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,8 +66,6 @@ export function ReviewPage() {
               ?.userId;
           })
           .filter((id): id is number => id !== undefined);
-
-        setWrittenReviewUserIds(reviewedUserIds);
 
         // 6. 아직 리뷰 작성하지 않은 팀원 ID 설정
         const notReviewedIds = otherMembers

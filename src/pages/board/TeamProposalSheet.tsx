@@ -43,7 +43,6 @@ export const TeamProposalSheet: React.FC<TeamProposalSheetProps> = ({
   onClose,
   boardId,
   onSuccess,
-  selectedBlockIds, // (UI용: 지금은 미사용)
 }) => {
   const [projectTitle, setProjectTitle] = useState("");
   const [memo, setMemo] = useState("");

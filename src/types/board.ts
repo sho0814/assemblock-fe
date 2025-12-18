@@ -12,13 +12,8 @@ export interface BoardListItem {
 export interface MinimalBoard {
   boardId: number;
   boardName: string;
-  blockCount: number;          // 추가
-  previewTypes: BlockType[];   // 추가
-}
-
-export interface StorageBoard {
-  boardId: number;
-  boardName: string;
+  blockCount?: number;          // 추가
+  previewTypes?: BlockType[];   // 추가
 }
 
 export interface BoardDetail {

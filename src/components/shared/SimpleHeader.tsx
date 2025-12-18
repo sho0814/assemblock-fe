@@ -12,7 +12,7 @@ interface HeaderProps {
   style?: CSSProperties;
 }
 
-export default function SimpleHeader({ title, onBackClick, style }: HeaderProps): React.JSX.Element {
+export default function SimpleHeader({ title, onBackClick }: HeaderProps): React.JSX.Element {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
@@ -24,7 +24,7 @@ export default function SimpleHeader({ title, onBackClick, style }: HeaderProps)
   };
 
   return (
-    <S.Header style={{...style}}>
+    <S.Header>
       
       <S.IconWrapper  onClick={handleBackClick}>
         <S.Icon src={backArrow}/>

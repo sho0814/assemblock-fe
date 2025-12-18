@@ -1,8 +1,6 @@
 import React, { useState, useRef, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { boardPageStyles as styles } from "./BoardPage.styles";
-import { useOverlay } from "@components/common/OverlayContext";
-import DeleteModal from "./DeleteModal";
 
 // 훅
 import { useBoards, useBoardDetail } from "@hooks";
@@ -95,7 +93,6 @@ const BoardCardItem: React.FC<{ board: MinimalBoard }> = ({ board }) => {
 
 export const BoardPage: React.FC<BoardPageProps> = () => {
   const navigate = useNavigate();
-  const { showOverlay } = useOverlay();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const { boards, createNewBoard } = useBoards();

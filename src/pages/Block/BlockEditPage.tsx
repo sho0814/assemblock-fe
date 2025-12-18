@@ -12,7 +12,7 @@ import {
 } from '@constants';
 import CommonButton from '@components/shared/CommonButton';
 import { getBlockDetail, updateBlock } from '@api/blockId';
-import { getCategoryLabel, getCategoryValue } from '@utils/getCategoryLabel';
+import { getCategoryLabel } from '@utils/getCategoryLabel';
 import type { NewBlockData } from '@types';
 
 import * as S from './BlockEditPage.styled';
@@ -34,7 +34,6 @@ export function BlockEditPage() {
     const [contributionRate, setContributionRate] = useState<number>(0);                // 기존 프로젝트 기여도
     const [fileName, setFileName] = useState<string | null>(null);                      // 기존 프로젝트 결과물 PDF
     const [isFormValid, setIsFormValid] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [improvementPoint, setImprovementPoint] = useState('');                      // 개선하고 싶은 점
     const [resultUrl, setResultUrl] = useState('');                                   // 결과물 URL
     
@@ -87,8 +86,6 @@ export function BlockEditPage() {
                 console.error('유효하지 않은 blockId:', blockId);
                 return;
             }
-
-            setIsLoading(true);
             try {
                 const blockDetail = await getBlockDetail(blockIdNum);
                 
@@ -176,8 +173,6 @@ export function BlockEditPage() {
             } catch (error) {
                 console.error('블록 정보를 가져오는 중 오류 발생:', error);
                 alert('블록 정보를 불러오는데 실패했습니다.');
-            } finally {
-                setIsLoading(false);
             }
         };
 
