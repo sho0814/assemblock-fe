@@ -25,3 +25,8 @@ dist-ssr
 
 #env files
 .env
+.env.*
+src/.env
+
+# pnpm
+pnpm-workspace.yaml

@@ -81,6 +81,7 @@ const profileTypeToImage: Record<string, ProfileData> = {
 export function BlockDetailPage() {
   const { blockId: blockIdParam } = useParams<{ blockId?: string }>();
   const [searchParams] = useSearchParams();
+  const blockIdKey = blockIdParam ?? searchParams.get('id') ?? '';
   const navigate = useNavigate();
   const { showOverlay, closeOverlay } = useOverlay();
   
@@ -217,7 +218,7 @@ export function BlockDetailPage() {
 
     fetchBlockData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockIdParam]); // searchParams는 하위 호환성을 위해 사용하지만 dependency에는 포함하지 않음
+  }, [blockIdParam, blockIdKey]); // query(id) 변경도 감지 // searchParams는 하위 호환성을 위해 사용하지만 dependency에는 포함하지 않음
 
   // 블록 상세 페이지에서는 API에서 가져온 작성자 프로필을 사용하므로
   // localStorage의 userProfile은 사용하지 않음
