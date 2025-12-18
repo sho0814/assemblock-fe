@@ -1,11 +1,11 @@
 // src/constants/profileImages.ts
 import type { ProfileType } from "@types";
 
-import Type1Image from "@assets/common/ProfileImg/Img1.svg";
-import Type2Image from "@assets/common/ProfileImg/Img2.svg";
-import Type3Image from "@assets/common/ProfileImg/Img3.svg";
-import Type4Image from "@assets/common/ProfileImg/Img4.svg";
-import Type5Image from "@assets/common/ProfileImg/Img5.svg";
+import Type1Image from "@assets/common/ProfileImg_color/Img1.svg";
+import Type2Image from "@assets/common/ProfileImg_color/Img2.svg";
+import Type3Image from "@assets/common/ProfileImg_color/Img3.svg";
+import Type4Image from "@assets/common/ProfileImg_color/Img4.svg";
+import Type5Image from "@assets/common/ProfileImg_color/Img5.svg";
 
 export const PROFILE_TYPE_IMAGES: Record<ProfileType, string> = {
   Type_1: Type1Image,

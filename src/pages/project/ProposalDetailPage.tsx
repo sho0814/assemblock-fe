@@ -16,6 +16,7 @@ import { proposalApi } from "@api/proposal";
 import { getUserMe } from "@api/user";
 import type { ProposalDetailResponse, MemberPart } from "@types";
 import { getProfileImage } from "@constants";
+import { getMediumImage } from "@constants/mediumImageMap";
 
 import {
   Page,
@@ -112,7 +113,7 @@ export function ProposalDetailPage() {
   // MemberBlock 형식으로 변환
   const viewBlocks: MemberBlock[] = proposal.targetBlocks.map((block) => ({
     blockId: block.blockId,
-    imageUrl: block.resultUrl || "/placeholder-block.png",
+    imageUrl: getMediumImage(block.categoryName),
     title: block.blockTitle,
     description: block.oneLineSummary,
   }));
