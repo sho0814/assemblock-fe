@@ -28,6 +28,6 @@ export interface ProjectDetailResponse {
   status: ProjectStatus;
   recruitStartDate: string;
   recruitEndDate: string;
-  contactMethod: string;
+  contact: string;
   members: Member[];
 }

@@ -181,7 +181,7 @@ export const MyTeamPage = () => {
       />
       {/* 3. 연락 수단 안내 */}
       {(project.status === "recruiting" || project.status === "ongoing") && (
-        <ContactSection contact={project.contactMethod} />
+        <ContactSection contact={project.contact} />
       )}
 
       {/* 4. 멤버 리스트 */}

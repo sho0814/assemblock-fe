@@ -162,10 +162,10 @@ export function ProjectPage() {
 
       <div>
         <S.TabContainer>
-          <S.Tab active={tab === "ONGOING"} onClick={() => setTab("ONGOING")}>
+          <S.Tab $active={tab === "ONGOING"} onClick={() => setTab("ONGOING")}>
             진행 중
           </S.Tab>
-          <S.Tab active={tab === "DONE"} onClick={() => setTab("DONE")}>
+          <S.Tab $active={tab === "DONE"} onClick={() => setTab("DONE")}>
             완료
           </S.Tab>
         </S.TabContainer>

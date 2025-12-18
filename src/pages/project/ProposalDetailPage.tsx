@@ -111,12 +111,14 @@ export function ProposalDetailPage() {
   }
 
   // MemberBlock 형식으로 변환
-  const viewBlocks: MemberBlock[] = proposal.targetBlocks.map((block) => ({
-    blockId: block.blockId,
-    imageUrl: getMediumImage(block.categoryName),
-    title: block.blockTitle,
-    description: block.oneLineSummary,
-  }));
+  const viewBlocks: MemberBlock[] = proposal.targetBlocks
+    ? proposal.targetBlocks.map((block) => ({
+        blockId: block.blockId,
+        imageUrl: getMediumImage(block.categoryName),
+        title: block.blockTitle,
+        description: block.oneLineSummary,
+      }))
+    : [];
 
   // 받은 제안인지 판단
   const isProposerMe = proposal.proposerId === myUserId;
@@ -169,10 +171,7 @@ export function ProposalDetailPage() {
           <ProjectTitle>{proposal.projectTitle}</ProjectTitle>
 
           {/* 제안자 프로필 */}
-          <ProposerProfile
-            onClick={() => {
-              navigate(`/OtherUser/Profile?userId=${proposal.proposerId}`);
-            }}>
+          <ProposerProfile>
             <ProposerImage
               src={getProfileImage(proposal.proposerProfileType)}
               alt={proposal.proposerNickname}

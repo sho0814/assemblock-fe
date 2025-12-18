@@ -154,24 +154,6 @@ export default function ProposalItem({
   const navigate = useNavigate();
   const title = kind === "SENT" ? "보낸 제안" : "받은 제안";
 
-  console.log("=== ProposalItem 디버깅 ===");
-  console.log("전체 props:", {
-    kind,
-    topNickname,
-    othersCount,
-    topProfileType,
-    projectId,
-    proposalId,
-  });
-  console.log("topProfileType:", topProfileType);
-  console.log("topProfileType 타입:", typeof topProfileType);
-  console.log("topProfileType이 undefined인가?", topProfileType === undefined);
-  console.log("topProfileType이 null인가?", topProfileType === null);
-
-  const profileImageSrc = topProfileType
-    ? getProfileImage(topProfileType)
-    : getProfileImage("Type_1" as ProfileType);
-
   const handleClickTeam = () => {
     navigate(`/Project/team/${proposalId}`);
   };
@@ -185,7 +167,7 @@ export default function ProposalItem({
       <TopRow>
         <Left>
           <AvatarWrap>
-            <Avatar src={profileImageSrc} />
+            <Avatar src={getProfileImage(topProfileType)} />
             <Badge>
               <BadgeIcon src={arrowIcon} alt="" />
             </Badge>

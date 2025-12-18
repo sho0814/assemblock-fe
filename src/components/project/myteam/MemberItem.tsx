@@ -38,22 +38,19 @@ const NameRole = styled.div`
 `;
 
 const Chip = styled.span<{
-  variant: "leader" | "pending" | "rejected" | "accepted";
+  $variant: "leader" | "pending" | "rejected" | "accepted";
 }>`
   height: 26px;
   width: 64px;
   padding: 4px 0;
   border-radius: 8px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 12px;
   font-weight: 500;
-
-  background: ${({ variant }) => {
-    switch (variant) {
+  background: ${({ $variant }) => {
+    switch ($variant) {
       case "leader":
         return "#49444A";
       case "pending":
@@ -65,9 +62,8 @@ const Chip = styled.span<{
         return "#F0EFF1";
     }
   }};
-
-  color: ${({ variant }) => {
-    switch (variant) {
+  color: ${({ $variant }) => {
+    switch ($variant) {
       case "pending":
       case "rejected":
         return "#726D72";
@@ -102,17 +98,17 @@ export const MemberItem = ({ status, member }: Props) => {
 
   if (status === "recruiting") {
     if (member.leader) {
-      right = <Chip variant="leader">팀장</Chip>;
+      right = <Chip $variant="leader">팀장</Chip>;
     } else if (member.responseStatus === "pending") {
-      right = <Chip variant="pending">대기 중</Chip>;
+      right = <Chip $variant="pending">대기 중</Chip>;
     } else if (member.responseStatus === "rejected") {
-      right = <Chip variant="rejected">거절됨</Chip>;
+      right = <Chip $variant="rejected">거절됨</Chip>;
     } else if (member.responseStatus === "accepted") {
-      right = <Chip variant="accepted">수락 완료</Chip>;
+      right = <Chip $variant="accepted">수락 완료</Chip>;
     }
   } else if (status === "ongoing") {
     if (member.leader) {
-      right = <Chip variant="leader">팀장</Chip>;
+      right = <Chip $variant="leader">팀장</Chip>;
     }
   }
 

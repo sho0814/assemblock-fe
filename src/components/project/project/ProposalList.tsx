@@ -44,16 +44,15 @@ export default function ProposalList({
   return (
     <ListContainer>
       {sortedItems.map((it) => (
-        <li key={it.proposalId}>
-          <ProposalItem
-            kind={it.kind}
-            topNickname={it.topNickname}
-            othersCount={it.othersCount}
-            topProfileType={it.topProfileType}
-            projectId={it.projectId}
-            proposalId={it.proposalId}
-          />
-        </li>
+        <ProposalItem
+          key={it.proposalId}
+          kind={it.kind}
+          topNickname={it.topNickname}
+          othersCount={it.othersCount}
+          topProfileType={it.topProfileType}
+          projectId={it.projectId}
+          proposalId={it.proposalId}
+        />
       ))}
     </ListContainer>
   );
