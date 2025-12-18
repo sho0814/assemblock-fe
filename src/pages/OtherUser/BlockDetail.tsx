@@ -16,10 +16,12 @@ import folderIcon from '@assets/MyPage/folder.svg';
 import CommonButton from '@components/shared/CommonButton';
 import { getBlockDetail } from '@api/blockId';
 import { getUserProfile } from '@api/profiles/profile';
-import { getMyProfile } from '@api/users/me';
 
 // Tech_parts 매핑
 const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
+  'DESIGN': { name: '디자인', color: '#FF1BB3' },
+  'FRONTEND': { name: '프론트엔드', color: '#FF6017' },
+  'BACKEND': { name: '백엔드', color: '#B8EB00' },
   'Design': { name: '디자인', color: '#FF1BB3' },
   'FrontEnd': { name: '프론트엔드', color: '#FF6017' },
   'BackEnd': { name: '백엔드', color: '#B8EB00' },
@@ -115,21 +117,6 @@ export function BlockDetail() {
         // 블록 상세 정보 가져오기 (블록 정보 + 작성자 정보 포함)
         const blockDetail = await getBlockDetail(blockIdNum);
         
-        // 내 블록인지 확인하여 내 블록이면 내 블록 상세 페이지로 리다이렉트
-        try {
-          const myProfile = await getMyProfile();
-          if (myProfile && blockDetail.writerId === myProfile.userId) {
-            navigate(`/My/BlockDetail/${blockIdNum}`);
-            return;
-          }
-        } catch (error: any) {
-          if (error?.response?.status === 403) {
-            console.warn('인증이 필요합니다. 블록 정보는 표시하지만 내 블록인지 확인할 수 없습니다.');
-          } else {
-            console.warn('Failed to fetch my profile:', error);
-          }
-        }
-
         // 작성자 상세 프로필 정보 가져오기
         let profileData;
         try {
@@ -217,17 +204,20 @@ export function BlockDetail() {
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
 
   const getCategoryPath = () => {
+    // 카테고리 이름에서 언더스코어를 공백으로 치환 (슬래시는 그대로 유지)
+    const categoryName = (safeBlock.category_name || '').replace(/_/g, ' ');
+    
     if (isTechnology && foundBlockData?.techPart) {
       // API에서 받은 techPart를 직접 사용
       const techPart = TECH_PARTS_MAP[foundBlockData.techPart];
       const partName = techPart ? techPart.name : '';
-      return `기술 > ${partName} > ${safeBlock.category_name || ''}`;
+      return `기술 > ${partName} > ${categoryName}`;
     } else if (isTechnology) {
-      return `기술 > ${safeBlock.category_name || ''}`;
+      return `기술 > ${categoryName}`;
     } else if (isIdea) {
-      return `아이디어 > ${safeBlock.category_name || ''}`;
+      return `아이디어 > ${categoryName}`;
     }
-    return safeBlock.category_name || '';
+    return categoryName;
   };
 
   // 로딩 중일 때 로딩 메시지 표시

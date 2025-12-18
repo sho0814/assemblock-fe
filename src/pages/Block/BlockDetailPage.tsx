@@ -16,7 +16,7 @@ import OptionMenu from '@components/block/OptionMenu';
 import CancelGuide from '@components/block/CancleGuide';
 import { useOverlay } from '@components/common/OverlayContext';
 import { getBlockDetail, deleteBlock, type BlockDetailResponse } from '@api/blockId';
-import { getCategoryLabel } from '@utils/getCategoryLabel';
+import { getCategoryLabel, getCategoryValue } from '@utils/getCategoryLabel';
 import { getUserProfile } from '@api/profiles/profile';
 
 // Tech_parts 매핑 (API는 문자열을 반환)
@@ -247,17 +247,20 @@ export function BlockDetailPage() {
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
 
   const getCategoryPath = () => {
+    // 카테고리 이름을 value 형식으로 변환 (category.ts의 value 값 사용)
+    const categoryValue = getCategoryValue(safeBlock.category_name);
+    
     // API 응답의 techPart는 string | null 타입이므로 직접 사용
     if (isTechnology && blockDetailResponse?.techPart) {
       const techPart = TECH_PARTS_MAP[blockDetailResponse.techPart];
       const partName = techPart ? techPart.name : '';
-      return `기술 > ${partName} > ${safeBlock.category_name || ''}`;
+      return `기술 > ${partName} > ${categoryValue}`;
     } else if (isTechnology) {
-      return `기술 > ${safeBlock.category_name || ''}`;
+      return `기술 > ${categoryValue}`;
     } else if (isIdea) {
-      return `아이디어 > ${safeBlock.category_name || ''}`;
+      return `아이디어 > ${categoryValue}`;
     }
-    return safeBlock.category_name || '';
+    return categoryValue;
   };
 
   const handleMoreButtonClick = () => {

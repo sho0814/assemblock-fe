@@ -362,10 +362,6 @@ export function BlockEditPage() {
             techPartValue = 'DESIGN';
         }
 
-        // 블록 생성 시와 동일한 형식으로 데이터 준비
-        // BlockDetails.tsx의 onSubmit과 동일한 형식 유지
-        // categoryName: 블록 생성 시에는 label 형식을 그대로 보내므로, 수정 시에도 label 형식 사용
-        // resultFile: 파일이 없으면 더미 문자열 사용 (블록 생성 시와 동일)
         const resultFileForApi = fileName && fileName.trim() && fileName !== 'dummy-pdf-base64-string-for-testing'
             ? fileName.trim()
             : 'dummy-pdf-base64-string-for-testing';
