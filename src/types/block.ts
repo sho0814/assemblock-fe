@@ -28,5 +28,6 @@ export interface NewBlockData {
   oneLineSummary: string;
   improvementPoint: string;
   resultUrl: string;
+  resultFileName: string;
   resultFile: string;
 }

@@ -27,7 +27,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
     const [improvementPoint, setImprovementPoint] = useState('');                               // 기존 프로젝트에서 개선하고 싶은 점
     const [resultUrl, setResultUrl] = useState('');                                             // 기존 프로젝트 결과물 URL
     const [selectedFile, setSelectedFile] = useState<File | null>(null);                        // 기존 프로젝트 결과물 PDF
-    const [fileName, setFileName] = useState<string | null>(null);                              // 업로드한 파일명(확인용)
+    const [resultFileName, setResultFileName] = useState<string>('');                           // 업로드한 파일명
     const [isFormValid, setIsFormValid] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,14 +39,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
         if (loading) return;
 
         let resultFileBase64 = "";
-        if (selectedFile) {
-            try {
-                resultFileBase64 = await convertToBase64(selectedFile);
-            } catch (error) {
-                toast.error('파일 변환 중 오류가 발생했습니다.');
-                return;
-            }
-        }
+        if (selectedFile) resultFileBase64 = await convertToBase64(selectedFile);
 
         const blockData = {
             blockType,
@@ -58,6 +51,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
             contributionScore,
             improvementPoint,
             resultUrl,
+            resultFileName,
             resultFile: resultFileBase64 || "dummy-pdf-base64-string-for-testing",
         };
 
@@ -123,7 +117,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
         setContributionScore(0);
         setImprovementPoint('');
         setResultUrl('');
-        resetFileState(setSelectedFile, setFileName, fileInputRef)
+        resetFileState(setSelectedFile, setResultFileName, fileInputRef)
         closeOverlay();
     };
 
@@ -157,7 +151,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        handlePdfFileChange(e, setSelectedFile, setFileName, 10); // 10MB 제한
+        handlePdfFileChange(e, setSelectedFile, setResultFileName, 10); // 10MB 제한
     };
 
     return (
@@ -261,9 +255,9 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
                 <S.Row>
                     <S.Label>기존 프로젝트 결과물 PDF</S.Label>
                     <S.FileInputWrapper onClick={() => fileInputRef.current?.click()}>
-                        {fileName ? (
+                        {resultFileName ? (
                             <div>
-                                {fileName}
+                                {resultFileName}
                             </div>
                         ) : (
                             <>
