@@ -52,7 +52,6 @@ export function ReviewBlocks({ value, onSelect }: ReviewBlocksProps) {
 
 const Wrapper = styled.div`
   width: 100%;
-  // max-width: 320px;
   display: flex;
   justify-content: space-between;
   gap: 6px;
@@ -85,7 +84,7 @@ const Img = styled.img<{ selected: boolean }>`
 `;
 
 const Label = styled.span`
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 600;
   color: #111827;
 `;

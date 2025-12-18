@@ -1,13 +1,10 @@
 import styled from "styled-components";
 import arrowIcon from "@assets/project/arrow.svg";
 import { useNavigate } from "react-router-dom";
+import type { notification } from "@types";
+import { getProfileImage } from "@constants";
 
-type Props = {
-  topNickname: string;
-  othersCount: number;
-  topProfileUrl?: string;
-  proposalId: number | string;
-};
+type Props = notification;
 
 const Item = styled.li`
   list-style: none;
@@ -17,9 +14,8 @@ const Item = styled.li`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   & + & {
-    border-top: 1.5px solid var(--GrayScale-GR10, #F0EFF1);
+    border-top: 1.5px solid var(--GrayScale-GR10, #f0eff1);
   }
 `;
 
@@ -35,11 +31,12 @@ const AvatarWrap = styled.div`
   height: 48px;
 `;
 
-const Avatar = styled.div<{ src?: string }>`
+const Avatar = styled.img`
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  background: ${({ src }) => (src ? `url(${src}) center/cover` : "#d9d9d9")};
+  border-radius: 999px;
+  object-fit: cover;
+  background: #ddd;
 `;
 
 const Badge = styled.div`
@@ -50,7 +47,6 @@ const Badge = styled.div`
   height: 20px;
   border-radius: 50%;
   background: #352f36;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,35 +87,32 @@ const DetailButton = styled.button`
 `;
 
 export default function NotificationProposalItem({
-  topNickname,
-  othersCount,
-  topProfileUrl,
+  senderName,
+  senderProfileType,
   proposalId,
 }: Props) {
   const navigate = useNavigate();
 
   const handleClickDetail = () => {
-    navigate(`/Project/proposal/${proposalId}`);
+    navigate(`/Project/proposal/${proposalId}`, {
+      state: { from: "notification" },
+    });
   };
 
   return (
     <Item>
       <Left>
         <AvatarWrap>
-          <Avatar src={topProfileUrl} />
+          <Avatar src={getProfileImage(senderProfileType)} />
           <Badge>
             <BadgeIcon src={arrowIcon} alt="" />
           </Badge>
         </AvatarWrap>
-
         <TextWrap>
           <Title>받은 제안</Title>
-          <Sub>
-            {topNickname} 님 외 {othersCount}인
-          </Sub>
+          <Sub>{senderName}</Sub>
         </TextWrap>
       </Left>
-
       <DetailButton onClick={handleClickDetail}>상세 보기</DetailButton>
     </Item>
   );

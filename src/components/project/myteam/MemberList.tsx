@@ -1,6 +1,6 @@
 // src/components/myTeam/MemberList.tsx
 import styled from "styled-components";
-import type { Member, ProjectStatus } from "./MyTeamTypes";
+import type { Member, ProjectStatus } from "@types";
 import { MemberItem } from "./MemberItem";
 
 const List = styled.ul`
@@ -27,7 +27,7 @@ export const MemberList = ({ status, members }: Props) => {
   return (
     <List>
       {members.map((m) => (
-        <MemberItem key={m.id} status={status} member={m} />
+        <MemberItem key={m.userId} status={status} member={m} />
       ))}
     </List>
   );

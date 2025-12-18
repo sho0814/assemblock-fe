@@ -1,6 +1,6 @@
 // src/components/myTeam/ProjectProgress.tsx
 import styled from "styled-components";
-import type { ProjectStatus } from "./MyTeamTypes";
+import type { ProjectStatus } from "@types";
 
 type Props = {
   status: ProjectStatus;
@@ -74,9 +74,9 @@ export const ProjectProgress = ({ status, startDate, endDate }: Props) => {
           {Array.from({ length: TOTAL_SEGMENTS }).map((_, idx) => (
             <BarSegment
               key={idx}
-              filled={idx < filledSegments}
-              isFirst={idx === 0}
-              isLast={idx === TOTAL_SEGMENTS - 1}
+              $filled={idx < filledSegments}
+              $isFirst={idx === 0}
+              $isLast={idx === TOTAL_SEGMENTS - 1}
             />
           ))}
         </ProgressBar>
@@ -140,17 +140,16 @@ const ProgressBar = styled.div`
 `;
 
 const BarSegment = styled.div<{
-  filled: boolean;
-  isFirst: boolean;
-  isLast: boolean;
+  $filled: boolean;
+  $isFirst: boolean;
+  $isLast: boolean;
 }>`
   flex: 1;
   height: 8px;
-  background: ${({ filled }) =>
-    filled ? "var(--Primary-BK, #352F36)" : "var(--GrayScale-GR10, #F0EFF1)"};
-
-  border-top-left-radius: ${({ isFirst }) => (isFirst ? "24px" : "0")};
-  border-bottom-left-radius: ${({ isFirst }) => (isFirst ? "24px" : "0")};
-  border-top-right-radius: ${({ isLast }) => (isLast ? "24px" : "0")};
-  border-bottom-right-radius: ${({ isLast }) => (isLast ? "24px" : "0")};
+  background: ${({ $filled }) =>
+    $filled ? "var(--Primary-BK, #352F36)" : "var(--GrayScale-GR10, #F0EFF1)"};
+  border-top-left-radius: ${({ $isFirst }) => ($isFirst ? "24px" : "0")};
+  border-bottom-left-radius: ${({ $isFirst }) => ($isFirst ? "24px" : "0")};
+  border-top-right-radius: ${({ $isLast }) => ($isLast ? "24px" : "0")};
+  border-bottom-right-radius: ${({ $isLast }) => ($isLast ? "24px" : "0")};
 `;

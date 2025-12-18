@@ -1,4 +1,4 @@
-import type { Block, TechPart } from "./block";
+import type { BlockData, TechPart } from "./block";
 import type { ProfileType } from "./project";
 
 // 블록 타입 참고용
@@ -27,5 +27,5 @@ export interface ProposalDetailResponse {
   recruitEndDate: string;
   projectTitle: string;
   projectMemo: string;
-  targetBlocks: Block[];
+  targetBlocks: BlockData[];
 }

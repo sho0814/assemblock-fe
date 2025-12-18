@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import ProposalItem from "./ProposalItem";
+import type { ProfileType } from "@types";
 
 export type ProposalListItem = {
   projectId: number | string;
@@ -8,7 +9,7 @@ export type ProposalListItem = {
   kind: "SENT" | "RECEIVED";
   topNickname: string;
   othersCount: number;
-  topProfileUrl?: string;
+  topProfileType: ProfileType;
   state: "ONGOING" | "DONE";
 };
 
@@ -43,16 +44,15 @@ export default function ProposalList({
   return (
     <ListContainer>
       {sortedItems.map((it) => (
-        <li key={it.proposalId}>
-          <ProposalItem
-            kind={it.kind}
-            topNickname={it.topNickname}
-            othersCount={it.othersCount}
-            topProfileUrl={it.topProfileUrl}
-            projectId={it.projectId}
-            proposalId={it.proposalId}
-          />
-        </li>
+        <ProposalItem
+          key={it.proposalId}
+          kind={it.kind}
+          topNickname={it.topNickname}
+          othersCount={it.othersCount}
+          topProfileType={it.topProfileType}
+          projectId={it.projectId}
+          proposalId={it.proposalId}
+        />
       ))}
     </ListContainer>
   );
