@@ -116,10 +116,10 @@ export function ProjectPage() {
           <S.IconWrapper>
             <S.Icon
               src={notificationIcon}
-              onClick={() => navigate("/Home/notification")}
+              onClick={() => navigate("/notification")}
             />
-            <S.Icon src={searchIcon} onClick={() => navigate("/Home/search")} />
-            <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
+            <S.Icon src={searchIcon} onClick={() => navigate("/search")} />
+            <S.Icon src={menuIcon} onClick={() => navigate("/category")} />
           </S.IconWrapper>
         </S.Header>
         <S.EmptyMessage>프로젝트 불러오는 중...</S.EmptyMessage>
@@ -135,10 +135,10 @@ export function ProjectPage() {
           <S.IconWrapper>
             <S.Icon
               src={notificationIcon}
-              onClick={() => navigate("/Home/notification")}
+              onClick={() => navigate("/notification")}
             />
-            <S.Icon src={searchIcon} onClick={() => navigate("/Home/search")} />
-            <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
+            <S.Icon src={searchIcon} onClick={() => navigate("/search")} />
+            <S.Icon src={menuIcon} onClick={() => navigate("/category")} />
           </S.IconWrapper>
         </S.Header>
         <div>{error}</div>
@@ -153,10 +153,10 @@ export function ProjectPage() {
         <S.IconWrapper>
           <S.Icon
             src={notificationIcon}
-            onClick={() => navigate("/Home/notification")}
+            onClick={() => navigate("/notification")}
           />
-          <S.Icon src={searchIcon} onClick={() => navigate("/Home/search")} />
-          <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
+          <S.Icon src={searchIcon} onClick={() => navigate("/search")} />
+          <S.Icon src={menuIcon} onClick={() => navigate("/category")} />
         </S.IconWrapper>
       </S.Header>
 

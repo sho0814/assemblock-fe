@@ -22,7 +22,7 @@ export default function HomeHeader({ isTechType, setIsTechType, setBlockType }: 
       </ S.TitleWrapper>
 
       <S.IconWrapper>
-        <S.Item to='/home/notification' aria-label='notification'>
+        <S.Item to='/notification' aria-label='notification'>
           <S.Icon src={notificationIcon} />
         </S.Item>
 

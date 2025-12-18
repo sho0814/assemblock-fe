@@ -141,7 +141,7 @@ export function ProposalDetailPage() {
     try {
       await proposalApi.respondToProposal(proposalIdNum, "ACCEPTED");
       alert("제안을 수락했습니다!");
-      navigate("/Home/notification");
+      navigate("/notification");
     } catch (err) {
       console.error("제안 수락 실패:", err);
       alert("제안 수락에 실패했습니다. 다시 시도해주세요.");
@@ -154,7 +154,7 @@ export function ProposalDetailPage() {
     try {
       await proposalApi.respondToProposal(proposalIdNum, "REJECTED");
       alert("제안을 거절했습니다.");
-      navigate("/Home/notification");
+      navigate("/notification");
     } catch (err) {
       console.error("제안 거절 실패:", err);
       alert("제안 거절에 실패했습니다. 다시 시도해주세요.");
