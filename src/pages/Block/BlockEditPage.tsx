@@ -13,6 +13,7 @@ import {
 import CommonButton from '@components/shared/CommonButton';
 import { getBlockDetail, updateBlock } from '@api/blockId';
 import { getCategoryLabel } from '@utils/getCategoryLabel';
+import { convertToBase64, handlePdfFileChange, resetFileState } from '@utils/blockFileUtils';
 import type { NewBlockData } from '@types';
 
 import * as S from './BlockEditPage.styled';
@@ -32,7 +33,8 @@ export function BlockEditPage() {
     const [selectedTools, setSelectedTools] = useState<string>('');                     // 사용 툴 및 언어
     const [onelineSummary, setOnelineSummary] = useState('');                           // 기존 프로젝트 한 줄 소개
     const [contributionRate, setContributionRate] = useState<number>(0);                // 기존 프로젝트 기여도
-    const [fileName, setFileName] = useState<string | null>(null);                      // 기존 프로젝트 결과물 PDF
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);                // 기존 프로젝트 결과물 PDF 파일
+    const [resultFileName, setResultFileName] = useState<string>('');                   // 업로드한 파일명
     const [isFormValid, setIsFormValid] = useState(false);
     const [improvementPoint, setImprovementPoint] = useState('');                      // 개선하고 싶은 점
     const [resultUrl, setResultUrl] = useState('');                                   // 결과물 URL
@@ -48,12 +50,12 @@ export function BlockEditPage() {
         contributionRate: number;
         improvementPoint: string;
         resultUrl: string;
-        fileName: string | null;
+        resultFileName: string;
     } | null>(null);
 
     const { showOverlay, closeOverlay } = useOverlay();
 
-    const inputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
 
     // 뒤로가기 버튼 클릭 시 취소 확인 모달 표시
@@ -127,21 +129,26 @@ export function BlockEditPage() {
                 // 결과물 URL
                 setResultUrl(blockDetail.resultUrl || '');
                 
-                // 결과물 파일명 (URL에서 파일명 추출 또는 파일명 그대로)
-                // API에서 받은 resultFile이 실제 파일 URL이면 파일명만 추출
-                // 더미 문자열이면 null로 처리
-                let fileNameValue: string | null = null;
+                // 결과물 파일명 설정
+                // API에서 받은 resultFile이 base64 문자열이면 파일명을 추출할 수 없으므로
+                // 별도로 파일명을 저장하지 않고, 새로 파일을 업로드하면 그 파일명을 사용
+                // 기존 파일이 있으면 파일명을 표시하기 위해 resultFile에서 추출 시도
                 if (blockDetail.resultFile && 
                     blockDetail.resultFile !== 'dummy-pdf-base64-string-for-testing' &&
                     blockDetail.resultFile.trim() !== '') {
-                    // 파일명이 URL인 경우 파일명만 추출
-                    const extractedName = blockDetail.resultFile.split('/').pop() || blockDetail.resultFile;
-                    fileNameValue = extractedName;
-                    setFileName(fileNameValue);
+                    // resultFile이 URL 형식이면 파일명 추출, base64면 빈 문자열
+                    const isBase64 = !blockDetail.resultFile.startsWith('http');
+                    if (!isBase64) {
+                        const extractedName = blockDetail.resultFile.split('/').pop() || '';
+                        setResultFileName(extractedName);
+                    } else {
+                        // base64인 경우 파일명을 알 수 없으므로 빈 문자열
+                        setResultFileName('');
+                    }
                 } else {
-                    // 파일이 없거나 더미 데이터면 null로 설정
-                    setFileName(null);
+                    setResultFileName('');
                 }
+                setSelectedFile(null); // 기존 파일은 File 객체로 복원할 수 없으므로 null
                 
                 // 기술 파트 값 저장
                 let techPartValue: BlockPart | null = null;
@@ -167,7 +174,12 @@ export function BlockEditPage() {
                     contributionRate: Number(blockDetail.contributionScore) || 0,
                     improvementPoint: blockDetail.improvementPoint || '',
                     resultUrl: blockDetail.resultUrl || '',
-                    fileName: fileNameValue,
+                    resultFileName: blockDetail.resultFile && 
+                        blockDetail.resultFile !== 'dummy-pdf-base64-string-for-testing' &&
+                        blockDetail.resultFile.trim() !== '' &&
+                        !blockDetail.resultFile.startsWith('http')
+                        ? blockDetail.resultFile.split('/').pop() || ''
+                        : '',
                 });
                 
             } catch (error) {
@@ -227,7 +239,8 @@ export function BlockEditPage() {
             Number(contributionRate) !== Number(initialData.contributionRate) ||
             improvementPoint !== initialData.improvementPoint ||
             resultUrl !== initialData.resultUrl ||
-            fileName !== initialData.fileName;
+            resultFileName !== initialData.resultFileName ||
+            selectedFile !== null; // 새 파일이 업로드되었는지 확인
         
         // 디버깅: 변경사항 확인
         console.log('변경사항 체크:', {
@@ -264,7 +277,7 @@ export function BlockEditPage() {
         } else {
             console.log('버튼 활성화됨!', { formValid, hasChanges });
         }
-    }, [isSkillState, blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary, contributionRate, improvementPoint, resultUrl, fileName, initialData, blockId]);
+    }, [isSkillState, blockTitle, selectedTechPart, selectedCategory, selectedTools, onelineSummary, contributionRate, improvementPoint, resultUrl, resultFileName, selectedFile, initialData, blockId]);
 
     // selectedTechPart가 변경되면 selectedCategories, selectedTools 초기화
     // 단, initialData가 설정된 후에는 초기화하지 않음 (수정 모드에서는 유지)
@@ -287,7 +300,7 @@ export function BlockEditPage() {
         setOnelineSummary('');
         setSelectedTools('');
         setContributionRate(0);
-        setFileName(null);
+        resetFileState(setSelectedFile, setResultFileName, fileInputRef);
 
         // State로 관리되지 않는 native input 리셋
         if (formRef.current) {
@@ -356,11 +369,13 @@ export function BlockEditPage() {
             techPartValue = 'DESIGN';
         }
 
-        const resultFileForApi = fileName && fileName.trim() && fileName !== 'dummy-pdf-base64-string-for-testing'
-            ? fileName.trim()
-            : 'dummy-pdf-base64-string-for-testing';
+        // 파일이 선택되었으면 base64로 변환, 없으면 더미 문자열 사용
+        let resultFileBase64 = "dummy-pdf-base64-string-for-testing";
+        if (selectedFile) {
+            resultFileBase64 = await convertToBase64(selectedFile);
+        }
         
-        const blockData: any = {
+        const blockData: NewBlockData = {
             blockType: (isSkillState ? 'TECHNOLOGY' : 'IDEA') as 'TECHNOLOGY' | 'IDEA',
             blockTitle: blockTitle.trim(),
             categoryName: selectedCategory, // 블록 생성 시와 동일하게 label 형식 사용
@@ -370,7 +385,8 @@ export function BlockEditPage() {
             oneLineSummary: onelineSummary.trim(),
             improvementPoint: improvementPoint && improvementPoint.trim() ? improvementPoint.trim() : '', // 빈 문자열 허용
             resultUrl: resultUrl && resultUrl.trim() ? resultUrl.trim() : '', // 빈 문자열 허용
-            resultFile: resultFileForApi, // 블록 생성 시와 동일하게 더미 문자열 사용
+            resultFileName: resultFileName || '', // 파일명
+            resultFile: resultFileBase64, // base64 문자열 또는 더미 문자열
         };
         
         // 데이터 검증
@@ -463,18 +479,8 @@ export function BlockEditPage() {
         });
     };
 
-    // 선택한 파일명 보여주는 함수
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file && file.type === 'application/pdf') {
-            setFileName(file.name);
-        } else {
-            setFileName(null);
-        }
-    };
-
-    const handleClick = () => {
-        inputRef.current?.click();
+    const handleFileInputClick = () => {
+        fileInputRef.current?.click();
     };
 
     return (
@@ -589,10 +595,10 @@ export function BlockEditPage() {
 
                     <S.Row>
                         <S.Label>기존 프로젝트 결과물 PDF</S.Label>
-                        <S.FileInputWrapper onClick={handleClick}>
-                            {fileName ? (
+                        <S.FileInputWrapper onClick={handleFileInputClick}>
+                            {resultFileName ? (
                                 <div>
-                                    {fileName}
+                                    {resultFileName}
                                 </div>
                             ) : (
                                 <>
@@ -600,7 +606,13 @@ export function BlockEditPage() {
                                     <span style={{ fontSize: '12px', color: '#C2C1C3' }}>지원되는 형식: PDF</span>
                                 </>
                             )}
-                            <S.HiddenFileInput name="result_file" type="file" accept="application/pdf" onChange={handleFileChange} />
+                            <S.HiddenFileInput 
+                                ref={fileInputRef}
+                                name="result_file" 
+                                type="file" 
+                                accept="application/pdf" 
+                                onChange={(e) => handlePdfFileChange(e, setSelectedFile, setResultFileName, 10)} 
+                            />
                         </S.FileInputWrapper>
                         <S.Desc>프로젝트 결과물을 PDF 파일 형태로 첨부해 주세요</S.Desc>
                     </S.Row>
