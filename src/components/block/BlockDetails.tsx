@@ -1,11 +1,11 @@
 // src/components/block/BlockDetails.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios, { AxiosError } from "axios";
 import toast from 'react-hot-toast';
 import { useOverlay } from '@components/common/OverlayContext';
 import { useBlocks } from '@hooks';
 import type { BlockType, TechPart } from '@types';
-import { getToolValuesFromLabels, getCategoryValuesFromLabels, getCategoryOptions } from '@utils';
+import { getToolValuesFromLabels, getCategoryValuesFromLabels, getCategoryOptions, convertToBase64, handlePdfFileChange, resetFileState } from '@utils';
 import CommonButton from '@components/shared/CommonButton'
 import CancelGuide from './CancleGuide.tsx';
 import Dropdown from './DropDown';
@@ -26,8 +26,10 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
     const [contributionScore, setContributionScore] = useState<number>(0);                      // 기존 프로젝트 기여도
     const [improvementPoint, setImprovementPoint] = useState('');                               // 기존 프로젝트에서 개선하고 싶은 점
     const [resultUrl, setResultUrl] = useState('');                                             // 기존 프로젝트 결과물 URL
-    const [fileName, setFileName] = useState<string | null>(null);                              // 업로드한 파일명
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);                        // 기존 프로젝트 결과물 PDF
+    const [fileName, setFileName] = useState<string | null>(null);                              // 업로드한 파일명(확인용)
     const [isFormValid, setIsFormValid] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { showOverlay, closeOverlay } = useOverlay();
     const { loading, createNewBlock } = useBlocks();
@@ -35,6 +37,16 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
 
     const onSubmit = async () => {
         if (loading) return;
+
+        let resultFileBase64 = "";
+        if (selectedFile) {
+            try {
+                resultFileBase64 = await convertToBase64(selectedFile);
+            } catch (error) {
+                toast.error('파일 변환 중 오류가 발생했습니다.');
+                return;
+            }
+        }
 
         const blockData = {
             blockType,
@@ -46,7 +58,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
             contributionScore,
             improvementPoint,
             resultUrl,
-            resultFile: "dummy-pdf-base64-string-for-testing",
+            resultFile: resultFileBase64 || "dummy-pdf-base64-string-for-testing",
         };
 
         try {
@@ -111,6 +123,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
         setContributionScore(0);
         setImprovementPoint('');
         setResultUrl('');
+        resetFileState(setSelectedFile, setFileName, fileInputRef)
         closeOverlay();
     };
 
@@ -143,14 +156,8 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
         setSelectedTechPart(prev => (prev === part ? null : part));
     };
 
-    // 선택한 파일명 보여주는 함수
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file && file.type === 'application/pdf') {
-            setFileName(file.name);
-        } else {
-            setFileName(null);
-        }
+        handlePdfFileChange(e, setSelectedFile, setFileName, 10); // 10MB 제한
     };
 
     return (
@@ -253,7 +260,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
 
                 <S.Row>
                     <S.Label>기존 프로젝트 결과물 PDF</S.Label>
-                    <S.FileInputWrapper onClick={() => { }}>
+                    <S.FileInputWrapper onClick={() => fileInputRef.current?.click()}>
                         {fileName ? (
                             <div>
                                 {fileName}
@@ -264,7 +271,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
                                 <span style={{ fontSize: '12px', color: '#C2C1C3' }}>지원되는 형식: PDF</span>
                             </>
                         )}
-                        <S.HiddenFileInput name="resultFile" type="file" accept="application/pdf" onChange={handleFileChange} />
+                        <S.HiddenFileInput ref={fileInputRef} name="resultFile" type="file" accept="application/pdf" onChange={handleFileChange} />
                     </S.FileInputWrapper>
                     <S.Desc>프로젝트 결과물을 PDF 파일 형태로 첨부해 주세요</S.Desc>
                 </S.Row>

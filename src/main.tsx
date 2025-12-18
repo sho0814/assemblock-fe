@@ -13,9 +13,9 @@ if (!container) {
 }
 
 ReactDOM.createRoot(container).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </React.StrictMode>
+  // </React.StrictMode>
 );

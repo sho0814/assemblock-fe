@@ -10,7 +10,6 @@ import {
     CATEGORY_IDEA, CATEGORY_TECH_DESIGN, CATEGORY_TECH_FRONT, CATEGORY_TECH_BACK,
     TOOLS_DESIGN, TOOLS_FRONT, TOOLS_BACK
 } from '@constants';
-import { logFormData } from '@utils/formSubmit';
 import CommonButton from '@components/shared/CommonButton';
 import { getBlockDetail, updateBlock } from '@api/blockId';
 import { getCategoryLabel, getCategoryValue } from '@utils/getCategoryLabel';
