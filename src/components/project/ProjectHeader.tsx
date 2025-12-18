@@ -16,10 +16,10 @@ export default function ProjectHeader() {
       <S.IconWrapper>
         <S.Icon
           src={notificationIcon}
-          onClick={() => navigate("/Home/notification")}
+          onClick={() => navigate("/notification")}
         />
-        <S.Icon src={searchIcon} onClick={() => navigate("/Home/search")} />
-        <S.Icon src={menuIcon} onClick={() => navigate("/Home/category")} />
+        <S.Icon src={searchIcon} onClick={() => navigate("/search")} />
+        <S.Icon src={menuIcon} onClick={() => navigate("/category")} />
       </S.IconWrapper>
     </S.Header>
   );

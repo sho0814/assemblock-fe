@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import arrowIcon from "@assets/project/arrow.svg";
 import { useNavigate } from "react-router-dom";
+import { getProfileImage } from "@constants";
+import type { ProfileType } from "@types";
 
 type Kind = "SENT" | "RECEIVED";
 
@@ -8,7 +10,7 @@ type Props = {
   kind: Kind;
   topNickname: string;
   othersCount: number;
-  topProfileUrl?: string;
+  topProfileType: ProfileType;
   projectId: number | string;
   proposalId: number | string;
 };
@@ -41,11 +43,12 @@ const AvatarWrap = styled.div`
   height: 48px;
 `;
 
-const Avatar = styled.div<{ src?: string }>`
+const Avatar = styled.img`
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: ${({ src }) => (src ? `url(${src}) center/cover` : "#d9d9d9")};
+  object-fit: cover;
+  background: #d9d9d9;
 `;
 
 const Badge = styled.div`
@@ -144,7 +147,7 @@ export default function ProposalItem({
   kind,
   topNickname,
   othersCount,
-  topProfileUrl,
+  topProfileType,
   projectId,
   proposalId,
 }: Props) {
@@ -164,7 +167,7 @@ export default function ProposalItem({
       <TopRow>
         <Left>
           <AvatarWrap>
-            <Avatar src={topProfileUrl} />
+            <Avatar src={getProfileImage(topProfileType)} />
             <Badge>
               <BadgeIcon src={arrowIcon} alt="" />
             </Badge>

@@ -1,6 +1,6 @@
 // src/pages/project/ProposalDetailPage.tsx
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
 
 import { ProjectProgress } from "@components/project/myteam/ProjectProgress";
@@ -13,7 +13,10 @@ import AcceptButton from "@components/project/proposal/AcceptButton";
 import RejectButton from "@components/project/proposal/RejectButton";
 
 import { proposalApi } from "@api/proposal";
-import type { ProposalDetailResponse } from "@types";
+import { getUserMe } from "@api/user";
+import type { ProposalDetailResponse, MemberPart } from "@types";
+import { getProfileImage } from "@constants";
+import { getMediumImage } from "@constants/mediumImageMap";
 
 import {
   Page,
@@ -31,23 +34,46 @@ import {
   ProposerRole,
 } from "./ProposalDetailPage.styled";
 
-const MY_USER_ID = 1; // TODO: 실제 로그인한 사용자 ID로 교체
+const getMemberPartLabel = (
+  part: MemberPart | string | null | undefined
+): string => {
+  const partMap: Record<string, string> = {
+    FRONTEND: "프론트엔드",
+    BACKEND: "백엔드",
+    DESIGN: "디자인",
+    PLAN: "기획",
+    PM: "PM",
+  };
+
+  if (!part) return "역할 미정";
+  return partMap[part] || "역할 미정";
+};
 
 export function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
-  const navigate = useNavigate();
+
+  const [myUserId, setMyUserId] = useState<number | null>(null);
 
   const [proposal, setProposal] = useState<ProposalDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isFromNotification = location.state?.from === "notification";
 
   useEffect(() => {
     const fetchProposalDetail = async () => {
       try {
         setIsLoading(true);
         setError(null);
+
+        const userInfo = await getUserMe();
+        setMyUserId(userInfo.userId);
+
         const data = await proposalApi.getProposalDetail(proposalIdNum);
+
         setProposal(data);
       } catch (err) {
         console.error("제안 상세 조회 실패:", err);
@@ -85,33 +111,54 @@ export function ProposalDetailPage() {
   }
 
   // MemberBlock 형식으로 변환
-  const viewBlocks: MemberBlock[] = proposal.targetBlocks.map((block) => ({
-    blockId: block.blockId,
-    imageUrl: block.resultUrl || "/placeholder-block.png",
-    title: block.blockTitle,
-    description: block.oneLineSummary,
-  }));
+  const viewBlocks: MemberBlock[] = proposal.targetBlocks
+    ? proposal.targetBlocks.map((block) => ({
+        blockId: block.blockId,
+        imageUrl: getMediumImage(block.categoryName),
+        title: block.blockTitle,
+        description: block.oneLineSummary,
+      }))
+    : [];
 
-  // 받은 제안인지 판단 (내 블록이 포함되어 있고, 제안자가 나가 아닌 경우)
-  // TODO: targetBlocks에 writerId가 있다면 그걸로 판단, 없다면 다른 방법 필요
-  const isProposerMe = proposal.proposerId === MY_USER_ID;
-  const isReceivedProposal = !isProposerMe; // 임시: 제안자가 아니면 받은 제안으로 간주
+  // 받은 제안인지 판단
+  const isProposerMe = proposal.proposerId === myUserId;
+  const isReceivedProposal = !isProposerMe;
 
   // 마감 전인지 판단
   const todayStr = new Date().toISOString().slice(0, 10);
   const isBeforeDeadline = proposal.recruitEndDate >= todayStr;
+
+  //버튼 활성화 조건
   const isActionActive = isReceivedProposal && isBeforeDeadline;
 
-  const handleAccept = () => {
+  // 버튼 노출 조건: 받은 제안 + 마감 전 + 알림에서 온 경우
+  const shouldShowButtons =
+    isReceivedProposal && isBeforeDeadline && isFromNotification;
+
+  const handleAccept = async () => {
     if (!isActionActive) return;
-    // TODO: 수락 API 연결
-    console.log("제안 수락:", proposalIdNum);
+
+    try {
+      await proposalApi.respondToProposal(proposalIdNum, "ACCEPTED");
+      alert("제안을 수락했습니다!");
+      navigate("/notification");
+    } catch (err) {
+      console.error("제안 수락 실패:", err);
+      alert("제안 수락에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!isActionActive) return;
-    // TODO: 거절 API 연결
-    console.log("제안 거절:", proposalIdNum);
+
+    try {
+      await proposalApi.respondToProposal(proposalIdNum, "REJECTED");
+      alert("제안을 거절했습니다.");
+      navigate("/notification");
+    } catch (err) {
+      console.error("제안 거절 실패:", err);
+      alert("제안 거절에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -124,19 +171,15 @@ export function ProposalDetailPage() {
           <ProjectTitle>{proposal.projectTitle}</ProjectTitle>
 
           {/* 제안자 프로필 */}
-          <ProposerProfile
-            onClick={() => {
-              navigate(`/OtherUser/Profile?userId=${proposal.proposerId}`);
-            }}
-          >
+          <ProposerProfile>
             <ProposerImage
-              src={"/default-profile.png"}
+              src={getProfileImage(proposal.proposerProfileType)}
               alt={proposal.proposerNickname}
             />
             <ProposerInfo>
               <ProposerName>{proposal.proposerNickname}</ProposerName>
               <ProposerRole>
-                {proposal.proposerTechPart || "역할 미정"}
+                {getMemberPartLabel(proposal.proposerTechPart)}
               </ProposerRole>
             </ProposerInfo>
           </ProposerProfile>
@@ -165,7 +208,7 @@ export function ProposalDetailPage() {
         <MemberBlockList blocks={viewBlocks} />
 
         {/* 5) 받은 제안일 때만 수락/거절 버튼 노출 */}
-        {isReceivedProposal && (
+        {shouldShowButtons && (
           <BottomActions>
             <AcceptButton disabled={!isActionActive} onClick={handleAccept} />
             <RejectButton disabled={!isActionActive} onClick={handleReject} />

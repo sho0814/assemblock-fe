@@ -88,7 +88,7 @@ export const boardPageStyles: Styles = {
     alignItems: "center",
     alignSelf: "stretch",
     flexShrink: 0,
-    marginTop: 2,
+    marginTop: 48,
   },
 
   // 내 보드 텍스트 박스
@@ -107,7 +107,7 @@ export const boardPageStyles: Styles = {
     display: "flex",
     alignItems: "center",
     gap: 16,
-    padding: "22px 20px",
+    padding: "20px 20px",
   },
 
   topNavBtn: {
@@ -136,7 +136,6 @@ export const boardPageStyles: Styles = {
 
   // 카드 리스트
   content: {
-    marginTop: 40,
     paddingTop: 116,
     paddingBottom: 199,
   },
@@ -145,7 +144,7 @@ export const boardPageStyles: Styles = {
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
     columnGap: 16,
     rowGap: 16,
-    padding: "0 20px",
+    padding: "16px 22px 12px 22px",
     boxSizing: "border-box",
   },
 

@@ -41,13 +41,13 @@ export const TabContainer = styled.div`
   border-radius: 20px;
 `;
 
-export const Tab = styled.button<{ active: boolean }>`
+export const Tab = styled.button<{ $active: boolean }>`
   width: 100%;
   height: 35px;
   border: none;
   border-radius: 16px;
-  background-color: ${({ active }) => (active ? "#352F36" : "transparent")};
-  color: ${({ active }) => (active ? "#FFFFFF" : "#A5A1A6")};
+  background: ${({ $active }) => ($active ? "#352f36" : "transparent")};
+  color: ${({ $active }) => ($active ? "#fff" : "#726d72")};
   font-size: 14px;
   font-weight: 500;
   line-height: 150%;
@@ -61,4 +61,14 @@ export const Tab = styled.button<{ active: boolean }>`
   &:hover {
     opacity: 0.9;
   }
+`;
+
+export const EmptyMessage = styled.div`
+  margin-top: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
 `;

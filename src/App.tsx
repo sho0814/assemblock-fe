@@ -38,8 +38,7 @@ import { ProfilePortfolio } from "@pages/Onboarding/profile/ProfilePortfolio";
 function App() {
   return (
     <>
-      <Toaster
-        position="bottom-center" containerStyle={{top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
+      <Toaster position="bottom-center" containerStyle={{bottom: '150px', whiteSpace: 'nowrap'}}/>
       <OverlayProvider>
         <Routes>
           <Route element={<MainLayout />}>
@@ -56,10 +55,10 @@ function App() {
             <Route path="/auth/error" element={<ErrorPage />} />
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
-            <Route path="/Home/notification" element={<NotificationPage />} />
+            <Route path="/notification" element={<NotificationPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/search/:keyword" element={<SearchResultPage />} />
-            <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => { }} />} />
+            <Route path="/Board/detail" element={<BoardDetailPage />} />
             <Route path="/block/detail" element={<BlockDetailPage />} />
             <Route path="/My/BlockDetail/:blockId" element={<BlockDetailPage />} />
             <Route path="/block/edit" element={<BlockEditPage />} />

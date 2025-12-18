@@ -2,34 +2,32 @@ export type ProjectStatus = "recruiting" | "ongoing" | "done";
 
 export type ProfileType = "Type_1" | "Type_2" | "Type_3" | "Type_4" | "Type_5";
 
-export interface ApiProjectUser {
-  id: number;
+export type MemberPart = "FRONTEND" | "BACKEND" | "DESIGN" | "PLAN" | "PM";
+
+export type ResponseStatus = "pending" | "accepted" | "rejected";
+
+export interface Member {
+  userId: number;
   nickname: string;
   profileType: ProfileType;
+  part: string;
+  leader: boolean;
+  responseStatus: ResponseStatus;
 }
 
-export interface ApiProposal {
-  id: number;
-  user: ApiProjectUser; // 제안 올린 사람
+export interface ProjectListItem {
+  projectId: number;
   projectTitle: string;
-  projectMemo: string;
-  discordId: string;
+  status: ProjectStatus;
+  members: Member[];
+}
+
+export interface ProjectDetailResponse {
+  projectId: number;
+  projectTitle: string;
+  status: ProjectStatus;
   recruitStartDate: string;
   recruitEndDate: string;
-}
-
-export interface ApiProjectMember {
-  id: number;
-  user: ApiProjectUser;
-  memberRole: string;
-  isProposer: boolean;
-}
-
-// /api/projects/me
-export interface ApiProject {
-  id: number;
-  proposer: ApiProjectUser;
-  projectStatus: ProjectStatus;
-  proposal: ApiProposal;
-  members: ApiProjectMember[];
+  contact: string;
+  members: Member[];
 }

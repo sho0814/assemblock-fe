@@ -40,46 +40,46 @@ export const boardDetailStyles: Styles = {
   },
 
   // 상태바
-  statusBar: {
-    display: "flex",
-    alignItems: "center",
-    height: 48,
-    width: "100%",
-    boxSizing: "border-box",
-    paddingTop: 21,
-  },
+  //statusBar: {
+    //display: "flex",
+    //alignItems: "center",
+    //height: 48,
+    //width: "100%",
+    //boxSizing: "border-box",
+    //paddingTop: 21,
+  //},
 
-  statusTimeBox: {
-    display: "flex",
-    padding: "0 6px 0 49px",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-    flexShrink: 0,
-  },
+  //statusTimeBox: {
+    //display: "flex",
+    //padding: "0 6px 0 49px",
+    //justifyContent: "center",
+    //alignItems: "center",
+    //gap: 10,
+    //flexShrink: 0,
+  //},
 
-  statusTime: {
-    color: "#000",
-    textAlign: "center",
-    fontFamily:
-      '"SF Pro", system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
-    fontSize: 17,
-    fontStyle: "normal",
-    fontWeight: 590,
-    lineHeight: "22px",
-  },
+  //statusTime: {
+    //color: "#000",
+   // textAlign: "center",
+    //fontFamily:
+    //  '"SF Pro", system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',
+    //fontSize: 17,
+    //fontStyle: "normal",
+    //fontWeight: 590,
+    //lineHeight: "22px",
+  //},
 
-  statusIconImg: {
-    flexShrink: 0,
-    height: 13,
-  },
+  //statusIconImg: {
+    //flexShrink: 0,
+    //height: 13,
+  //},
 
-  statusSideRight: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
+  //statusSideRight: {
+    //flex: 1,
+    //display: "flex",
+    //justifyContent: "flex-end",
+    //alignItems: "center",
+  //},
 
   // 탑네비
   topNav: {
@@ -92,6 +92,7 @@ export const boardDetailStyles: Styles = {
     flexShrink: 0,
     boxSizing: "border-box",
     background: "var(--GrayScale-WT, #FAFAFA)",
+    marginTop: 48,
   },
   topNavLeft: {
     display: "flex",
@@ -148,7 +149,7 @@ export const boardDetailStyles: Styles = {
 
   // 내용
   content: {
-    paddingTop: 129, // 상태바(48px) + 탑네비(68px) + 여백(13px)
+    paddingTop: 129, 
     paddingLeft: 21,
     paddingRight: 19,
     paddingBottom: 100,
@@ -162,7 +163,7 @@ export const boardDetailStyles: Styles = {
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 6,
-    marginBottom: 80,
+    marginBottom: 40,
   },
 
   blockCountText: {
@@ -275,7 +276,7 @@ export const boardDetailStyles: Styles = {
   // 삭제 모달
   deleteModal: {
     position: "absolute",
-    top: 68, // 탑네비 바로 아래
+    top: 68, 
     right: 20,
     width: 104,
     height: 54,
