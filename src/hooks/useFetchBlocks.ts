@@ -1,59 +1,66 @@
 // src/hooks/useFetchBlocks.ts
-// api연결 안되어있음!! 하드코딩
-import { useEffect, useState } from 'react'
-import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@components/block/DropdownOptions";
-import type { BlockData } from '@types';
+import { useState, useCallback } from "react";
+import {
+    fetchKeywordBlocks,
+    fetchTypeBlocks,
+    fetchCategoryBlocks,
+} from "@api";
+import type { BlockData, BlockType } from "@types";
 
-export const useFetchBlocks = (
-    isTech?: boolean,
-    frontendCategory?: string,
-    backendCategory?: string,
-    designCategory?: string,
-    ideaCategory?: string
-) => {
-    const [cards, setCards] = useState<BlockData[]>([])
+type UseFetchBlocksReturn = {
+    blocks: BlockData[];
+    loading: boolean;
+    error: string | null;
+    fetchByKeyword: (keyword: string) => Promise<void>;
+    fetchByType: (blockType: BlockType) => Promise<void>;
+    fetchByCategory: (category: string) => Promise<void>;
+};
 
-    useEffect(() => {
-        fetch('/dummyBlocks.json')
-            .then(res => res.json())
-            .then((data: BlockData[]) => {
-                let filtered: BlockData[] = []
+export const useFetchBlocks = (): UseFetchBlocksReturn => {
+    const [blocks, setBlocks] = useState<BlockData[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-                if (typeof isTech === 'boolean') {
-                    filtered = data.filter(block =>
-                        isTech ? block.blockType === 'TECHNOLOGY' : block.blockType === 'IDEA'
-                    )
-                } else if (frontendCategory) {
-                    const matchedOption = CATEGORY_TECH_FRONT.find(option => option.label === frontendCategory);
-                    const categoryValue = matchedOption?.value;
-                    filtered = data.filter(block =>
-                        block.blockType === 'TECHNOLOGY' &&
-                        block.techPart === 'frontend' &&
-                        block.categoryName === categoryValue
-                    )
-                } else if (backendCategory) {
-                    filtered = data.filter(block =>
-                        block.blockType === 'TECHNOLOGY' &&
-                        block.techPart === 'backend' &&
-                        block.categoryName === backendCategory
-                    )
-                } else if (designCategory) {
-                    filtered = data.filter(block =>
-                        block.blockType === 'TECHNOLOGY' &&
-                        block.techPart === 'design' &&
-                        block.categoryName === designCategory
-                    )
-                } else if (ideaCategory) {
-                    filtered = data.filter(block =>
-                        block.blockType === 'IDEA' &&
-                        block.categoryName === ideaCategory
-                    )
+    const createFetcher = useCallback(
+        <T,>(fetchFn: (arg: T) => Promise<BlockData[]>, errorMessage: string) =>
+            async (arg: T) => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const data = await fetchFn(arg);
+                    setBlocks(data);
+                } catch (err) {
+                    console.error(errorMessage, err);
+                    setError(errorMessage);
+                    setBlocks([]);
+                } finally {
+                    setLoading(false);
                 }
+            },
+        []
+    );
 
-                setCards(filtered)
-            })
-            .catch(console.error)
-    }, [isTech, frontendCategory, backendCategory, designCategory, ideaCategory])
+    const fetchByKeyword = useCallback(
+        createFetcher<string>(fetchKeywordBlocks, "검색 결과를 불러오지 못했습니다."),
+        [createFetcher]
+    );
 
-    return cards
+    const fetchByType = useCallback(
+        createFetcher<BlockType>(fetchTypeBlocks, "블록을 불러오지 못했습니다."),
+        [createFetcher]
+    );
+
+    const fetchByCategory = useCallback(
+        createFetcher<string>(fetchCategoryBlocks, "카테고리별 블록을 불러오지 못했습니다."),
+        [createFetcher]
+    );
+
+    return {
+        blocks,
+        loading,
+        error,
+        fetchByKeyword,
+        fetchByType,
+        fetchByCategory,
+    };
 };

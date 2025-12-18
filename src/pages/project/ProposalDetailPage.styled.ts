@@ -37,6 +37,12 @@ export const ProposerProfile = styled.div`
   align-items: center;
   gap: 12px;
   margin: 16px 0 16px 0;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 0.7;
+  }
 `;
 
 export const ProposerImage = styled.img`

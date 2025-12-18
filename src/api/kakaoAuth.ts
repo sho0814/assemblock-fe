@@ -1,4 +1,4 @@
-import { api } from "@api";
+import { api, authApi } from "@api";
 import type { KakaoUserJwt } from "@types";
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY!;
@@ -19,5 +19,24 @@ export const sendKakaoCodeToBackend = async (code: string): Promise<KakaoUserJwt
   if (response.status !== 200) {
     throw new Error('Send Kakao code to backend failed');
   }
+  return response.data;
+};
+
+// 온보딩 완료 시 프로필 등록 추가
+export interface SignupRequest {
+  nickname: string;
+  roles: string[];
+  userProfileType: string; 
+  introduction: string;
+  portfolioUrl?: string;
+  portfolioPdfUrl?: string;
+}
+
+export const signup = async (signupData: SignupRequest): Promise<void> => {
+  const response = await authApi.put('/auth/signup', signupData, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };

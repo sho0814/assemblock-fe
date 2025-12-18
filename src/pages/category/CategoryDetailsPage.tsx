@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SimpleHeader from "@components/shared/SimpleHeader";
 import { CATEGORY_TECH_FRONT, CATEGORY_TECH_DESIGN, CATEGORY_TECH_BACK, CATEGORY_IDEA } from "@constants";
@@ -24,14 +24,51 @@ export function CategoryDetailsPage() {
     const { techpart } = useParams();
     const { title, options } = getPageInfo(techpart);
 
+    const scrollNavRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!scrollNavRef.current || !category) return;
+
+        requestAnimationFrame(() => {
+            const nav = scrollNavRef.current;
+            const tabs = nav?.children as HTMLCollectionOf<HTMLElement>;
+
+            // options 배열에서 현재 category의 index 찾기
+            const currentIndex = options.findIndex(option => option.label === category);
+
+            if (currentIndex !== -1) {
+                const tab = tabs[currentIndex];
+                if (nav && tab) {
+                    nav.scrollLeft = tab.offsetLeft;
+                }
+            }
+        });
+    }, [category, options])
+
+    const handleTabClick = (label: string, index: number) => {
+        setCategory(label);
+
+        // 상태 업데이트 후 DOM 반영 대기
+        requestAnimationFrame(() => {
+            const nav = scrollNavRef.current;
+            const tabs = nav?.children as HTMLCollectionOf<HTMLElement>;
+            const tab = tabs[index];
+
+            if (nav && tab) {
+                nav.scrollLeft = tab.offsetLeft;
+            }
+        });
+    };
+
     return (
         <>
-            <SimpleHeader title={title} style={{paddingLeft: 20, paddingRight: 20}}/>
-            <S.ScrollNav>
-                {options.map((option: { label: string, value: string }) => (
+            <SimpleHeader title={title} style={{ paddingLeft: 20, paddingRight: 20 }} />
+
+            <S.ScrollNav ref={scrollNavRef}>
+                {options.map((option: { label: string, value: string }, index) => (
                     <S.NavTab
                         key={option.label}
-                        onClick={() => setCategory(option.label)}
+                        onClick={() => handleTabClick(option.label, index)}
                         selected={category === option.label}
                     >
                         {option.value}
@@ -40,7 +77,7 @@ export function CategoryDetailsPage() {
             </S.ScrollNav>
 
             <S.CarouselWrapper>
-                <RenderCategoryCards frontendCategory={category} />
+                <RenderCategoryCards category={category} />
             </S.CarouselWrapper>
 
         </>

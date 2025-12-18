@@ -296,19 +296,3 @@ export const HiddenFileInput = styled.input`
   display: none;
 `;
 
-export const ProfileEditButton = styled.button`
-  display: flex;
-  width: 335px;
-  margin-top: 36px;
-  padding: 12px 10px;
-  justify-content: center;
-  align-items: center;
-  border-radius: 16px;
-  background: var(--Primary-BK, #352F36);
-  color: #FAFAFA;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-`;
-

@@ -2,17 +2,11 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-    min-width: 375px;
-    max-width: 400px;
-    height: 100vh;
-    background: #FAFAFA;
-    padding-top: 48px;
-    padding-left: 20px;
-    padding-right: 20px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 400px;
 `;
 
 export const Form = styled.form`

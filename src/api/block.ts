@@ -1,5 +1,5 @@
 import { authApi } from '@api';
-import type { NewBlockData, BlockType, TechPart, SearchResultBlock } from '@types';
+import type { NewBlockData, BlockData,BlockType } from '@types';
 
 export const createBlock = async (blockData: NewBlockData): Promise<any> => {
     const response = await authApi.post('/blocks', blockData, {
@@ -21,38 +21,16 @@ export const addBlockToBoard = async (boardId: number, blockId: number): Promise
     return response.data;
 }
 
-export const searchBlocks = async (keyword: string): Promise<SearchResultBlock[]> => {
-    const response = await authApi.get('/search/blocks', {
-        params: { q: keyword }
-    });
-    return response.data;
+const fetchBlocksBase = async (params: any): Promise<BlockData[]> => {
+  const response = await authApi.get('/blocks', { params });
+  return response.data;
 };
 
-export const fetchTypeBlocks = async (blockType: BlockType, page: number, size: number, sort: string,): Promise<any> => {
-    const response = await authApi.get('/blocks', {
-        params: {
-            blockType,
-            pageable: {
-                page,
-                size,
-                sort
-            }
-        }
-    });
-    return response.data;
-}
+export const fetchKeywordBlocks = (keyword: string) =>
+  fetchBlocksBase({ keyword });
 
-export const fetchCategoryBlocks = async (techPart: TechPart, category: string, page: number, size: number, sort: string): Promise<any> => {
-    const response = await authApi.get('/blocks', {
-        params: {
-            techPart,
-            category,
-            pageable: {
-                page,
-                size,
-                sort
-            }
-        }
-    });
-    return response.data;
-}
+export const fetchTypeBlocks = (blockType: BlockType) =>
+  fetchBlocksBase({ blockType });
+
+export const fetchCategoryBlocks = (category: string) =>
+  fetchBlocksBase({ category });

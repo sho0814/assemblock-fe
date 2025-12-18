@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { OverlayProvider } from "@components/common/OverlayContext";
 import { MainLayout } from "@components/common/MainLayout";
 import { SubLayout } from "@components/common/SubLayout";
+import { Toaster } from 'react-hot-toast';
 
 import { Splash } from "@pages/splash/Splash";
 import { OnboardingPage } from "@pages/Onboarding/OnboardingPage";
@@ -36,44 +37,49 @@ import { ProfilePortfolio } from "@pages/Onboarding/profile/ProfilePortfolio";
 
 function App() {
   return (
-    <OverlayProvider>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/Home" element={<HomePage />} />
-          <Route path="/Board" element={<BoardPage />} />
-          <Route path="/Project" element={<ProjectPage />} />
-          <Route path="/Project/team/:proposalId/review" element={<ReviewPage />} />
-          <Route path="/My" element={<MyPage />} />
-        </Route>
-        <Route element={<SubLayout />}>
-          <Route path="/" element={<Splash />} />
-          <Route path="/callback" element={<KakaoCallbackPage />} />
-          <Route path="/auth/success" element={<SuccessPage />} />
-          <Route path="/auth/error" element={<ErrorPage />} />
-          <Route path="/category" element={<CategoryPage />} />
-          <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
-          <Route path="/Home/notification" element={<NotificationPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/search/:keyword" element={<SearchResultPage />} />
-          <Route path="/Board/detail" element={<BoardDetailPage boards={[]} setBoards={() => { }} />} />
-          <Route path="/block/detail" element={<BlockDetailPage />} />
-          <Route path="/block/edit" element={<BlockEditPage />} />
-          <Route path="/block/register" element={<BlockRegisterPage />} />
-          <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
-          <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
-          <Route path="/OtherUser/Profile" element={<OtherUserProfile />} />
-          <Route path="/OtherUser/BlockDetail" element={<BlockDetail />} />
-          <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
-          <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
-          <Route path="/Onboarding" element={<OnboardingPage />} />
-          <Route path="/Onboarding/ProfileName" element={<ProfileName />} />
-          <Route path="/Onboarding/ProfilePart" element={<ProfilePart />} />
-          <Route path="/Onboarding/ProfileImage" element={<ProfileImage />} />
-          <Route path="/Onboarding/ProfileIntro" element={<ProfileIntro />} />
-          <Route path="/Onboarding/ProfilePortfolio" element={<ProfilePortfolio />} />
-        </Route>
-      </Routes>
-    </OverlayProvider>
+    <>
+      <Toaster
+        position="bottom-center" />
+      <OverlayProvider>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/Home" element={<HomePage />} />
+            <Route path="/Board" element={<BoardPage />} />
+            <Route path="/Project" element={<ProjectPage />} />
+            <Route path="/Project/team/:proposalId/review" element={<ReviewPage />} />
+            <Route path="/My" element={<MyPage />} />
+          </Route>
+          <Route element={<SubLayout />}>
+            <Route path="/" element={<Splash />} />
+            <Route path="/callback" element={<KakaoCallbackPage />} />
+            <Route path="/auth/success" element={<SuccessPage />} />
+            <Route path="/auth/error" element={<ErrorPage />} />
+            <Route path="/category" element={<CategoryPage />} />
+            <Route path="/category/:techpart" element={<CategoryDetailsPage />} />
+            <Route path="/Home/notification" element={<NotificationPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/search/:keyword" element={<SearchResultPage />} />
+            <Route path="/Board/detail" element={<BoardDetailPage />} />
+            <Route path="/block/detail" element={<BlockDetailPage />} />
+            <Route path="/My/BlockDetail/:blockId" element={<BlockDetailPage />} />
+            <Route path="/block/edit" element={<BlockEditPage />} />
+            <Route path="/block/register" element={<BlockRegisterPage />} />
+            <Route path="/My/ProfileEdit" element={<ProfileEdit />} />
+            <Route path="/My/ProfileSelect" element={<ProfileSelect />} />
+            <Route path="/OtherUser/Profile" element={<OtherUserProfile />} />
+            <Route path="/OtherUser/BlockDetail/:blockId" element={<BlockDetail />} />
+            <Route path="/Project/team/:proposalId" element={<MyTeamPage />} />
+            <Route path="/Project/proposal/:proposalId" element={<ProposalDetailPage />} />
+            <Route path="/Onboarding" element={<OnboardingPage />} />
+            <Route path="/Onboarding/ProfileName" element={<ProfileName />} />
+            <Route path="/Onboarding/ProfilePart" element={<ProfilePart />} />
+            <Route path="/Onboarding/ProfileImage" element={<ProfileImage />} />
+            <Route path="/Onboarding/ProfileIntro" element={<ProfileIntro />} />
+            <Route path="/Onboarding/ProfilePortfolio" element={<ProfilePortfolio />} />
+          </Route>
+        </Routes>
+      </OverlayProvider>
+    </>
   );
 }
 

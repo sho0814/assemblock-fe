@@ -1,60 +1,17 @@
 import styled from "styled-components";
 
 export const ProfileSelectContainer = styled.div`
-  min-width: 375px;        
-  height: 100vh;
-  margin: 0 auto;          
-  padding: 0 20px 56px 20px;         
-  background: #FAFAFA;     
-`;
-
-export const HeaderBar = styled.div`
-  position: relative;
-  top: 0;
-  min-height: 68px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  opacity: 1;
-`;
-
-export const HeaderSlot = styled.div`
-  display: flex;
-  align-items: center;
-  top: 0;
-`;
-
-export const CenterTextBox = styled.div`
-  min-width: 70px;
-  min-height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #352F36;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 150%;
-`;
-
-export const BackButton = styled.button`
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  aspect-ratio: 1/1;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 `;
 
 export const TextSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 24px 20px;
+  padding: 24px 0;
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -78,14 +35,17 @@ export const SubText = styled.div`
 
 export const ProfileGrid = styled.div`
   display: grid;
-  width: 375px;
+  width: 100%;
+  max-width: 335px;
   height: 434px;
-  padding: 0 20px;
+  margin: 0 20px;
   row-gap: 12px;
   column-gap: 4px;
   flex-shrink: 0;
   grid-template-rows: repeat(3, minmax(0, 1fr));
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  box-sizing: border-box;
+  padding: 0;
 `;
 
 export const ProfileItem = styled.button<{ $selected?: boolean }>`
@@ -123,7 +83,8 @@ export const ProfilePlaceholder = styled.div`
 
 export const ConfirmBtn = styled.button`
   display: flex;
-  width: 335px;
+  width: 100%;
+  max-width: 335px;
   padding: 12px 10px;
   justify-content: center;
   align-items: center;
@@ -136,4 +97,5 @@ export const ConfirmBtn = styled.button`
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
+  box-sizing: border-box;
 `;

@@ -1,4 +1,4 @@
-// hooks/useRecentSearches.ts
+// src/hooks/useRecentSearches.ts
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { HistoryItem } from '@types';

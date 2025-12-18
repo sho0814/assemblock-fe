@@ -36,10 +36,19 @@ export const Header = styled.header`
   border-bottom: 1px solid #f0f0f0;
 `;
 
+export const HeaderSide = styled.div`
+  width: 16px;  
+  height: 16px;
+`;
+
 export const Title = styled.h2`
-  font-size: 18px;
-  font-weight: 700;
+  flex: 1;
+  text-align: center;
+
+  font-size: 16px;
+  font-weight: 600;
   color: #352f36;
+  white-space: nowrap;
   margin: 0;
 `;
 
@@ -47,7 +56,6 @@ export const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,7 +67,7 @@ export const CloseIcon = styled.img`
 `;
 
 export const Content = styled.div`
-  padding: 40px 20px 32px 20px;
+  padding: 65px 20px 40px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -98,7 +106,7 @@ export const SubMessage = styled.p`
 `;
 
 export const ButtonContainer = styled.div`
-  margin-top: 70px;
+  margin-top: 76.1px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -106,16 +114,17 @@ export const ButtonContainer = styled.div`
 `;
 
 export const ViewTeamButton = styled.button`
-  width: 100%;
-  height: 52px;
-  border: 1px solid #352f36;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  width: 335px;
+  height: 45px;
+  border: none;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
   color: #352f36;
   background-color: #fff;
   cursor: pointer;
   transition: all 0.2s;
+  align-self: stretch;
 
   &:active {
     transform: scale(0.98);
@@ -123,16 +132,17 @@ export const ViewTeamButton = styled.button`
 `;
 
 export const ConfirmButton = styled.button`
-  width: 100%;
-  height: 52px;
+  width: 335px;
+  height: 45px;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
   color: #fafafa;
   background-color: #352f36;
   cursor: pointer;
   transition: all 0.2s;
+  align-self: stretch;
 
   &:active {
     transform: scale(0.98);

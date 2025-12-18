@@ -53,6 +53,7 @@ const getMemberPartLabel = (
 export function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
+  const navigate = useNavigate();
 
   const [myUserId, setMyUserId] = useState<number | null>(null);
 
@@ -172,7 +173,10 @@ export function ProposalDetailPage() {
           <ProjectTitle>{proposal.projectTitle}</ProjectTitle>
 
           {/* 제안자 프로필 */}
-          <ProposerProfile>
+          <ProposerProfile
+            onClick={() => {
+              navigate(`/OtherUser/Profile?userId=${proposal.proposerId}`);
+            }}>
             <ProposerImage
               src={getProfileImage(proposal.proposerProfileType)}
               alt={proposal.proposerNickname}

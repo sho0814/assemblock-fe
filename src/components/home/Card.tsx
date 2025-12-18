@@ -4,23 +4,15 @@ import { useNavigate } from 'react-router-dom'
 import { useDrag } from '@use-gesture/react'
 import { useSpring, animated } from '@react-spring/web'
 
+import type { BlockData } from '@types'
 import { cardBackgrounds } from '@constants'
 import { useOverlay } from '@components/common/OverlayContext'
-import SelectBoard from './SelectBoard'
+import BoardSelector from './BoardSelector'
 import * as S from './Card.styled'
 
-const threshold = -70
+const threshold = -50
 
-interface CardProps {
-  blockId: number;
-  blockTitle: string;
-  blockType: string;
-  oneLineSummary: string;
-  techPart: string;
-  categoryName: string;
-  writerId: number;
-  writerNickname: string;
-  contributionScore: number;
+interface CardProps extends BlockData {
   isRegisterBlockActive: boolean;
   setIsRegisterBlockActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -50,7 +42,6 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
   }
   const techPartText = getTechPartText();
 
-
   const spring = useSpring({ y, config: { tension: 300, friction: 20 } })
 
   const bind = useDrag(({ movement: [, my], last, first }) => {
@@ -73,22 +64,22 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
     }
   })
 
-  const handleBoardOverlay = () => {
+  const handleBoardOverlay = (blockId: number) => {
     showOverlay(
-      <SelectBoard blockId={blockId} setIsRegisterBlockActive={setIsRegisterBlockActive} />,
+      <BoardSelector blockId={blockId} setIsRegisterBlockActive={setIsRegisterBlockActive} />,
       { contentStyle: { position: 'absolute', bottom: '0', width: '100%' } }
     );
   }
 
-  const handleClick = () => {
-    if (isDragging) return; // 드래그 중이면 클릭 무시
-    navigate('/OtherUser/BlockDetail');
+  const handleClick = (blockId: number) => {
+    if (isDragging) return;
+    navigate(`/OtherUser/BlockDetail/${encodeURIComponent(blockId)}`);
   }
 
   return (
     <>
       <animated.div {...bind()} style={{ y: spring.y }}>
-        <S.Card key={blockId} bgImage={bgImage} onClick={handleClick}>
+        <S.Card key={blockId} bgImage={bgImage} onClick={() => handleClick(blockId)}>
           <S.Title>{blockTitle}</S.Title>
           <S.Summary>{oneLineSummary}</S.Summary>
           <S.Username>{writerNickname} 님</S.Username>
@@ -96,7 +87,7 @@ const Card: React.FC<CardProps> = ({ blockId, blockTitle, oneLineSummary, writer
         </S.Card>
       </animated.div>
       {!isRegisterBlockActive &&
-        <S.StoreToBoardBtn onClick={() => handleBoardOverlay()}>보드에 추가</S.StoreToBoardBtn>}
+        <S.StoreToBoardBtn onClick={() => handleBoardOverlay(blockId)}>보드에 추가</S.StoreToBoardBtn>}
     </>
   )
 }

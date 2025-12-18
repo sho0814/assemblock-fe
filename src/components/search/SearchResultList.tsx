@@ -1,7 +1,8 @@
 // src/components/search/SearchResultList.tsx
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { categoryToIconMap } from "@constants";
-import { useSearchBlocks } from "@hooks";
+import { useFetchBlocks } from "@hooks";
 import * as S from './SearchResultsList.styled'
 
 interface SearchResultListProps {
@@ -10,11 +11,30 @@ interface SearchResultListProps {
 
 const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
   const navigate = useNavigate();
-  const { blocks, loading, error } = useSearchBlocks(keyword);
+  const { blocks, loading, error, fetchByKeyword } = useFetchBlocks();
 
-  // 에러 상태
+  useEffect(() => {
+    if (!keyword) return;
+    fetchByKeyword(keyword);
+  }, [keyword, fetchByKeyword]);
+
+  const getCategoryThumbnail = (category: string) => {
+    return categoryToIconMap[category] ?? "/sample.png";
+  };
+
+  const handleClick = (blockId: number) => {
+    navigate(`/OtherUser/BlockDetail/${encodeURIComponent(blockId)}`);
+  }
+
   if (error) {
-    return
+    return (
+      <S.EmptyResultWrapper>
+        <S.EmptyMessage>{error}</S.EmptyMessage>
+        <S.EmptySubMessage>
+          네트워크 연결을 확인해주세요!
+        </S.EmptySubMessage>
+      </S.EmptyResultWrapper>
+    );
   }
 
   if (loading) {
@@ -33,7 +53,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
     );
   }
 
-  // 결과 없음 화면
+  // 결과 없음
   if (blocks.length === 0) {
     return (
       <S.EmptyResultWrapper>
@@ -45,18 +65,10 @@ const SearchResultList: React.FC<SearchResultListProps> = ({ keyword }) => {
     );
   }
 
-  const getCategoryThumbnail = (category: string) => {
-    return categoryToIconMap[category] ?? "/sample.png";
-  };
-
-  const handleClick = () => {
-    navigate('/OtherUser/BlockDetail');
-  }
-
   return (
     <S.BlockListWrapper>
       {blocks.map(block => (
-        <S.BlockItem key={block.blockId} onClick={handleClick}>
+        <S.BlockItem key={block.blockId} onClick={() => handleClick(block.blockId)}>
           <S.Thumbnail
             src={getCategoryThumbnail(block.categoryName)}
             alt="블록 썸네일"

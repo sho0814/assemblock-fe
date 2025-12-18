@@ -1,5 +1,6 @@
 import { useOverlay } from '@components/common/OverlayContext';
 import * as S from './EditCancelModal.styled';
+import cancelBtnIcon from '@assets/common/cancel-btn.svg';
 
 interface EditCancelModalProps {
   onCancel: () => void;
@@ -23,7 +24,7 @@ export default function EditCancelModal({ onCancel }: EditCancelModalProps) {
         <div style={{ width: '24px' }} />
         <S.Title>수정 취소 안내</S.Title>
         <S.CloseButton onClick={handleCancel} aria-label="닫기">
-          X
+          <img src={cancelBtnIcon} alt="닫기" />
         </S.CloseButton>
       </S.Header>
 
