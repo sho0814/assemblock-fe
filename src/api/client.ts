@@ -8,14 +8,14 @@ import { useAuthStore } from "@stores";
 // import api from '@api';
 // const fetchbBlocks = () => api.get('/blocks');
 export const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
 });
 
 // 엑세스토큰 필요한 api
 // import authApi from '@api';
 // const fetchUserBlocks = () => apiAuth.get('/user/blocks');
 export const authApi = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
 });
 
 // ----- 요청 인터셉터: accessToken 붙이기 -----
