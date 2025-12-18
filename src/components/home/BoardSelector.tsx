@@ -36,29 +36,40 @@ export default function BoardSelector({ blockId, setIsRegisterBlockActive }: Boa
     if (loading) return;
 
     try {
-      await addToBoard(boardId, blockId);
+      const promise = addToBoard(boardId, blockId);
 
+      await toast.promise(
+        promise,
+        {
+          loading: '보드에 추가 중...',
+          success: '보드에 추가 완료!',
+          error: (e: unknown) => {
+            if (axios.isAxiosError(e)) {
+              const err = e as AxiosError<{ error?: string }>;
+
+              if (err.response?.status === 400) {
+                return err.response.data?.error || '요청이 올바르지 않습니다.';
+              } else {
+                console.error('Axios error:', err.message, err.response?.status);
+                return '요청 처리 중 오류가 발생했습니다.';
+              }
+            } else {
+              console.error('Unknown error:', e);
+              return '알 수 없는 오류가 발생했습니다.';
+            }
+          },
+        }
+      );
+
+      // 성공 시에만 실행
       closeOverlay();
-      toast.success('보드에 추가 완료!')
       if (setIsRegisterBlockActive) {
         setIsRegisterBlockActive(true);
       }
-    } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        const err = e as AxiosError<{ error?: string }>;
-
-        if (err.response?.status === 400) {
-          const msg = err.response.data?.error || "요청이 올바르지 않습니다.";
-          toast.error(msg);
-        } else {
-          console.error("Axios error:", err.message, err.response?.status);
-          toast.error("요청 처리 중 오류가 발생했습니다.");
-        }
-      } else {
-        console.error("Unknown error:", e);
-        toast.error("알 수 없는 오류가 발생했습니다.");
-      }
+    } catch {
+      // 에러 토스트는 toast.promise에서 이미 처리하므로 여기서는 별도 처리 안 해도 됨
     }
+
   };
 
   return (

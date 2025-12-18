@@ -38,7 +38,7 @@ import { ProfilePortfolio } from "@pages/Onboarding/profile/ProfilePortfolio";
 function App() {
   return (
     <>
-      <Toaster position="bottom-center" containerStyle={{top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
+      <Toaster position="bottom-center" containerStyle={{bottom: '150px', whiteSpace: 'nowrap'}}/>
       <OverlayProvider>
         <Routes>
           <Route element={<MainLayout />}>
