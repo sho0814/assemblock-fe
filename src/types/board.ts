@@ -16,6 +16,11 @@ export interface MinimalBoard {
   previewTypes: BlockType[];   // 추가
 }
 
+export interface StorageBoard {
+  boardId: number;
+  boardName: string;
+}
+
 export interface BoardDetail {
   boardId: number;
   boardName: string;
