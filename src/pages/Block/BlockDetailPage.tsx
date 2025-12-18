@@ -579,12 +579,15 @@ export function BlockDetailPage() {
              safeBlock.result_file !== 'dummy-pdf-base64-string-for-testing' && (
               <S.FileLink
                 onClick={() => {
-                  console.log('Download file:', safeBlock.result_file);
+                  // result_file이 URL이면 새 창에서 열기
+                  if (safeBlock.result_file) {
+                    window.open(safeBlock.result_file, '_blank');
+                  }
                 }}
                 style={{ display: 'flex', alignItems: 'center' }}
               >
                 <img src={folderIcon} alt="folder" style={{ width: '18px', height: '18px', marginRight: '8px' }} ></img>
-                {safeBlock.result_file}
+                {safeBlock.result_file.split('/').pop() || safeBlock.result_file}
               </S.FileLink>
             )}
           </S.Section>

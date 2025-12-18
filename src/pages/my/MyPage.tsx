@@ -131,7 +131,6 @@ export function MyPage() {
           // 프로필 정보 API 호출
           try {
             const profileData = await getMyProfile();
-            console.log('Profile data from API:', profileData); // 디버깅용
             
             // 백엔드 응답이 snake_case일 수 있으므로 camelCase로 변환
             // mainRoles를 selectedParts로 변환 (백엔드 roles -> 프론트엔드 part IDs)
@@ -157,31 +156,16 @@ export function MyPage() {
             
             const portfolioUrl = profileData.portfolioUrl || '';
             
-            // 파일명 가져오기 (API 응답에서 또는 URL에서 추출)
+            // 파일명 가져오기 (API 응답 또는 localStorage에서 가져오기)
             let portfolioFileName = (profileData as any).portfolio_file_name 
               || (profileData as any).portfolioFileName
               || (profileData as any).fileName
               || '';
             
-            // URL에서 파일명 추출 (파일명이 없을 경우)
+            // API 응답에 파일명이 없으면 localStorage에서 가져오기
             if (!portfolioFileName && portfolioPdfUrl) {
-              try {
-                const url = new URL(portfolioPdfUrl);
-                const pathname = url.pathname;
-                const fileNameFromUrl = pathname.split('/').pop() || '';
-                if (fileNameFromUrl) {
-                  portfolioFileName = decodeURIComponent(fileNameFromUrl);
-                }
-              } catch (e) {
-                // URL 파싱 실패 시 전체 URL에서 파일명 추출 시도
-                const match = portfolioPdfUrl.match(/\/([^\/]+\.pdf)$/i);
-                if (match) {
-                  portfolioFileName = decodeURIComponent(match[1]);
-                }
-              }
+              portfolioFileName = localStorage.getItem('portfolioFileName') || '';
             }
-            
-            console.log('Portfolio URLs:', { portfolioUrl, portfolioPdfUrl, portfolioFileName }); // 디버깅용
             
             const convertedProfile: ProfileInfo = {
               nickname: profileData.nickname || (profileData as any).nickname || '',

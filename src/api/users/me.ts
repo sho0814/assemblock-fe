@@ -9,6 +9,7 @@ export interface UserMeResponse {
   profileType: string; // 프로필 이미지 타입 (예: "Type_1")
   portfolioUrl?: string; // 포트폴리오 URL
   portfolioPdfUrl?: string | null; // 포트폴리오 PDF URL (nullable)
+  portfolioFileName?: string; // 포트폴리오 파일명 (원본 파일명)
   reviewSentCnt: number; // 보낸 리뷰 수
   reviewReceivedCnt: number; // 받은 리뷰 수
   isPublishing: boolean; // 공개 여부
