@@ -150,10 +150,6 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
         setSelectedTechPart(prev => (prev === part ? null : part));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        handlePdfFileChange(e, setSelectedFile, setResultFileName, 10); // 10MB 제한
-    };
-
     return (
         <>
             <S.TextWrapper>
@@ -265,7 +261,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
                                 <span style={{ fontSize: '12px', color: '#C2C1C3' }}>지원되는 형식: PDF</span>
                             </>
                         )}
-                        <S.HiddenFileInput ref={fileInputRef} name="resultFile" type="file" accept="application/pdf" onChange={handleFileChange} />
+                        <S.HiddenFileInput ref={fileInputRef} name="resultFile" type="file" accept="application/pdf"  onChange={(e) => handlePdfFileChange(e, setSelectedFile, setResultFileName, 10)}  />
                     </S.FileInputWrapper>
                     <S.Desc>프로젝트 결과물을 PDF 파일 형태로 첨부해 주세요</S.Desc>
                 </S.Row>
