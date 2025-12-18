@@ -16,6 +16,7 @@ import folderIcon from '@assets/MyPage/folder.svg';
 import CommonButton from '@components/shared/CommonButton';
 import { getBlockDetail } from '@api/blockId';
 import { getUserProfile } from '@api/profiles/profile';
+import { getCategoryValue } from '@utils/getCategoryLabel';
 
 // Tech_parts 매핑
 const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
@@ -204,20 +205,20 @@ export function BlockDetail() {
   const isIdea = !isTechnology && (safeBlock.block_type === 'IDEA' || safeBlock.block_type === 'idea');
 
   const getCategoryPath = () => {
-    // 카테고리 이름에서 언더스코어를 공백으로 치환 (슬래시는 그대로 유지)
-    const categoryName = (safeBlock.category_name || '').replace(/_/g, ' ');
+    // 카테고리 이름을 value 형식으로 변환 (category.ts의 value 값 사용)
+    const categoryValue = getCategoryValue(safeBlock.category_name);
     
     if (isTechnology && foundBlockData?.techPart) {
       // API에서 받은 techPart를 직접 사용
       const techPart = TECH_PARTS_MAP[foundBlockData.techPart];
       const partName = techPart ? techPart.name : '';
-      return `기술 > ${partName} > ${categoryName}`;
+      return `기술 > ${partName} > ${categoryValue}`;
     } else if (isTechnology) {
-      return `기술 > ${categoryName}`;
+      return `기술 > ${categoryValue}`;
     } else if (isIdea) {
-      return `아이디어 > ${categoryName}`;
+      return `아이디어 > ${categoryValue}`;
     }
-    return categoryName;
+    return categoryValue;
   };
 
   // 로딩 중일 때 로딩 메시지 표시
@@ -375,12 +376,15 @@ export function BlockDetail() {
              safeBlock.result_file !== 'dummy-pdf-base64-string-for-testing' && (
               <S.FileLink
                 onClick={() => {
-                  console.log('Download file:', safeBlock.result_file);
+                  // result_file이 URL이면 새 창에서 열기
+                  if (safeBlock.result_file) {
+                    window.open(safeBlock.result_file, '_blank');
+                  }
                 }}
                 style={{ display: 'flex', alignItems: 'center' }}
               >
                 <img src={folderIcon} alt="folder" style={{ width: '18px', height: '18px', marginRight: '8px' }} ></img>
-                {safeBlock.result_file}
+                {safeBlock.result_file.split('/').pop() || safeBlock.result_file}
               </S.FileLink>
             )}
           </S.Section>

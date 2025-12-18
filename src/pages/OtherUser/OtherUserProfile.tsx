@@ -410,21 +410,9 @@ export function OtherUserProfile() {
              userProfile.portfolioPdfUrl !== 'string' ? (
               <PortfolioFileLink
                 onClick={() => {
-                  // 파일 다운로드 로직 (URL에서 직접 다운로드)
+                  // PDF URL이 있으면 새 창에서 열기
                   if (userProfile.portfolioPdfUrl) {
-                    try {
-                      const link = document.createElement('a');
-                      link.href = userProfile.portfolioPdfUrl;
-                      link.download = userProfile.fileName;
-                      link.target = '_blank';
-                      link.style.display = 'none';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    } catch (error) {
-                      console.error(error);
-                      alert('파일 다운로드 중 오류가 발생했습니다.');
-                    }
+                    window.open(userProfile.portfolioPdfUrl, '_blank');
                   }
                 }}
               >

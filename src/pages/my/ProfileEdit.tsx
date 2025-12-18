@@ -452,18 +452,57 @@ export function ProfileEdit() {
         let portfolioPdfUrl: string | undefined = undefined;
         if (portfolioFile) {
           try {
-            // 파일 크기 체크 (10MB 제한)
-            const maxSize = 10 * 1024 * 1024; // 10MB
+            // 파일 크기 체크 (4MB 제한 - 서버 제한으로 인해 4MB로 설정)
+            const maxSize = 4 * 1024 * 1024; // 4MB
             if (portfolioFile.size > maxSize) {
-              alert('파일 크기가 10MB를 초과합니다. 더 작은 파일을 선택해주세요.');
+              const fileSizeMB = (portfolioFile.size / (1024 * 1024)).toFixed(2);
+              alert(`파일 크기가 4MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
               return;
             }
             
             const uploadResult = await uploadFile(portfolioFile);
-            portfolioPdfUrl = uploadResult.fileUrl || '';
-          } catch (error) {
+            
+            // API 명세서에 따르면 fileUrl은 선택적 필드이므로 확인 필요
+            if (!uploadResult.fileUrl) {
+              alert('파일 업로드는 성공했지만 파일 URL을 받지 못했습니다. 다시 시도해주세요.');
+              return;
+            }
+            
+            portfolioPdfUrl = uploadResult.fileUrl;
+            
+            // 파일명을 localStorage에 저장 (MyPage에서 표시용)
+            if (portfolioPdfUrl && portfolioFile.name) {
+              localStorage.setItem('portfolioFileName', portfolioFile.name);
+            }
+          } catch (error: any) {
             console.error('File upload failed:', error);
-            alert('파일 업로드에 실패했습니다.');
+            if (error?.response?.status === 413) {
+              const fileSizeMB = portfolioFile ? (portfolioFile.size / (1024 * 1024)).toFixed(2) : '알 수 없음';
+              alert(`파일 크기가 서버 제한을 초과했습니다. (현재: ${fileSizeMB}MB)\n4MB 이하의 파일을 선택해주세요.`);
+            } else {
+              // S3 버킷 오류 등 기타 오류 처리
+              let errorMessage = '알 수 없는 오류';
+              
+              // XML 응답 처리 (S3 오류)
+              if (typeof error?.response?.data === 'string' && error.response.data.includes('NoSuchBucket')) {
+                errorMessage = '서버 설정 오류: S3 버킷이 존재하지 않습니다. 관리자에게 문의해주세요.';
+              } else if (error?.response?.data) {
+                // JSON 응답
+                if (typeof error.response.data === 'object') {
+                  errorMessage = error.response.data.message || error.response.data.error || '알 수 없는 오류';
+                } else if (typeof error.response.data === 'string') {
+                  errorMessage = error.response.data;
+                }
+              } else if (error?.message) {
+                errorMessage = error.message;
+              }
+              
+              if (errorMessage.includes('NoSuchBucket') || errorMessage.includes('bucket')) {
+                alert('파일 업로드 중 서버 설정 오류가 발생했습니다. 관리자에게 문의해주세요.');
+              } else {
+                alert(`파일 업로드에 실패했습니다: ${errorMessage}`);
+              }
+            }
             return; // 파일 업로드 실패 시 페이지에 머물기
           }
         } else if (fileName && initialDataRef.current?.fileName === fileName) {
@@ -674,11 +713,14 @@ export function ProfileEdit() {
             ) : (
               <>
                 <FileUploadText>이 곳을 눌러 파일을 업로드 하세요</FileUploadText>
-                <FileFormatText>지원되는 형식: PDF</FileFormatText>
+                <FileFormatText>
+                  지원되는 형식: PDF
+                </FileFormatText>
               </>
             )}
           </FileUploadArea>
-          <HelperText>포트폴리오를 PDF 형태로 첨부해 주세요.</HelperText>
+          <HelperText>기존 프로젝트의 결과물을 PDF 형태로 첨부해 주세요 <br />
+          10MB 이하의 파일을 업로드해주세요</HelperText>
         </FormSection>
       </FormContainer>
       
