@@ -8,18 +8,21 @@ export const useBlocks = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
 
-    const createNewBlock = useCallback(async (blockData: NewBlockData): Promise<any> => {
-        setLoading(true);
-        try {
-            const response = await createBlock(blockData);
-            navigate(-1);
-            return response;
-        } catch (err: any) {
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, [navigate]);
+    const createNewBlock = useCallback(
+        async (blockData: NewBlockData, fileBase64: string): Promise<any> => {
+            setLoading(true);
+            try {
+                const response = await createBlock(blockData, fileBase64);
+                navigate(-1);
+                return response;
+            } catch (err: any) {
+                throw err;
+            } finally {
+                setLoading(false);
+            }
+        },
+        [navigate]
+    );
 
     const addToBoard = useCallback(async (boardId: number, blockId: number): Promise<any> => {
         setLoading(true);
