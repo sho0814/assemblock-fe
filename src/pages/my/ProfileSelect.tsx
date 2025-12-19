@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getMyProfile } from '@api/users/me';
 import {
   ProfileSelectContainer,
   TextSection,
@@ -71,6 +72,57 @@ export function ProfileSelect() {
     }
   ];
 
+  // 현재 선택된 프로필을 초기값으로 설정
+  useEffect(() => {
+    const loadCurrentProfile = async () => {
+      try {
+        // 1. localStorage에서 선택된 프로필 확인
+        const savedProfile = localStorage.getItem('selectedProfile');
+        if (savedProfile) {
+          try {
+            const profile = JSON.parse(savedProfile) as ProfileData;
+            setSelectedProfile(profile.id);
+            return;
+          } catch (e) {
+            console.error('Failed to parse saved profile:', e);
+          }
+        }
+
+        // 2. localStorage에 없으면 API에서 가져오기
+        const profileData = await getMyProfile();
+        const profileType = profileData.profileType || 'Type_1';
+        
+        // profileType을 profile ID로 변환
+        const profileTypeToId: Record<string, string> = {
+          'Type_1': 'img1',
+          'Type_2': 'img2',
+          'Type_3': 'img3',
+          'Type_4': 'img4',
+          'Type_5': 'img5',
+        };
+        
+        const profileId = profileTypeToId[profileType] || 'img1';
+        setSelectedProfile(profileId);
+      } catch (error) {
+        console.error('Failed to load current profile:', error);
+        // API 실패 시 localStorage의 selectedProfileType 확인
+        const savedProfileType = localStorage.getItem('selectedProfileType');
+        if (savedProfileType) {
+          const profileTypeToId: Record<string, string> = {
+            'Type_1': 'img1',
+            'Type_2': 'img2',
+            'Type_3': 'img3',
+            'Type_4': 'img4',
+            'Type_5': 'img5',
+          };
+          const profileId = profileTypeToId[savedProfileType] || 'img1';
+          setSelectedProfile(profileId);
+        }
+      }
+    };
+
+    loadCurrentProfile();
+  }, []);
 
   const handleSave = () => {
     if (selectedProfile) {

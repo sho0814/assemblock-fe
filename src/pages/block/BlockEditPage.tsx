@@ -98,16 +98,23 @@ export function BlockEditPage() {
                 // 블록 제목
                 setBlockTitle(blockDetail.blockTitle || '');
                 
-                // 기술 파트 설정 (API는 대문자, 폼은 소문자)
+                // 기술 파트 설정 (API는 대문자 문자열, 폼은 소문자)
+                // techPart는 string | null 타입 (예: 'FRONTEND', 'BACKEND', 'DESIGN')
                 if (blockDetail.techPart) {
-                    const techPartLower = blockDetail.techPart.toLowerCase();
-                    if (techPartLower === 'frontend' || techPartLower === 'front_end') {
+                    const techPartUpper = blockDetail.techPart.toUpperCase();
+                    if (techPartUpper === 'FRONTEND' || techPartUpper === 'FRONT_END') {
                         setSelectedTechPart('frontend');
-                    } else if (techPartLower === 'backend' || techPartLower === 'back_end') {
+                    } else if (techPartUpper === 'BACKEND' || techPartUpper === 'BACK_END') {
                         setSelectedTechPart('backend');
-                    } else if (techPartLower === 'design') {
+                    } else if (techPartUpper === 'DESIGN') {
                         setSelectedTechPart('design');
+                    } else {
+                        // 예상치 못한 값이면 null로 설정
+                        console.warn('알 수 없는 techPart 값:', blockDetail.techPart);
+                        setSelectedTechPart(null);
                     }
+                } else {
+                    setSelectedTechPart(null);
                 }
                 
                 // 카테고리 설정 (API는 value 형식, 폼은 label 형식)
@@ -150,15 +157,16 @@ export function BlockEditPage() {
                 }
                 setSelectedFile(null); // 기존 파일은 File 객체로 복원할 수 없으므로 null
                 
-                // 기술 파트 값 저장
+                // 기술 파트 값 저장 (초기 데이터용)
+                // techPart는 string | null 타입이므로 동일한 로직 사용
                 let techPartValue: BlockPart | null = null;
                 if (blockDetail.techPart) {
-                    const techPartLower = blockDetail.techPart.toLowerCase();
-                    if (techPartLower === 'frontend' || techPartLower === 'front_end') {
+                    const techPartUpper = blockDetail.techPart.toUpperCase();
+                    if (techPartUpper === 'FRONTEND' || techPartUpper === 'FRONT_END') {
                         techPartValue = 'frontend';
-                    } else if (techPartLower === 'backend' || techPartLower === 'back_end') {
+                    } else if (techPartUpper === 'BACKEND' || techPartUpper === 'BACK_END') {
                         techPartValue = 'backend';
-                    } else if (techPartLower === 'design') {
+                    } else if (techPartUpper === 'DESIGN') {
                         techPartValue = 'design';
                     }
                 }
@@ -369,9 +377,9 @@ export function BlockEditPage() {
             techPartValue = 'DESIGN';
         }
 
-        // 파일이 선택되었으면 base64로 변환, 없으면 더미 문자열 사용
-        // updateBlock이 내부에서 resultFile을 분리하여 dto와 file로 나누어 전송
-        let resultFileBase64 = "dummy-pdf-base64-string-for-testing";
+        // 파일이 선택되었으면 base64로 변환, 없으면 빈 문자열 사용
+        // createBlock과 동일한 구조: blockData와 fileBase64를 별도로 전달
+        let resultFileBase64 = "";
         if (selectedFile) {
             resultFileBase64 = await convertToBase64(selectedFile);
         }
@@ -387,7 +395,7 @@ export function BlockEditPage() {
             improvementPoint: improvementPoint && improvementPoint.trim() ? improvementPoint.trim() : '', // 빈 문자열 허용
             resultUrl: resultUrl && resultUrl.trim() ? resultUrl.trim() : '', // 빈 문자열 허용
             resultFileName: resultFileName || '', // 파일명
-            resultFile: resultFileBase64, // base64 문자열 또는 더미 문자열 (updateBlock에서 file 필드로 분리)
+            resultFile: "", // createBlock과 동일하게 빈 문자열
         };
         
         // 데이터 검증
@@ -416,9 +424,9 @@ export function BlockEditPage() {
         console.log('블록 ID:', blockIdNum);
 
         try {
-            // API 호출 - updateBlock이 내부에서 dto와 file로 분리하여 백엔드 형식에 맞게 전송
+            // API 호출 - createBlock과 동일한 구조: blockData와 fileBase64를 별도로 전달
             console.log('updateBlock API 호출 시작...');
-            await updateBlock(blockIdNum, blockData);
+            await updateBlock(blockIdNum, blockData, resultFileBase64);
             console.log('블록 수정 API 호출 성공');
 
             console.log('블록 수정 성공');
