@@ -413,23 +413,11 @@ export function BlockEditPage() {
 
         console.log('수정할 블록 데이터:', JSON.stringify(blockData, null, 2));
         console.log('블록 ID:', blockIdNum);
-        console.log('데이터 타입 확인:', {
-            blockType: typeof blockData.blockType,
-            blockTitle: typeof blockData.blockTitle,
-            categoryName: typeof blockData.categoryName,
-            techPart: typeof blockData.techPart,
-            contributionScore: typeof blockData.contributionScore,
-            toolsText: typeof blockData.toolsText,
-            oneLineSummary: typeof blockData.oneLineSummary,
-            improvementPoint: typeof blockData.improvementPoint,
-            resultUrl: typeof blockData.resultUrl,
-            resultFile: typeof blockData.resultFile,
-        });
 
         try {
-            // API 호출 - updateBlock 사용
+            // API 호출 - updateBlock이 내부에서 dto와 file로 분리하여 백엔드 형식에 맞게 전송
             console.log('updateBlock API 호출 시작...');
-            await updateBlock(blockIdNum, blockData as NewBlockData);
+            await updateBlock(blockIdNum, blockData);
             console.log('블록 수정 API 호출 성공');
 
             console.log('블록 수정 성공');

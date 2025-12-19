@@ -37,7 +37,22 @@ export interface ProfileInfo {
 // 내 프로필 정보 수정
 // PUT /api/mypage/profile
 export const updateMyProfile = async (profileData: UpdateProfileRequest): Promise<UpdateProfileResponse> => {
-  const response = await authApi.put('/mypage/profile', profileData, {
+  // 백엔드 형식에 맞게 dto와 file을 분리
+  const { portfolioPdfUrl, ...dtoData } = profileData;
+  
+  const requestBody = {
+    dto: {
+      nickname: dtoData.nickname,
+      introduction: dtoData.introduction,
+      mainRoles: dtoData.mainRoles,
+      profileType: dtoData.profileType,
+      portfolioUrl: dtoData.portfolioUrl,
+      portfolioPdfUrl: portfolioPdfUrl, // dto 안에도 포함
+    },
+    file: portfolioPdfUrl && portfolioPdfUrl.trim() !== '' ? portfolioPdfUrl : '', // file 필드에는 base64 문자열 또는 빈 문자열
+  };
+  
+  const response = await authApi.put('/mypage/profile', requestBody, {
     headers: {
       'Content-Type': 'application/json',
     },

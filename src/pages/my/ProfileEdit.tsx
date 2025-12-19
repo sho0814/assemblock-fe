@@ -45,6 +45,7 @@ import EditCancelModal from './EditCancelModal';
 import { getMyProfile } from '@api/users/me';
 import { updateMyProfile, type UpdateProfileRequest } from '@api/mypage/profile';
 import { uploadFile } from '@api/mypage/upload';
+import { handlePdfFileChange } from '@utils/blockFileUtils';
 import CommonButton from '@components/shared/CommonButton';
 
 export function ProfileEdit() {
@@ -288,30 +289,38 @@ export function ProfileEdit() {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      setIsUploading(true);
-      setUploadProgress(0);
-      
-      // 업로드 진행률 표시
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            uploadIntervalRef.current = null;
-            setIsUploading(false);
-            setPortfolioFile(file);
-            setFileName(file.name);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 200);
-      
-      uploadIntervalRef.current = interval;
-    } else {
-      alert('PDF 파일만 업로드할 수 있어요.');
+    // handlePdfFileChange로 파일 검증 (10MB 제한)
+    const isValid = handlePdfFileChange(e, setPortfolioFile, setFileName, 10);
+    
+    if (!isValid) {
+      // 검증 실패 시 input 리셋
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
     }
+    
+    // 검증 통과 시 업로드 진행률 표시 시작
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    // 업로드 진행률 표시
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          uploadIntervalRef.current = null;
+          setIsUploading(false);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
+    
+    uploadIntervalRef.current = interval;
   };
 
   const handleFileRemove = () => {
@@ -448,15 +457,15 @@ export function ProfileEdit() {
           }
         }
         
-        // 파일이 있으면 먼저 업로드
+        // 파일이 있으면 먼저 업로드하여 URL 받기
         let portfolioPdfUrl: string | undefined = undefined;
         if (portfolioFile) {
           try {
-            // 파일 크기 체크 (4MB 제한 - 서버 제한으로 인해 4MB로 설정)
-            const maxSize = 4 * 1024 * 1024; // 4MB
+            // 파일 크기 체크 (10MB 제한)
+            const maxSize = 10 * 1024 * 1024; // 10MB
             if (portfolioFile.size > maxSize) {
               const fileSizeMB = (portfolioFile.size / (1024 * 1024)).toFixed(2);
-              alert(`파일 크기가 4MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
+              alert(`파일 크기가 10MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
               return;
             }
             
@@ -478,7 +487,7 @@ export function ProfileEdit() {
             console.error('File upload failed:', error);
             if (error?.response?.status === 413) {
               const fileSizeMB = portfolioFile ? (portfolioFile.size / (1024 * 1024)).toFixed(2) : '알 수 없음';
-              alert(`파일 크기가 서버 제한을 초과했습니다. (현재: ${fileSizeMB}MB)\n4MB 이하의 파일을 선택해주세요.`);
+              alert(`파일 크기가 서버 제한을 초과했습니다. (현재: ${fileSizeMB}MB)\n10MB 이하의 파일을 선택해주세요.`);
             } else {
               // S3 버킷 오류 등 기타 오류 처리
               let errorMessage = '알 수 없는 오류';
@@ -513,7 +522,7 @@ export function ProfileEdit() {
           portfolioPdfUrl = '';
         }
         
-        // 프로필 수정 API 호출
+        // 프로필 수정 API 호출 - updateMyProfile이 내부에서 dto와 file로 분리하여 백엔드 형식에 맞게 전송
         const updateData: UpdateProfileRequest = {
           nickname: nickname.trim(),
           introduction: introduction.trim() || undefined,

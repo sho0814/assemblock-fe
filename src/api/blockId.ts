@@ -36,7 +36,27 @@ export const getBlockDetail = async (blockId: number): Promise<BlockDetailRespon
 };
 
 export const updateBlock = async (blockId: number, blockData: NewBlockData): Promise<void> => {
-  await authApi.put(`/blocks/${blockId}`, blockData, {
+  // 백엔드 형식에 맞게 dto와 file을 분리
+  const { resultFile, ...dtoData } = blockData;
+  
+  const requestBody = {
+    dto: {
+      blockTitle: dtoData.blockTitle,
+      categoryName: dtoData.categoryName,
+      techPart: dtoData.techPart,
+      blockType: dtoData.blockType,
+      contributionScore: dtoData.contributionScore,
+      toolsText: dtoData.toolsText,
+      oneLineSummary: dtoData.oneLineSummary,
+      improvementPoint: dtoData.improvementPoint,
+      resultFileName: dtoData.resultFileName,
+      resultUrl: dtoData.resultUrl,
+      resultFile: resultFile, // dto 안에도 포함
+    },
+    file: resultFile !== 'dummy-pdf-base64-string-for-testing' ? resultFile : '', // file 필드에는 base64 문자열 또는 빈 문자열
+  };
+  
+  await authApi.put(`/blocks/${blockId}`, requestBody, {
     headers: {
       'Content-Type': 'application/json',
     },

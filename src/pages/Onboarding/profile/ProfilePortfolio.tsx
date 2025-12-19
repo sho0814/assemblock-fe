@@ -23,29 +23,47 @@ export function ProfilePortfolio() {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      setIsUploading(true);
-      setUploadProgress(0);
-      
-      // 업로드 진행률 표시
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            uploadIntervalRef.current = null;
-            setIsUploading(false);
-            setPortfolioFile(file);
-            setFileName(file.name);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 200);
-      
-      uploadIntervalRef.current = interval;
-    } else {
+    if (!file) return;
+    
+    // PDF 파일 타입 체크
+    if (file.type !== 'application/pdf') {
       alert('PDF 파일만 업로드할 수 있어요.');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
     }
+    
+    // 파일 크기 체크 (10MB 제한)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      alert(`파일 크기가 10MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    // 업로드 진행률 표시
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          uploadIntervalRef.current = null;
+          setIsUploading(false);
+          setPortfolioFile(file);
+          setFileName(file.name);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
+    
+    uploadIntervalRef.current = interval;
   };
 
   const handleFileRemove = () => {
@@ -147,11 +165,11 @@ export function ProfilePortfolio() {
       let portfolioPdfUrl = '';
       if (portfolioFile) {
         try {
-          // 파일 크기 체크 (4MB 제한 - 서버 제한으로 인해 4MB로 설정)
-          const maxSize = 4 * 1024 * 1024; // 4MB
+          // 파일 크기 체크 (10MB 제한)
+          const maxSize = 10 * 1024 * 1024; // 10MB
           if (portfolioFile.size > maxSize) {
             const fileSizeMB = (portfolioFile.size / (1024 * 1024)).toFixed(2);
-            alert(`파일 크기가 4MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
+            alert(`파일 크기가 10MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
             setIsSubmitting(false);
             return;
           }
@@ -170,7 +188,7 @@ export function ProfilePortfolio() {
           console.error('File upload failed:', error);
           if (error?.response?.status === 413) {
             const fileSizeMB = portfolioFile ? (portfolioFile.size / (1024 * 1024)).toFixed(2) : '알 수 없음';
-            alert(`파일 크기가 서버 제한을 초과했습니다. (현재: ${fileSizeMB}MB)\n4MB 이하의 파일을 선택해주세요.`);
+            alert(`파일 크기가 서버 제한을 초과했습니다. (현재: ${fileSizeMB}MB)\n10MB 이하의 파일을 선택해주세요.`);
             setIsSubmitting(false);
             return;
           } else {
