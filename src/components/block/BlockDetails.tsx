@@ -4,7 +4,7 @@ import axios, { AxiosError } from "axios";
 import toast from 'react-hot-toast';
 import { useOverlay } from '@components/common/OverlayContext';
 import { useBlocks } from '@hooks';
-import type { BlockType, TechPart } from '@types';
+import type { BlockType, TechPart, NewBlockData } from '@types';
 import { getToolValuesFromLabels, getCategoryValuesFromLabels, getCategoryOptions, convertToBase64, handlePdfFileChange, resetFileState } from '@utils';
 import CommonButton from '@components/shared/CommonButton'
 import CancelGuide from './CancleGuide.tsx';
@@ -36,27 +36,34 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
     const { categoryOptions, toolsOptions } = getCategoryOptions(isTechType, selectedTechPart)
 
     const onSubmit = async () => {
-        if (loading) return;
+        if (loading || !isFormValid) return;
 
         let resultFileBase64 = "";
-        if (selectedFile) resultFileBase64 = await convertToBase64(selectedFile);
+        if (selectedFile) {
+            try {
+                resultFileBase64 = await convertToBase64(selectedFile);
+            } catch (error) {
+                toast.error('파일 변환 중 오류가 발생했습니다.');
+                return;
+            }
+        }
 
-        const blockData = {
+        const blockData: NewBlockData = {
             blockType,
             blockTitle,
-            techPart: selectedTechPart,
             categoryName: selectedCategory,
+            techPart: selectedTechPart!,
+            contributionScore,
             toolsText: selectedTools,
             oneLineSummary,
-            contributionScore,
             improvementPoint,
             resultUrl,
             resultFileName,
-            resultFile: resultFileBase64 || "dummy-pdf-base64-string-for-testing",
+            resultFile: "",
         };
 
         try {
-            const promise = createNewBlock(blockData);
+            const promise = createNewBlock(blockData, resultFileBase64);
 
             await toast.promise(
                 promise,
@@ -84,10 +91,9 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
             // 성공 시에만 실행
             closeOverlay();
         } catch {
-            // 에러 토스트는 toast.promise에서 이미 처리하므로 추가 처리 필요 없으면 비워둬도 됨
+            // 에러 토스트는 toast.promise에서 이미 처리
         }
-
-    }
+    };
 
     // 필수 조건 검사
     useEffect(() => {
@@ -261,7 +267,7 @@ export default function BlockDetails({ isTech }: BlockDetailsProps) {
                                 <span style={{ fontSize: '12px', color: '#C2C1C3' }}>지원되는 형식: PDF</span>
                             </>
                         )}
-                        <S.HiddenFileInput ref={fileInputRef} name="resultFile" type="file" accept="application/pdf"  onChange={(e) => handlePdfFileChange(e, setSelectedFile, setResultFileName, 10)}  />
+                        <S.HiddenFileInput ref={fileInputRef} name="resultFile" type="file" accept="application/pdf" onChange={(e) => handlePdfFileChange(e, setSelectedFile, setResultFileName, 10)} />
                     </S.FileInputWrapper>
                     <S.Desc>프로젝트 결과물을 PDF 파일 형태로 첨부해 주세요</S.Desc>
                 </S.Row>
