@@ -370,6 +370,7 @@ export function BlockEditPage() {
         }
 
         // 파일이 선택되었으면 base64로 변환, 없으면 더미 문자열 사용
+        // updateBlock이 내부에서 resultFile을 분리하여 dto와 file로 나누어 전송
         let resultFileBase64 = "dummy-pdf-base64-string-for-testing";
         if (selectedFile) {
             resultFileBase64 = await convertToBase64(selectedFile);
@@ -378,7 +379,7 @@ export function BlockEditPage() {
         const blockData: NewBlockData = {
             blockType: (isSkillState ? 'TECHNOLOGY' : 'IDEA') as 'TECHNOLOGY' | 'IDEA',
             blockTitle: blockTitle.trim(),
-            categoryName: selectedCategory, // 블록 생성 시와 동일하게 label 형식 사용
+            categoryName: selectedCategory, // label 형식 (updateBlock에서 value로 변환)
             techPart: techPartValue, // null 허용 (아이디어 블록일 때)
             contributionScore: Number(contributionRate),
             toolsText: selectedTools && selectedTools.trim() ? selectedTools.trim() : null, // null 허용
@@ -386,7 +387,7 @@ export function BlockEditPage() {
             improvementPoint: improvementPoint && improvementPoint.trim() ? improvementPoint.trim() : '', // 빈 문자열 허용
             resultUrl: resultUrl && resultUrl.trim() ? resultUrl.trim() : '', // 빈 문자열 허용
             resultFileName: resultFileName || '', // 파일명
-            resultFile: resultFileBase64, // base64 문자열 또는 더미 문자열
+            resultFile: resultFileBase64, // base64 문자열 또는 더미 문자열 (updateBlock에서 file 필드로 분리)
         };
         
         // 데이터 검증
