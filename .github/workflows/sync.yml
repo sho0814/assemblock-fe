@@ -1,0 +1,54 @@
+name: Sync Fork with Upstream
+
+on:
+  schedule:
+    # 1시간마다 한 번씩 실행 (원하는 주기로 변경 가능)
+    # 문법: 분 시 일 월 요일
+    - cron: '0 * * * *' 
+  workflow_dispatch: # 수동으로 버튼을 눌러서 실행할 수도 있게 함
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          # 내 레포지토리를 가져올 때도 토큰을 사용하여 권한 문제 방지
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+
+      - name: Sync with Upstream
+        env:
+          # Secret에 저장한 토큰 불러오기
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          # 1. 원본(Upstream) 레포지토리 주소 설정 (토큰을 포함하여 인증 통과)
+          # 아래 주소를 반드시 본인의 [조직 레포지토리 주소]로 수정하세요!
+          # 예: https://github.com/MyOrg/my-project.git
+          UPSTREAM_URL="https://github.com/erica-likelion/assemblock-fe.git"
+          
+          # URL에 인증 토큰 삽입 (https://토큰@github.com/... 형식)
+          # sed 명령어로 https:// 뒤에 토큰을 끼워넣습니다.
+          AUTH_URL=$(echo "$UPSTREAM_URL" | sed "s/https:\/\//https:\/\/$GH_TOKEN@/")
+          
+          # 2. Upstream 리모트 추가
+          git remote add upstream "$AUTH_URL"
+          
+          # 3. 최신 코드 가져오기
+          git fetch upstream
+          
+          # 4. 내 레포지토리의 main 브랜치로 이동 (혹은 master)
+          git checkout main
+          
+          # 5. 원본 코드를 내 코드로 병합 (Merge)
+          # --allow-unrelated-histories 옵션은 필요시 추가
+          git merge upstream/main
+          
+          # 6. 변경 사항을 내 개인 레포지토리로 푸시
+          git push origin main
