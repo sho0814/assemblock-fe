@@ -26,7 +26,7 @@ export const getMyProfile = async (): Promise<UserMeResponse> => {
   
   // roles가 null이거나 undefined인 경우 빈 배열로 처리
   if (!data.roles || !Array.isArray(data.roles)) {
-    console.warn('⚠️ 백엔드 응답에서 roles가 배열이 아닙니다:', data.roles);
+    console.warn('백엔드 응답에서 roles가 배열이 아닙니다:', data.roles);
     data.roles = [];
   } else {
     console.log('getMyProfile - roles 배열 길이:', data.roles.length);
@@ -36,7 +36,7 @@ export const getMyProfile = async (): Promise<UserMeResponse> => {
   // profileType이 null이거나 undefined인 경우 기본값 설정
   // 백엔드가 null을 반환할 수 있으므로 명시적으로 처리
   if (data.profileType === null || data.profileType === undefined || data.profileType === '') {
-    console.warn('⚠️ 백엔드 응답에서 profileType이 null/undefined입니다. 기본값 Type_1을 사용합니다.');
+    console.warn('백엔드 응답에서 profileType이 null/undefined입니다. 기본값 Type_1을 사용합니다.');
     data.profileType = 'Type_1'; // 기본값
   }
   

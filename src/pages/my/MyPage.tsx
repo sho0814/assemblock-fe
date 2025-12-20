@@ -348,26 +348,20 @@ export function MyPage() {
     }, [activeReviewTab, location.pathname]); // location.pathname 추가 - ProfileEdit에서 돌아올 때 데이터 새로고침
 
     // 블록 배치 로직: 아래에서 위로, 최하단 행부터 랜덤 배치
-    const placeReviewBlocks = (receivedReviews: MyReview[]): Array<{ col: number; row: number; review: MyReview; imageSrc: string } | null> => {
+    // 받은 후기와 보낸 후기 모두 처리
+    const placeReviewBlocks = (reviewList: MyReview[]): Array<{ col: number; row: number; review: MyReview; imageSrc: string } | null> => {
       const grid: Array<{ col: number; row: number; review: MyReview; imageSrc: string } | null> = new Array(20).fill(null);
       const occupied = new Set<string>(); // "col,row" 형식으로 저장
 
-      // 받은 후기만 처리 (activeReviewTab === 'received'일 때만)
-      if (activeReviewTab !== 'received') {
-        return grid;
-      }
-
-      // 현재 사용자의 mainRoles 가져오기 (받은 사용자의 역할)
-      const userMainRoles = userProfile?.selectedParts || [];
-      if (userMainRoles.length === 0) {
+      if (reviewList.length === 0) {
         return grid;
       }
 
       // 각 리뷰에 대해 이미지 결정 및 배치
-      receivedReviews.forEach((review) => {
-        // API 응답의 targetUserMainRole 사용 (받은 사용자의 역할)
+      reviewList.forEach((review) => {
+        // 받은 후기: targetUserMainRole 사용 (나에게 후기를 보낸 사람의 역할)
+        // 보낸 후기: targetUserMainRole 사용 (내가 후기를 보낸 사람의 역할)
         // targetUserMainRole은 'BackEnd', 'Design', 'FrontEnd', 'Plan', 'PM' 형식
-        // TODO: rating 필드가 API 응답에 포함되면 (review as any).rating 전달
         const imageSrc = getReviewImage(review.targetUserMainRole);
         if (!imageSrc) return;
 
@@ -401,9 +395,9 @@ export function MyPage() {
       return grid;
     };
 
-    // 받은 후기만 그리드에 표시
-    const receivedReviews = activeReviewTab === 'received' ? reviews : [];
-    const reviewGrid = placeReviewBlocks(receivedReviews);
+    // 현재 탭에 따라 후기 목록 선택 (받은 후기 또는 보낸 후기)
+    const currentReviews = reviews;
+    const reviewGrid = placeReviewBlocks(currentReviews);
     
     // 초기 로딩 중일 때 로딩 메시지 표시
     if (isInitialLoading) {
@@ -527,14 +521,14 @@ export function MyPage() {
               </ReviewTab>
             </ReviewTabContainer>
           )}
-          {!hasReviews || activeReviewTab === 'sent' ? (
+          {!hasReviews || (currentReviews.length === 0) ? (
             <ReviewBlock $hasReviews={false}>
               <ReviewBlockImage src={ReviewBlockDefault} alt="Review Block Default" />
               <ReviewBlockText>
                 {!hasReviews 
                   ? '아직 받은 후기 블록이 없어요'
                   : activeReviewTab === 'sent' 
-                    ? `보낸 후기 ${reviews.length}개`
+                    ? '아직 보낸 후기 블록이 없어요'
                     : '아직 받은 후기 블록이 없어요'}
               </ReviewBlockText>
             </ReviewBlock>
