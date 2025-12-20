@@ -7,12 +7,12 @@ export const HeaderWrapper = styled.div`
   }
   
   > div {
-    justify-content: flex-start;
-    padding-left: 20px;
+    justify-content: center;
+    padding-left: 0;
   }
   
   > div > div:nth-child(2) {
-    justify-content: flex-start;
+    justify-content: center;
     margin-left: 0;
   }
 `;
