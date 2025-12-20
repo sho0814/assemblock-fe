@@ -11,7 +11,8 @@ export const NavBar = styled.nav`
   padding: 16px 30px 32px 30px;
 
   background: #FFFFFF;
-  width: 100%;
+  min-width: 375px;
+  max-width: 400px;
   height: 100px;
 
   border-top: 1px solid #F0EFF1;
