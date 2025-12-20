@@ -6,6 +6,9 @@ export const Wrapper = styled.div`
   background: #FAFAFA;
   border-radius: 24px 24px 0 0;
   gap: 7px;
+
+  min-width: 400px;
+  max-width: 400px;
 `;
 
 export const TopRow = styled.div`
