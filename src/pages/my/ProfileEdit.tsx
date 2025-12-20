@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   ProfileEditContainer,
   HeaderBar,
@@ -45,10 +45,12 @@ import EditCancelModal from './EditCancelModal';
 import { getMyProfile } from '@api/users/me';
 import { updateMyProfile, type UpdateProfileRequest } from '@api/mypage/profile';
 import { uploadFile } from '@api/mypage/upload';
+import { handlePdfFileChange } from '@utils/blockFileUtils';
 import CommonButton from '@components/shared/CommonButton';
 
 export function ProfileEdit() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { showOverlay } = useOverlay();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -61,6 +63,7 @@ export function ProfileEdit() {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태
   
   // 초기 데이터 저장 (변경사항 추적용)
   const initialDataRef = useRef<{
@@ -123,6 +126,7 @@ export function ProfileEdit() {
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      setIsLoading(true); // 로딩 시작
       try {
         // API에서 프로필 정보 가져오기
         const profileData = await getMyProfile();
@@ -212,8 +216,21 @@ export function ProfileEdit() {
         
         // 초기 데이터 저장 (변경사항 추적 및 placeholder용)
         initialDataRef.current = initialData;
+        
+        // localStorage에도 저장 (다른 페이지에서 사용할 수 있도록)
+        localStorage.setItem('userProfile', JSON.stringify({
+          nickname: initialData.nickname,
+          introduction: initialData.introduction,
+          selectedParts: initialData.selectedParts,
+          portfolioUrl: initialData.portfolioUrl,
+          fileName: initialData.fileName,
+          portfolioPdfUrl: initialData.portfolioPdfUrl,
+        }));
+        
+        setIsLoading(false); // 로딩 완료
       } catch (error) {
         console.error('Failed to fetch profile from API:', error);
+        setIsLoading(false); // 에러 발생 시에도 로딩 완료
         
         // API 실패 시 localStorage에서 가져오기 (fallback)
         const savedProfile = localStorage.getItem('selectedProfile');
@@ -269,7 +286,7 @@ export function ProfileEdit() {
     };
     
     fetchProfileData();
-  }, []);
+  }, [location.pathname]); // location.pathname 변경 시 프로필 이미지 다시 로드 (ProfileSelect에서 돌아올 때)
 
   const parts = [
     { id: 'planning', label: '기획', color: '#35CDFF' },
@@ -288,30 +305,38 @@ export function ProfileEdit() {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      setIsUploading(true);
-      setUploadProgress(0);
-      
-      // 업로드 진행률 표시
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            uploadIntervalRef.current = null;
-            setIsUploading(false);
-            setPortfolioFile(file);
-            setFileName(file.name);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 200);
-      
-      uploadIntervalRef.current = interval;
-    } else {
-      alert('PDF 파일만 업로드할 수 있어요.');
+    // handlePdfFileChange로 파일 검증 (10MB 제한)
+    const isValid = handlePdfFileChange(e, setPortfolioFile, setFileName, 10);
+    
+    if (!isValid) {
+      // 검증 실패 시 input 리셋
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
     }
+    
+    // 검증 통과 시 업로드 진행률 표시 시작
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    // 업로드 진행률 표시
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          uploadIntervalRef.current = null;
+          setIsUploading(false);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
+    
+    uploadIntervalRef.current = interval;
   };
 
   const handleFileRemove = () => {
@@ -448,15 +473,15 @@ export function ProfileEdit() {
           }
         }
         
-        // 파일이 있으면 먼저 업로드
+        // 파일이 있으면 먼저 업로드하여 URL 받기
         let portfolioPdfUrl: string | undefined = undefined;
         if (portfolioFile) {
           try {
-            // 파일 크기 체크 (4MB 제한 - 서버 제한으로 인해 4MB로 설정)
-            const maxSize = 4 * 1024 * 1024; // 4MB
+            // 파일 크기 체크 (10MB 제한)
+            const maxSize = 10 * 1024 * 1024; // 10MB
             if (portfolioFile.size > maxSize) {
               const fileSizeMB = (portfolioFile.size / (1024 * 1024)).toFixed(2);
-              alert(`파일 크기가 4MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
+              alert(`파일 크기가 10MB를 초과합니다. (현재: ${fileSizeMB}MB)\n더 작은 파일을 선택해주세요.`);
               return;
             }
             
@@ -478,7 +503,7 @@ export function ProfileEdit() {
             console.error('File upload failed:', error);
             if (error?.response?.status === 413) {
               const fileSizeMB = portfolioFile ? (portfolioFile.size / (1024 * 1024)).toFixed(2) : '알 수 없음';
-              alert(`파일 크기가 서버 제한을 초과했습니다. (현재: ${fileSizeMB}MB)\n4MB 이하의 파일을 선택해주세요.`);
+              alert(`파일 크기가 서버 제한을 초과했습니다. (현재: ${fileSizeMB}MB)\n10MB 이하의 파일을 선택해주세요.`);
             } else {
               // S3 버킷 오류 등 기타 오류 처리
               let errorMessage = '알 수 없는 오류';
@@ -513,40 +538,218 @@ export function ProfileEdit() {
           portfolioPdfUrl = '';
         }
         
-        // 프로필 수정 API 호출
+        // 프로필 수정 API 호출 - updateMyProfile이 내부에서 dto와 file로 분리하여 백엔드 형식에 맞게 전송
+        // 필수 필드 검증: nickname은 필수이므로 빈 문자열이면 안됨
+        const trimmedNickname = nickname.trim();
+        if (!trimmedNickname || trimmedNickname.length === 0) {
+          alert('닉네임을 입력해주세요.');
+          return;
+        }
+        
+        // mainRoles는 최소 1개 이상 필요
+        if (!mainRoles || mainRoles.length === 0) {
+          alert('파트를 최소 1개 이상 선택해주세요.');
+          return;
+        }
+        
+        // profileType은 필수
+        if (!userProfileType) {
+          alert('프로필 이미지를 선택해주세요.');
+          return;
+        }
+        
         const updateData: UpdateProfileRequest = {
-          nickname: nickname.trim(),
+          nickname: trimmedNickname, // 빈 문자열이 아닌 것이 보장됨
           introduction: introduction.trim() || undefined,
-          mainRoles: mainRoles,
-          profileType: userProfileType,
+          mainRoles: mainRoles, // 빈 배열이 아닌 것이 보장됨
+          profileType: userProfileType, // null이 아닌 것이 보장됨
           portfolioUrl: portfolioUrl.trim() || undefined,
           portfolioPdfUrl: portfolioPdfUrl || undefined,
         };
         
-        await updateMyProfile(updateData);
+        // 디버깅: 전송할 데이터 로그 (상세)
+        console.log('프로필 수정 요청 데이터 (상세):', {
+          updateData,
+          원본데이터: {
+            nickname,
+            introduction,
+            selectedParts,
+            portfolioUrl,
+            portfolioFile,
+            fileName,
+            userProfileType,
+          },
+          변환된데이터: {
+            mainRoles,
+            profileType: userProfileType,
+          },
+          portfolioPdfUrl,
+          portfolioPdfUrlType: typeof portfolioPdfUrl,
+          portfolioPdfUrlLength: portfolioPdfUrl?.length,
+          portfolioPdfUrlIsUrl: portfolioPdfUrl?.startsWith('http'),
+        });
         
-        // 초기 데이터 업데이트
-        initialDataRef.current = {
-          nickname,
-          introduction,
-          selectedParts,
-          portfolioUrl,
-          fileName: fileName || '',
-          portfolioPdfUrl: portfolioPdfUrl || '',
-        };
-        
-        // 파일 업로드 상태 리셋
-        setPortfolioFile(null);
-        
-        // 저장 성공 후 마이페이지로 이동
-        navigate('/My');
+        try {
+          const response = await updateMyProfile(updateData);
+          console.log('프로필 수정 성공, 응답 데이터:', response);
+          console.log('응답 데이터 상세:', {
+            nickname: response.nickname,
+            profileType: response.profileType,
+            mainRoles: response.mainRoles,
+            introduction: response.introduction,
+            portfolioUrl: response.portfolioUrl,
+            portfolioPdfUrl: response.portfolioPdfUrl,
+            reviewSentCnt: response.reviewSentCnt,
+            reviewReceivedCnt: response.reviewReceivedCnt,
+          });
+          
+          // 응답 데이터 검증: null이나 빈 값이 있으면 경고
+          if (!response.nickname || response.nickname === null) {
+            console.warn('⚠️ 응답에서 nickname이 null입니다. 백엔드 로그를 확인해주세요.');
+          }
+          if (!response.profileType || response.profileType === null) {
+            console.warn('⚠️ 응답에서 profileType이 null입니다. 백엔드 로그를 확인해주세요.');
+          }
+          if (!response.mainRoles || response.mainRoles.length === 0) {
+            console.warn('⚠️ 응답에서 mainRoles가 비어있습니다. 백엔드 로그를 확인해주세요.');
+          }
+          
+          // API 응답 데이터로 초기 데이터 업데이트 (서버에서 반환된 최신 데이터 사용)
+          const updatedInitialData = {
+            nickname: response.nickname || nickname,
+            introduction: response.introduction || introduction,
+            selectedParts: selectedParts, // API 응답에 없으므로 현재 값 유지
+            portfolioUrl: response.portfolioUrl || portfolioUrl,
+            fileName: fileName || '',
+            portfolioPdfUrl: response.portfolioPdfUrl || portfolioPdfUrl || '',
+          };
+          
+          initialDataRef.current = updatedInitialData;
+          
+          // localStorage에 업데이트 (다른 페이지에서 사용할 수 있도록)
+          const updatedUserProfile = {
+            nickname: updatedInitialData.nickname,
+            introduction: updatedInitialData.introduction,
+            selectedParts: updatedInitialData.selectedParts,
+            portfolioUrl: updatedInitialData.portfolioUrl,
+            fileName: updatedInitialData.fileName,
+            portfolioPdfUrl: updatedInitialData.portfolioPdfUrl,
+          };
+          localStorage.setItem('userProfile', JSON.stringify(updatedUserProfile));
+          
+          // 프로필 타입도 localStorage에 저장
+          // API 응답의 profileType 사용 (서버에서 반환된 최신 값)
+          const savedProfileType = response.profileType || userProfileType;
+          if (savedProfileType) {
+            localStorage.setItem('selectedProfileType', savedProfileType);
+            
+            // selectedProfile state도 업데이트 (API 응답의 profileType으로)
+            if (savedProfileType && profileTypeToImage[savedProfileType]) {
+              setSelectedProfile(profileTypeToImage[savedProfileType]);
+              
+              // localStorage의 selectedProfile도 업데이트
+              const updatedProfile = profileTypeToImage[savedProfileType];
+              localStorage.setItem('selectedProfile', JSON.stringify({
+                id: updatedProfile.id,
+                src: updatedProfile.src,
+                alt: updatedProfile.alt,
+                colorMap: updatedProfile.colorMap
+              }));
+            }
+          }
+          
+          // state도 업데이트 (API 응답 데이터로)
+          setNickname(updatedInitialData.nickname);
+          setIntroduction(updatedInitialData.introduction);
+          setPortfolioUrl(updatedInitialData.portfolioUrl);
+          
+          // 파일 업로드 상태 리셋
+          setPortfolioFile(null);
+          
+          console.log('프로필 정보가 localStorage에 저장되었습니다:', updatedUserProfile);
+          console.log('프로필 타입이 업데이트되었습니다:', savedProfileType);
+          
+          // 저장 성공 후 마이페이지로 이동
+          navigate('/My');
+        } catch (updateError: any) {
+          // 프로필 수정 API 에러 상세 로깅
+          console.error('프로필 수정 API 에러:', updateError);
+          console.error('에러 전체 객체:', updateError);
+          console.error('에러 응답:', updateError?.response);
+          console.error('에러 상태 코드:', updateError?.response?.status);
+          console.error('에러 응답 데이터:', updateError?.response?.data);
+          console.error('요청한 데이터:', updateData);
+          
+          // 에러 메시지 추출
+          let errorMessage = '저장 중 오류가 발생했습니다.';
+          const status = updateError?.response?.status;
+          const errorData = updateError?.response?.data;
+          
+          if (status === 400) {
+            const serverMessage = errorData?.message || errorData?.error;
+            errorMessage = serverMessage || '입력한 정보를 확인해주세요.';
+            console.error('400 에러 - 요청 데이터 문제:', updateData);
+            console.error('서버 응답:', errorData);
+          } else if (status === 401) {
+            errorMessage = '인증이 만료되었습니다. 다시 로그인해주세요.';
+          } else if (status === 403) {
+            errorMessage = '수정 권한이 없습니다.';
+          } else if (status === 404) {
+            errorMessage = '프로필을 찾을 수 없습니다.';
+          } else if (status === 500) {
+            // 500 에러는 서버 내부 오류
+            errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            console.error('500 에러 - 서버 응답 데이터:', errorData);
+            console.error('500 에러 - 요청 경로:', updateError?.config?.url);
+            console.error('500 에러 - 요청 메서드:', updateError?.config?.method);
+            
+            // signup과 같은 문제인지 확인
+            if (errorData?.message?.includes('signup') || errorData?.path?.includes('signup')) {
+              console.error('⚠️ signup 관련 에러가 감지되었습니다. 백엔드 로그를 확인해주세요.');
+              errorMessage = '회원가입 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.';
+            }
+          } else if (errorData?.message) {
+            errorMessage = errorData.message;
+          } else if (updateError?.message) {
+            errorMessage = `오류: ${updateError.message}`;
+          }
+          
+          alert(errorMessage);
+          // 에러 발생 시 페이지에 머물기
+          return;
+        }
       } else {
         // 변경사항이 없으면 바로 마이페이지로 이동
         navigate('/My');
       }
-    } catch (error) {
+    } catch (error: any) {
+      // 전체 에러 처리 (파일 업로드 등)
       console.error('Error in handleSave:', error);
-      alert('저장 중 오류가 발생했습니다.');
+      console.error('에러 전체 객체:', error);
+      console.error('에러 응답:', error?.response);
+      console.error('에러 상태 코드:', error?.response?.status);
+      console.error('에러 응답 데이터:', error?.response?.data);
+      
+      let errorMessage = '저장 중 오류가 발생했습니다.';
+      const status = error?.response?.status;
+      const errorData = error?.response?.data;
+      
+      if (status === 500) {
+        errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        console.error('500 에러 상세:', {
+          status,
+          statusText: error?.response?.statusText,
+          data: errorData,
+          message: error?.message,
+          config: error?.config,
+        });
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      } else if (error?.message) {
+        errorMessage = `오류: ${error.message}`;
+      }
+      
+      alert(errorMessage);
       // 에러 발생 시 페이지에 머물기 (navigate 제거)
     }
   };
@@ -598,7 +801,7 @@ export function ProfileEdit() {
           <InputWrapper>
             <InputField
               type="text"
-              placeholder={initialDataRef.current?.nickname || '닉네임을 입력해주세요'}
+              placeholder={isLoading ? '로딩 중...' : (initialDataRef.current?.nickname || '닉네임을 입력해주세요')}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={5}
@@ -642,7 +845,7 @@ export function ProfileEdit() {
           <InputWrapper>
             <InputField
               type="text"
-              placeholder={initialDataRef.current?.introduction || '한 줄 소개를 입력해주세요'}
+              placeholder={isLoading ? '로딩 중...' : (initialDataRef.current?.introduction || '한 줄 소개를 입력해주세요')}
               value={introduction}
               onChange={(e) => setIntroduction(e.target.value)}
               maxLength={36}
@@ -663,7 +866,7 @@ export function ProfileEdit() {
           <InputWrapper>
             <InputField
               type="url"
-              placeholder={initialDataRef.current?.portfolioUrl || '포트폴리오 URL을 입력해주세요'}
+              placeholder={isLoading ? '로딩 중...' : (initialDataRef.current?.portfolioUrl || '포트폴리오 URL을 입력해주세요')}
               value={portfolioUrl}
               onChange={(e) => setPortfolioUrl(e.target.value)}
             />

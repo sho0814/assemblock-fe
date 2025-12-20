@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   MyPageContainer, 
   HeaderBar,
@@ -38,7 +38,7 @@ import linkIcon from '@assets/MyPage/link.svg';
 import folderIcon from '@assets/MyPage/folder.svg';
 import ReviewBlockDefault from '@assets/MyPage/ReviewBlockDefault.svg';
 import AssemBlcokDefault from '@assets/MyPage/AssemBlcokDefault.svg';
-import pattern from '@assets/project/pattern.png';
+import pattern from '@assets/project/Pattern.png';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import Img2 from '@assets/common/ProfileImg/Img2.svg';
 import Img3 from '@assets/common/ProfileImg/Img3.svg';
@@ -65,6 +65,7 @@ export function MyPage() {
     const [blocks, setBlocks] = useState<BlockData[]>([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true); // 초기 로딩 상태
     const navigate = useNavigate();
+    const location = useLocation();
 
     const parts = [
       { id: 'planning', label: '기획', color: '#35CDFF' },
@@ -144,9 +145,18 @@ export function MyPage() {
             
             // API 응답에서 roles 사용 (UserMeResponse 타입)
             const backendRoles = profileData.roles || [];
+            console.log('MyPage - API 응답 roles:', backendRoles);
+            console.log('MyPage - profileData 전체:', profileData);
+            
             const convertedParts = backendRoles.length > 0 
-              ? backendRoles.map((role: string) => roleToPartId[role] || role.toLowerCase())
+              ? backendRoles.map((role: string) => {
+                  const partId = roleToPartId[role] || role.toLowerCase();
+                  console.log(`MyPage - role 변환: ${role} -> ${partId}`);
+                  return partId;
+                })
               : [];
+            
+            console.log('MyPage - convertedParts:', convertedParts);
             
             // 필드명 변환
             const profileType = profileData.profileType || '';
@@ -164,7 +174,18 @@ export function MyPage() {
             
             // API 응답에 파일명이 없으면 localStorage에서 가져오기
             if (!portfolioFileName && portfolioPdfUrl) {
-              portfolioFileName = localStorage.getItem('portfolioFileName') || '';
+              // localStorage의 userProfile에서 fileName 가져오기 (ProfileEdit에서 저장한 형식)
+              const savedUserProfile = localStorage.getItem('userProfile');
+              if (savedUserProfile) {
+                try {
+                  const localProfile = JSON.parse(savedUserProfile);
+                  portfolioFileName = localProfile.fileName || localStorage.getItem('portfolioFileName') || '';
+                } catch (e) {
+                  portfolioFileName = localStorage.getItem('portfolioFileName') || '';
+                }
+              } else {
+                portfolioFileName = localStorage.getItem('portfolioFileName') || '';
+              }
             }
             
             const convertedProfile: ProfileInfo = {
@@ -177,14 +198,34 @@ export function MyPage() {
               profileType: profileType,
             };
             
+            console.log('MyPage - convertedProfile:', convertedProfile);
+            console.log('MyPage - selectedParts:', convertedProfile.selectedParts);
+            
             setUserProfile(convertedProfile);
             
             // API에서 받은 profileType을 기반으로 프로필 이미지 설정
             if (profileType && profileTypeToImage[profileType]) {
-              setSelectedProfile(profileTypeToImage[profileType]);
+              const profileImage = profileTypeToImage[profileType];
+              setSelectedProfile(profileImage);
+              
+              // localStorage의 selectedProfile도 업데이트 (API 응답과 동기화)
+              localStorage.setItem('selectedProfile', JSON.stringify({
+                id: profileImage.id,
+                src: profileImage.src,
+                alt: profileImage.alt,
+                colorMap: profileImage.colorMap
+              }));
+              localStorage.setItem('selectedProfileType', profileType);
             } else {
               // profileType이 없으면 기본값 (Type_1)
-              setSelectedProfile(profileTypeToImage['Type_1']);
+              const defaultProfile = profileTypeToImage['Type_1'];
+              setSelectedProfile(defaultProfile);
+              localStorage.setItem('selectedProfile', JSON.stringify({
+                id: defaultProfile.id,
+                src: defaultProfile.src,
+                alt: defaultProfile.alt,
+                colorMap: defaultProfile.colorMap
+              }));
             }
           } catch (error) {
             console.error('Failed to fetch profile:', error);
@@ -195,12 +236,14 @@ export function MyPage() {
             if (savedUserProfile) {
               try {
                 const localProfile = JSON.parse(savedUserProfile);
+                // localStorage에서 portfolioPdfUrl도 가져오기 (ProfileEdit에서 저장한 형식)
+                const portfolioPdfUrl = localProfile.portfolioPdfUrl || (localProfile.fileData ? 'data:application/pdf;base64,' + localProfile.fileData.split(',')[1] : undefined);
                 setUserProfile({
                   nickname: localProfile.nickname || '',
                   introduction: localProfile.introduction || '',
                   selectedParts: localProfile.selectedParts || [],
                   portfolioUrl: localProfile.portfolioUrl || '',
-                  portfolioPdfUrl: localProfile.fileData ? 'data:application/pdf;base64,' + localProfile.fileData.split(',')[1] : undefined,
+                  portfolioPdfUrl: portfolioPdfUrl,
                   portfolioFileName: localProfile.fileName || '',
                 });
               } catch (e) {
@@ -302,7 +345,7 @@ export function MyPage() {
       };
 
       fetchData();
-    }, [activeReviewTab]); // activeTab 제거 - 블록은 항상 전체를 가져오고 프론트엔드에서 필터링
+    }, [activeReviewTab, location.pathname]); // location.pathname 추가 - ProfileEdit에서 돌아올 때 데이터 새로고침
 
     // 블록 배치 로직: 아래에서 위로, 최하단 행부터 랜덤 배치
     const placeReviewBlocks = (receivedReviews: MyReview[]): Array<{ col: number; row: number; review: MyReview; imageSrc: string } | null> => {
