@@ -81,7 +81,7 @@ export const ProfilePlaceholder = styled.div`
   background: transparent;
 `;
 
-export const ConfirmBtn = styled.button`
+export const ConfirmBtn = styled.button<{ $disabled?: boolean }>`
   display: flex;
   width: 100%;
   max-width: 335px;
@@ -90,12 +90,22 @@ export const ConfirmBtn = styled.button`
   align-items: center;
   gap: 32px;
   border-radius: 16px;
-  background: var(--Primary-BK, #352F36);
+  background: ${props => props.$disabled ? '#C2C1C3' : 'var(--Primary-BK, #352F36)'};
   margin: 32px auto 24px;
   color: #FAFAFA;
   border: none;
-  cursor: pointer;
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   font-size: 14px;
   font-weight: 600;
   box-sizing: border-box;
+  opacity: ${props => props.$disabled ? 0.6 : 1};
+  transition: background-color 0.2s, opacity 0.2s;
+  
+  &:hover {
+    background: ${props => props.$disabled ? '#C2C1C3' : '#2A2529'};
+  }
+  
+  &:active {
+    background: ${props => props.$disabled ? '#C2C1C3' : '#1F1B20'};
+  }
 `;

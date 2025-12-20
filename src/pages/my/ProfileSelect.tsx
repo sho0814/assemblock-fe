@@ -125,32 +125,35 @@ export function ProfileSelect() {
   }, []);
 
   const handleSave = () => {
-    if (selectedProfile) {
-      const profile = profiles.find(p => p.id === selectedProfile);
-      if (profile) {
-        // localStorage에 선택된 프로필 정보 저장
-        localStorage.setItem('selectedProfile', JSON.stringify({
-          id: profile.id,
-          src: profile.src,
-          alt: profile.alt,
-          colorMap: profile.colorMap
-        }));
-        
-        // profileType도 함께 저장 (ProfileEdit에서 사용)
-        const profileIdToType: Record<string, string> = {
-          'img1': 'Type_1',
-          'img2': 'Type_2',
-          'img3': 'Type_3',
-          'img4': 'Type_4',
-          'img5': 'Type_5',
-        };
-        const profileType = profileIdToType[profile.id] || 'Type_1';
-        localStorage.setItem('selectedProfileType', profileType);
-      }
+    // 프로필이 선택되지 않았으면 아무것도 하지 않음
+    if (!selectedProfile) {
+      return;
     }
     
-    // 저장 후 ProfileEdit로 이동
-    navigate('/My/ProfileEdit');
+    const profile = profiles.find(p => p.id === selectedProfile);
+    if (profile) {
+      // localStorage에 선택된 프로필 정보 저장
+      localStorage.setItem('selectedProfile', JSON.stringify({
+        id: profile.id,
+        src: profile.src,
+        alt: profile.alt,
+        colorMap: profile.colorMap
+      }));
+      
+      // profileType도 함께 저장 (ProfileEdit에서 사용)
+      const profileIdToType: Record<string, string> = {
+        'img1': 'Type_1',
+        'img2': 'Type_2',
+        'img3': 'Type_3',
+        'img4': 'Type_4',
+        'img5': 'Type_5',
+      };
+      const profileType = profileIdToType[profile.id] || 'Type_1';
+      localStorage.setItem('selectedProfileType', profileType);
+      
+      // 저장 후 ProfileEdit로 이동
+      navigate('/My/ProfileEdit');
+    }
   };
 
   return (
