@@ -6,7 +6,7 @@ export const BlockListContainer = styled.div`
   gap: 24px;
   width: 100%;
   max-width: 335px;
-  margin: 0 auto;
+  margin: 0;
   min-height: min-content;
 `;
 
@@ -17,13 +17,15 @@ export const BlockCardWrapper = styled.div`
 
 export const BlockCard = styled.div`
   width: 100%;
+  height: 60px;
   border-radius: 16px;
   background: #FAFAFA;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
+  padding: 12px 12px 12px 0;
+  box-sizing: border-box;
 `;
 
 export const BlockIcon = styled.div`
