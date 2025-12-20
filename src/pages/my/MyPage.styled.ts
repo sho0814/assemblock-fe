@@ -143,6 +143,7 @@ export const ReviewTabContainer = styled.div`
 
 export const ReviewTab = styled.div<{ $isActive?: boolean }>`
   display: flex;
+  padding: 6px 16px;
   justify-content: center;
   align-items: center;
   gap: 8px;
