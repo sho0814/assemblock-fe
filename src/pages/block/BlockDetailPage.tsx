@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from './BlockDetailPage.styled';
 import backArrow from '@assets/common/back-arrow.svg';
-import more from '@assets/common/more.svg';
+import more from '@assets/common/More.svg';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import Img2 from '@assets/common/ProfileImg/Img2.svg';
@@ -18,6 +18,7 @@ import { useOverlay } from '@components/common/OverlayContext';
 import { getBlockDetail, deleteBlock, type BlockDetailResponse } from '@api/blockId';
 import { getCategoryLabel, getCategoryValue } from '@utils/getCategoryLabel';
 import { getUserProfile } from '@api/profiles/profile';
+import { downloadPdfFromBase64 } from '@utils/blockFileUtils';
 
 // Tech_parts 매핑 (API는 문자열을 반환)
 const TECH_PARTS_MAP: Record<string, { name: string; color: string }> = {
@@ -579,15 +580,29 @@ export function BlockDetailPage() {
              safeBlock.result_file !== 'dummy-pdf-base64-string-for-testing' && (
               <S.FileLink
                 onClick={() => {
+                  if (!safeBlock.result_file || !blockDetailResponse?.resultFile) return;
+                  
+                  const resultFile = blockDetailResponse.resultFile;
+                  
                   // result_file이 URL이면 새 창에서 열기
-                  if (safeBlock.result_file) {
-                    window.open(safeBlock.result_file, '_blank');
+                  if (resultFile.startsWith('http')) {
+                    window.open(resultFile, '_blank');
+                  } else {
+                    // base64 문자열이면 다운로드
+                    // 파일명 추출: URL이면 파일명 추출, base64면 기본 파일명 사용
+                    const resultFileName = resultFile.includes('/') 
+                      ? resultFile.split('/').pop() || 'document.pdf'
+                      : 'document.pdf';
+                    
+                    downloadPdfFromBase64(resultFile, resultFileName);
                   }
                 }}
-                style={{ display: 'flex', alignItems: 'center' }}
+                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
               >
                 <img src={folderIcon} alt="folder" style={{ width: '18px', height: '18px', marginRight: '8px' }} ></img>
-                {safeBlock.result_file.split('/').pop() || safeBlock.result_file}
+                {blockDetailResponse?.resultFile && blockDetailResponse.resultFile.includes('/')
+                  ? blockDetailResponse.resultFile.split('/').pop()
+                  : 'document.pdf'}
               </S.FileLink>
             )}
           </S.Section>
