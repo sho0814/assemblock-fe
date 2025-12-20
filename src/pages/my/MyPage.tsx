@@ -38,7 +38,7 @@ import linkIcon from '@assets/MyPage/link.svg';
 import folderIcon from '@assets/MyPage/folder.svg';
 import ReviewBlockDefault from '@assets/MyPage/ReviewBlockDefault.svg';
 import AssemBlcokDefault from '@assets/MyPage/AssemBlcokDefault.svg';
-import pattern from '@assets/project/Pattern.png';
+import pattern from '@assets/project/pattern.png';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import Img2 from '@assets/common/ProfileImg/Img2.svg';
 import Img3 from '@assets/common/ProfileImg/Img3.svg';

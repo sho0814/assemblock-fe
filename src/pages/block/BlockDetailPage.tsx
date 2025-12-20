@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import type { BlockData } from '@components/block/MyBlockCard';
 import * as S from './BlockDetailPage.styled';
 import backArrow from '@assets/common/back-arrow.svg';
-import more from '@assets/common/More.svg';
+import more from '@assets/common/more.svg';
 import { ProfileAct, type ProfileData } from '@components/common/ProfileAct';
 import Img1 from '@assets/common/ProfileImg/Img1.svg';
 import Img2 from '@assets/common/ProfileImg/Img2.svg';
