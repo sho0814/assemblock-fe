@@ -73,38 +73,40 @@ export default function BoardSelector({ blockId, setIsRegisterBlockActive }: Boa
   };
 
   return (
-    <S.Wrapper>
-      <S.TopRow>
-        <S.CloseBtn />
-        <S.Title>보드 선택</S.Title>
-        <S.CloseBtn src={cancelButton} onClick={handleCloseButton} aria-label="닫기" />
-      </S.TopRow>
+    <div style={{display: 'flex', justifyContent: 'center'}}>
+      <S.Wrapper>
+        <S.TopRow>
+          <S.CloseBtn />
+          <S.Title>보드 선택</S.Title>
+          <S.CloseBtn src={cancelButton} onClick={handleCloseButton} aria-label="닫기" />
+        </S.TopRow>
 
-      <S.Divider />
+        <S.Divider />
 
-      <S.BoardList>
-        {boards.map((board: any) => (
-          <S.BoardItem
-            key={board.boardId}
-            selected={selectedBoardId === board.boardId}
-            onClick={() => setSelectedBoardId(board.boardId)}
-          >
-            <S.BoardName>{board.boardName}</S.BoardName>
-            {selectedBoardId === board.boardId && <span>✓</span>}
-          </S.BoardItem>
-        ))}
-      </S.BoardList>
+        <S.BoardList>
+          {boards.map((board: any) => (
+            <S.BoardItem
+              key={board.boardId}
+              selected={selectedBoardId === board.boardId}
+              onClick={() => setSelectedBoardId(board.boardId)}
+            >
+              <S.BoardName>{board.boardName}</S.BoardName>
+              {selectedBoardId === board.boardId && <span>✓</span>}
+            </S.BoardItem>
+          ))}
+        </S.BoardList>
 
-      <S.AddBoardBox>
-        <S.AddBoardInput
-          placeholder="새 보드 추가"
-          value={newBoardName}
-          onChange={e => setNewBoardName(e.target.value)}
-        />
-        <S.AddBoardBtn onClick={handleAddBoard}>＋</S.AddBoardBtn>
-      </S.AddBoardBox>
+        <S.AddBoardBox>
+          <S.AddBoardInput
+            placeholder="새 보드 추가"
+            value={newBoardName}
+            onChange={e => setNewBoardName(e.target.value)}
+          />
+          <S.AddBoardBtn onClick={handleAddBoard}>＋</S.AddBoardBtn>
+        </S.AddBoardBox>
 
-      <S.BottomBtn onClick={() => handleAddBlockToBoard(selectedBoardId, blockId)}>보드에 담기</S.BottomBtn>
-    </S.Wrapper>
+        <S.BottomBtn onClick={() => handleAddBlockToBoard(selectedBoardId, blockId)}>보드에 담기</S.BottomBtn>
+      </S.Wrapper>
+    </div>
   );
 }
