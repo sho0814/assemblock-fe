@@ -17,7 +17,7 @@ export const cardBackgrounds: Record<string, string> = {
   // 기술 타입 -> 디자인 기술파트
   '브랜드_디자인': '/assets/card/designBrand.svg',
   '아이콘_디자인': '/assets/card/designIcon.svg',
-  '인터렉션_및_모션_디자인': '/assets/card/designMotionInteraction.svg',
+  '인터랙션_및_모션_디자인': '/assets/card/designMotionInteraction.svg',
   'UXUI디자인': '/assets/card/designUIUX.svg',
   '비주얼_그래픽_디자인': '/assets/card/designVisualGraphic.svg',
 
