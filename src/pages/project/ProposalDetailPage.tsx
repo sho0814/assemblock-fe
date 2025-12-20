@@ -11,6 +11,7 @@ import {
 
 import AcceptButton from "@components/project/proposal/AcceptButton";
 import RejectButton from "@components/project/proposal/RejectButton";
+import { ProposalResponseModal } from "@components/project/proposal/ProposalModal";
 
 import { proposalApi } from "@api/proposal";
 import { getUserMe } from "@api/user";
@@ -49,6 +50,12 @@ const getMemberPartLabel = (
   return partMap[part] || "역할 미정";
 };
 
+interface ModalState {
+  isOpen: boolean;
+  type: "accept" | "reject" | "error";
+  message: string;
+}
+
 export function ProposalDetailPage() {
   const { proposalId } = useParams<{ proposalId: string }>();
   const proposalIdNum = Number(proposalId);
@@ -60,6 +67,12 @@ export function ProposalDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [modal, setModal] = useState<ModalState>({
+    isOpen: false,
+    type: "accept",
+    message: "",
+  });
 
   const isFromNotification = location.state?.from === "notification";
 
@@ -140,11 +153,18 @@ export function ProposalDetailPage() {
 
     try {
       await proposalApi.respondToProposal(proposalIdNum, "ACCEPTED");
-      alert("제안을 수락했습니다!");
-      navigate("/notification");
+      setModal({
+        isOpen: true,
+        type: "accept",
+        message: "제안을 수락했습니다!\n알림 페이지로 이동합니다.",
+      });
     } catch (err) {
       console.error("제안 수락 실패:", err);
-      alert("제안 수락에 실패했습니다. 다시 시도해주세요.");
+      setModal({
+        isOpen: true,
+        type: "error",
+        message: "제안 수락에 실패했습니다.\n다시 시도해주세요.",
+      });
     }
   };
 
@@ -153,11 +173,27 @@ export function ProposalDetailPage() {
 
     try {
       await proposalApi.respondToProposal(proposalIdNum, "REJECTED");
-      alert("제안을 거절했습니다.");
-      navigate("/notification");
+      setModal({
+        isOpen: true,
+        type: "reject",
+        message: "제안을 거절했습니다.\n알림 페이지로 이동합니다.",
+      });
     } catch (err) {
       console.error("제안 거절 실패:", err);
-      alert("제안 거절에 실패했습니다. 다시 시도해주세요.");
+      setModal({
+        isOpen: true,
+        type: "error",
+        message: "제안 거절에 실패했습니다.\n다시 시도해주세요.",
+      });
+    }
+  };
+
+  const handleModalConfirm = () => {
+    setModal({ ...modal, isOpen: false });
+
+    // 성공한 경우에만 알림 페이지로 이동
+    if (modal.type === "accept" || modal.type === "reject") {
+      navigate("/notification");
     }
   };
 
@@ -215,6 +251,14 @@ export function ProposalDetailPage() {
           </BottomActions>
         )}
       </Body>
+
+      {/* 모달 */}
+      <ProposalResponseModal
+        isOpen={modal.isOpen}
+        type={modal.type}
+        message={modal.message}
+        onConfirm={handleModalConfirm}
+      />
     </Page>
   );
 }
