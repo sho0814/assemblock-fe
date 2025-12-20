@@ -58,7 +58,9 @@ export const BlockSummary = styled.div`
   color: #726D72;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
 `;
 
 export const EmptyResultWrapper = styled.div`
