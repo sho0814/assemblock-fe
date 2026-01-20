@@ -1,10 +1,10 @@
 name: Sync Fork with Upstream
 
 on:
-  schedule:
+  # schedule:
     # 1시간마다 한 번씩 실행 (원하는 주기로 변경 가능)
     # 문법: 분 시 일 월 요일
-    - cron: '0 * * * *' 
+    # - cron: 
   workflow_dispatch: # 수동으로 버튼을 눌러서 실행할 수도 있게 함
 
 jobs:
